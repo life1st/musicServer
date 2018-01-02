@@ -1,22 +1,30 @@
 <template>
   <div id="app">
+    <m-header></m-header>
+    <tab></tab>
     <router-view/>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-};
+  import MHeader from '@/components/m-header/main';
+  import Tab from '@/components/tab/main';
+
+  export default {
+    name: 'app',
+    components: {
+      MHeader,
+      Tab,
+    },
+  };
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="less">
+  @import "common/css/reset.less";
+
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 </style>
