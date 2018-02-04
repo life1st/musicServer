@@ -1,30 +1,28 @@
 <template>
   <div id="app">
-    <m-header></m-header>
-    <tab></tab>
-    <router-view/>
+    <vMain></vMain>
   </div>
 </template>
 
 <script>
-  import MHeader from '@/components/m-header/main';
-  import Tab from '@/components/tab/main';
+  import vMain from '@/components/VMain';
 
   export default {
     name: 'app',
     components: {
-      MHeader,
-      Tab,
+      vMain,
     },
   };
 </script>
 
 <style lang="less">
-  @import "common/css/reset.less";
+  @import "common/css/reset";
+  @import "common/css/animation";
 
   #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #FAFAFA;
   }
 </style>
