@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node ./dist/app.js",
     "serve": "parcel ./app.ts",
-    "build": "esbuild app.ts --bundle --platform=node --target=node16 --external:./node_modules/* --outfile=./dist/app.js"
+    "build": "esbuild app.ts --bundle --platform=node --target=node16 --outfile=./dist/app.js"
   },
   "dependencies": {
     "koa": "^2.13.4",
