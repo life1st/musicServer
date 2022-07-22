@@ -6,6 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "start": "node ./dist/app.js",
     "serve": "parcel watch --no-hmr ./app.ts"
   },
   "dependencies": {
