@@ -1,4 +1,3 @@
-import fs from 'fs/promises'
 import Router from 'koa-router'
 import { library } from '../controller/library'
 
@@ -24,6 +23,7 @@ apiRoute
 })
 .get('/music/:id', async ctx => {
     const { id } = ctx.params
+    ctx.response.set('content-type', 'audio/mpeg')
     ctx.body = await library.getMusic(id)
 })
 

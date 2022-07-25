@@ -1,4 +1,5 @@
 import fs from 'fs/promises'
+import { createReadStream } from 'fs'
 import os from 'os'
 import path from 'path'
 import { env } from '../utils/env'
@@ -16,6 +17,7 @@ interface Music {
 
 class Library {
     isScanning = false
+    musics = {}
     
     async scan() {
         if (!this.isScanning) {
@@ -63,6 +65,7 @@ class Library {
         }
         
         fs.writeFile(path.join(CONFIG_DIR, `music_list0.json`), JSON.stringify(musics))
+        this.musics = musics
         return musics
     }
     
@@ -77,7 +80,10 @@ class Library {
     }
 
     async getMusic(id) {
-        return true
+        if (!this.musics[id]) {
+            this.musics = this.getMusicList()
+        }
+        return createReadStream(this.musics[id].path)
     }
 }
 const library = new Library()
