@@ -5,7 +5,7 @@ import { env } from '../utils/env'
 import { getFileId, isMusicFile, getMusicID3 } from '../utils/file'
 
 const HOME_DIR = os.homedir()
-const CONFIG_DIR = path.join(HOME_DIR, 'musicCenter/config')
+const CONFIG_DIR = env.isDev ? path.join(HOME_DIR, 'Documents/musicCenter/config') : path.resolve('/config')
 const MUSIC_DIR = env.isDev ? path.join(HOME_DIR, 'Documents/music') : path.resolve('/music')
 
 interface Music {
@@ -58,7 +58,7 @@ class Library {
             ])
             console.log('id, info: ', id, info)
             musics[id] = {
-                id, ...info
+                id, info, path: file
             }
         }
         
@@ -71,7 +71,7 @@ class Library {
             const config = await fs.readFile(path.join(CONFIG_DIR, `music_list0.json`))
             return JSON.parse(config)
         } catch (e) {
-            console.log(e)
+            console.log('handled:', e)
             return {}
         }
     }
