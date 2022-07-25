@@ -2,10 +2,10 @@ import fs from 'fs/promises'
 import os from 'os'
 import path from 'path'
 import { env } from '../utils/env'
-import { getFileId, isMusicFile } from '../utils/file'
+import { getFileId, isMusicFile, getMusicID3 } from '../utils/file'
 
-const CONFIG_DIR = path.resolve('~/musicCenter/config')
 const HOME_DIR = os.homedir()
+const CONFIG_DIR = path.join(HOME_DIR, 'musicCenter/config')
 const MUSIC_DIR = env.isDev ? path.join(HOME_DIR, 'Documents/music') : path.resolve('/music')
 
 interface Music {
@@ -30,8 +30,11 @@ class Library {
                     console.log(names)
                     for (const name of names) {
                         const fullPath = path.join(folder, name)
-                        const stat = await fs.stat(fullPath)
-                        if (name.includes('.mp3')){
+                        const [isMusic, stat] = await Promise.all([
+                            isMusicFile(fullPath),
+                            fs.stat(fullPath)
+                        ])
+                        if (isMusic){
                             musicList.push(fullPath);
                         } else if (stat.isDirectory()) {
                             tmpFolders.push(fullPath)
@@ -45,12 +48,32 @@ class Library {
         }
     }
 
-    updateMusicList(musicList: [string]) {
-        console.log('update', musicList)
+    async updateMusicList(musicList: [string]) {
+        let musics = await this.getMusicList()
+        
+        for (const file of musicList) {
+            const [id, info] = await Promise.all([
+                getFileId(file),
+                getMusicID3(file)
+            ])
+            console.log('id, info: ', id, info)
+            musics[id] = {
+                id, ...info
+            }
+        }
+        
+        fs.writeFile(path.join(CONFIG_DIR, `music_list0.json`), JSON.stringify(musics))
+        return musics
     }
-    async getMusicList(pageNum) {
-        const config = fs.readFile(path.join(CONFIG_DIR, `music_list/${pageNum}.json`))
-        return config
+    
+    async getMusicList(pageNum = 0) {
+        try {
+            const config = await fs.readFile(path.join(CONFIG_DIR, `music_list0.json`))
+            return JSON.parse(config)
+        } catch (e) {
+            console.log(e)
+            return {}
+        }
     }
 
     async getMusic(id) {
