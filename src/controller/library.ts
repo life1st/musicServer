@@ -47,6 +47,7 @@ class Library {
             }
             await this.updateMusicList(musicList)
             this.isScanning = false
+            console.log('scan finish.')
         }
     }
 
@@ -59,8 +60,14 @@ class Library {
                 getMusicID3(file)
             ])
             console.log('id, info: ', id, info)
+            const {
+                title, artist, album, genre, trackNumber, unsynchronisedLyrics, 
+            } = info
             musics[id] = {
-                id, info, path: file
+                id, path: file,
+                info: {
+                    title, artist, album, genre, trackNumber, unsynchronisedLyrics, 
+                }
             }
         }
         
@@ -81,7 +88,7 @@ class Library {
 
     async getMusic(id) {
         if (!this.musics[id]) {
-            this.musics = this.getMusicList()
+            this.musics = await this.getMusicList()
         }
         return createReadStream(this.musics[id].path)
     }

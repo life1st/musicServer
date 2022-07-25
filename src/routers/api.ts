@@ -7,7 +7,7 @@ apiRoute
 .get('/', async ctx => {
     ctx.body = 'hello from api handler.'
 })
-.get('/scan', async ctx => {
+.post('/scan', async ctx => {
     try {
         library.scan()
         ctx.body = { isScan: true }

@@ -8,11 +8,15 @@
     "start": "node ./dist/app.js",
     "dev": "development=true yarn start",
     "watch": "yarn build --watch",
-    "build": "esbuild app.ts --bundle --platform=node --target=node16 --outfile=./dist/app.js"
+    "build": "esbuild app.ts --bundle --platform=node --target=node16 --outfile=./dist/app.js",
+    "fe": "parcel ./src/static/index.html",
+    "build-fe": "parcel build ./src/static/index.html"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "koa": "^2.13.4",
     "koa-router": "^12.0.0",
+    "koa-static": "^5.0.0",
     "md5": "^2.3.0",
     "node-id3": "^0.2.3",
     "react": "^18.2.0",
@@ -25,6 +29,7 @@
     "crypto-browserify": "^3.12.0",
     "esbuild": "^0.14.49",
     "events": "^3.3.0",
+    "parcel": "^2.6.2",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
