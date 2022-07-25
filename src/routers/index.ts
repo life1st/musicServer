@@ -4,6 +4,6 @@ import { apiRoute  } from './api'
 const route = new Router()
 
 route
-.get('/api', apiRoute.routers(), apiRoute.allowedMethods())
+.use('/api', apiRoute.routes(), apiRoute.allowedMethods())
 
 export { route }
