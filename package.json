@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./dist/app.js",
-    "dev": "yarn start --development=true",
+    "dev": "development=true yarn start",
     "watch": "yarn build --watch",
     "build": "esbuild app.ts --bundle --platform=node --target=node16 --outfile=./dist/app.js"
   },

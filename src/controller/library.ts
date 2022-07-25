@@ -1,10 +1,12 @@
 import fs from 'fs/promises'
+import os from 'os'
 import path from 'path'
 import { env } from '../utils/env'
 import { getFileId, isMusicFile } from '../utils/file'
 
-const CONFIG_FOLDER = path.resolve('~/musicCenter/config')
-const MUSIC_FOLDER = env.isDev ? path.resolve('~/Document/music') : path.resolve('/music')
+const CONFIG_DIR = path.resolve('~/musicCenter/config')
+const HOME_DIR = os.homedir()
+const MUSIC_DIR = env.isDev ? path.join(HOME_DIR, 'Documents/music') : path.resolve('/music')
 
 interface Music {
     title: string;
@@ -16,9 +18,10 @@ class Library {
     isScanning = false
     
     async scan() {
+        console.log(process.env.development)
         if (!this.isScanning) {
             this.isScanning = true      
-            let folderStack = [MUSIC_FOLDER]
+            let folderStack = [MUSIC_DIR]
             console.log(folderStack)
             const musicList = []
             while(folderStack.length > 0) {
@@ -45,7 +48,7 @@ class Library {
         
     }
     async getMusicList(pageNum) {
-        const config = fs.readFile(path.join(CONFIG_FOLDER, `music_list/${pageNum}.json`))
+        const config = fs.readFile(path.join(CONFIG_DIR, `music_list/${pageNum}.json`))
         return config
     }
 

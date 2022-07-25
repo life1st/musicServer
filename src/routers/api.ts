@@ -18,12 +18,12 @@ apiRoute
     }
 })
 .get('/music_list/:pageNum', async ctx => {
-    const { pageNum } = ctx.request.param
+    const { pageNum } = ctx.params
 
     ctx.body = await library.getMusicList(pageNum)
 })
 .get('/music/:id', async ctx => {
-    const { id } = ctx.request.param
+    const { id } = ctx.params
     ctx.body = await library.getMusic(id)
 })
 
