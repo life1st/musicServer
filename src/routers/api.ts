@@ -23,8 +23,11 @@ apiRoute
 })
 .get('/music/:id', async ctx => {
     const { id } = ctx.params
-    ctx.response.set('content-type', 'audio/mpeg')
-    ctx.body = await library.getMusic(id)
+    const {stream, size} = await library.getMusic(id)
+    ctx.set('content-type', 'audio/mpeg')
+    ctx.set('Accept-Ranges', 'bytes')
+    ctx.set('Content-Length', size)
+    ctx.body = stream
 })
 
 export { apiRoute }

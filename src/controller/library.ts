@@ -90,7 +90,7 @@ class Library {
         if (!this.musics[id]) {
             this.musics = await this.getMusicList()
         }
-        return createReadStream(this.musics[id].path)
+        return { stream: createReadStream(this.musics[id].path), size: (await fs.stat(this.musics[id].path)).size }
     }
 }
 const library = new Library()
