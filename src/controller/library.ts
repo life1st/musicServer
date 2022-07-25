@@ -18,22 +18,23 @@ class Library {
     isScanning = false
     
     async scan() {
-        console.log(process.env.development)
         if (!this.isScanning) {
             this.isScanning = true      
             let folderStack = [MUSIC_DIR]
-            console.log(folderStack)
-            const musicList = []
+            const musicList: [string] = []
             while(folderStack.length > 0) {
-                const tmpFolders = []
+                const tmpFolders: [string] = []
+                console.log(folderStack)
                 for (const folder of folderStack) {
-                    const fsDirent = await fs.readdir(folder)
-                    console.log(fsDirent)
-                    for (const f of fsDirent) {
-                        if (f.isDirectory()) {
-                            tmpFolders.push(f)
-                        } else {
-                            musicList.push(f)
+                    const names = await fs.readdir(folder)
+                    console.log(names)
+                    for (const name of names) {
+                        const fullPath = path.join(folder, name)
+                        const stat = await fs.stat(fullPath)
+                        if (name.includes('.mp3')){
+                            musicList.push(fullPath);
+                        } else if (stat.isDirectory()) {
+                            tmpFolders.push(fullPath)
                         }
                     }
                 }
@@ -44,8 +45,8 @@ class Library {
         }
     }
 
-    updateMusicList(musicList: [Music] | []) {
-        
+    updateMusicList(musicList: [string]) {
+        console.log('update', musicList)
     }
     async getMusicList(pageNum) {
         const config = fs.readFile(path.join(CONFIG_DIR, `music_list/${pageNum}.json`))
