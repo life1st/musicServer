@@ -27,8 +27,8 @@ export const Player = (props: IPlayer) => {
         }
     }, [])
 
-    const handleEdit = () => {
-        setEditing(true)
+    const handleEditToggle = () => {
+        setEditing(!isEditing)
     }
     const handleUpdated = (isSuccess) => {
         setEditing(false)
@@ -37,9 +37,8 @@ export const Player = (props: IPlayer) => {
     return (
         <div>
             <audio controls src={`/api/music/${id}`} ref={ref} />
-            <p>{music.title}</p>
-            <p>{music.artist}</p>
-            <button onClick={handleEdit}>Edit</button>
+            <p>{music.title} - {music.artist}</p>
+            <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
             { isEditing ? (
                 <TagEditer id={id} {...{album, artist, title}} onFinish={handleUpdated} />
             ) : null}

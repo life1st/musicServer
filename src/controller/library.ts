@@ -6,6 +6,13 @@ import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/fi
 import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
 
+const excludeProps = (obj, excludes: string[]) => Object.keys(obj).reduce((acc, k) => {
+    if (!excludes.includes(k)) {
+        acc[k] = obj[k]
+    }
+    return acc;
+}, {})
+
 class Library {
     isScanning = false
     musics = {}
@@ -72,7 +79,7 @@ class Library {
     }
 
     async getMusicList(pageNum) {
-        return libraryModel.getMusicList(pageNum)
+        return (await libraryModel.getMusicList(pageNum)).map(item => excludeProps(item, ['path', '_id']))
     }
     
     async getMusic(id) {

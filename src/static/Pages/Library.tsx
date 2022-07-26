@@ -10,14 +10,15 @@ export const Library = (props: ILibrary) => {
     
     const handleItemClick = (item) => {
         onItemClick && onItemClick(item)
-}
+    }
+
 return (
-        <ul>
-            {
-                list.map(item => (
-                    <li onClick={() => {handleItemClick(item)}}>{item.title}</li>
-                ))
-            }
-        </ul>
+    <ul>
+        {
+            list.map(item => (
+                <li onClick={() => {handleItemClick(item)}}>{item.title}</li>
+            ))
+        }
+    </ul>
     )
 }

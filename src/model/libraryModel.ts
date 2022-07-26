@@ -50,9 +50,9 @@ class LibraryModel {
         })
     }
 
-    async getMusicList(page = 0, limit = 10) {
+    async getMusicList(page = 0, limit = 10): Promise<Music[]> {
         return new Promise((r, j) => {
-            this.db.find({}).skip(page).limit(limit).exec((e, data) => {
+            this.db.find({}).skip(page * limit).limit(limit).exec((e, data) => {
                 if (e) {
                     j(e)
                     return
