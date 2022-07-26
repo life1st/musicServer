@@ -1,19 +1,9 @@
 import fs from 'fs/promises'
 import { createReadStream } from 'fs'
-import os from 'os'
 import path from 'path'
-import { env } from '../utils/env'
+import { CONFIG_DIR, MUSIC_DIR } from '../utils/path'
 import { getFileId, isMusicFile, getMusicID3 } from '../utils/file'
-
-const HOME_DIR = os.homedir()
-const CONFIG_DIR = env.isDev ? path.join(HOME_DIR, 'Documents/musicCenter/config') : path.resolve('/config')
-const MUSIC_DIR = env.isDev ? path.join(HOME_DIR, 'Documents/music') : path.resolve('/music')
-
-interface Music {
-    title: string;
-    artist: string;
-    year: string;
-}
+import { libraryModel, Music } from '../model/libraryModel'
 
 class Library {
     isScanning = false
@@ -23,9 +13,8 @@ class Library {
         if (!this.isScanning) {
             this.isScanning = true      
             let folderStack = [MUSIC_DIR]
-            const musicList: [string] = []
             while(folderStack.length > 0) {
-                const tmpFolders: [string] = []
+                const tmpFolders: string[] = []
                 console.log(folderStack)
                 for (const folder of folderStack) {
                     const names = await fs.readdir(folder)
@@ -37,7 +26,13 @@ class Library {
                             fs.stat(fullPath)
                         ])
                         if (isMusic){
-                            musicList.push(fullPath);
+                            try {
+                                const music = await this.getMusicData(fullPath)
+                                await libraryModel.updateMusicList(music)
+                            } catch (e) {
+                                console.log('scan music error', fullPath)
+                            }
+                        
                         } else if (stat.isDirectory()) {
                             tmpFolders.push(fullPath)
                         }
@@ -45,52 +40,42 @@ class Library {
                 }
                 folderStack = tmpFolders
             }
-            await this.updateMusicList(musicList)
             this.isScanning = false
             console.log('scan finish.')
         }
     }
 
-    async updateMusicList(musicList: [string]) {
-        let musics = await this.getMusicList()
-        
-        for (const file of musicList) {
-            const [id, info] = await Promise.all([
-                getFileId(file),
-                getMusicID3(file)
-            ])
-            console.log('id, info: ', id, info)
-            const {
-                title, artist, album, genre, trackNumber, unsynchronisedLyrics, 
-            } = info
-            musics[id] = {
-                id, path: file,
-                info: {
-                    title, artist, album, genre, trackNumber, unsynchronisedLyrics, 
-                }
+    async getMusicData(musicPath: string): Promise<Music> {
+
+        const buf = await fs.readFile(musicPath)
+        const stat = await fs.stat(musicPath)
+
+        const [id, info] = await Promise.all([
+            getFileId(buf),
+            getMusicID3(buf)
+        ])
+        console.log('id, info: ', id, info, musicPath)
+
+        const {
+            title = path.basename(musicPath), artist = '', album = '', genre = '',
+            trackNumber, unsynchronisedLyrics, 
+        } = info
+        return {
+            id, path: musicPath,
+            title, artist, album, genre,
+            size: stat.size,
+            extraInfo: {
+                trackNumber, unsynchronisedLyrics, 
             }
         }
-        
-        fs.writeFile(path.join(CONFIG_DIR, `music_list0.json`), JSON.stringify(musics))
-        this.musics = musics
-        return musics
     }
     
-    async getMusicList(pageNum = 0) {
-        try {
-            const config = await fs.readFile(path.join(CONFIG_DIR, `music_list0.json`))
-            return JSON.parse(config)
-        } catch (e) {
-            console.log('handled:', e)
-            return {}
-        }
-    }
-
     async getMusic(id) {
-        if (!this.musics[id]) {
-            this.musics = await this.getMusicList()
+        const music = await libraryModel.getMusic(id)
+        return { 
+            stream: createReadStream(music.path), 
+            size: music.size
         }
-        return { stream: createReadStream(this.musics[id].path), size: (await fs.stat(this.musics[id].path)).size }
     }
 }
 const library = new Library()

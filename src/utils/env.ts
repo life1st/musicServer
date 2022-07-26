@@ -1,3 +1,3 @@
 export const env = {
-    isDev: process.env.development
+    isDev: process.env.development,
 }
