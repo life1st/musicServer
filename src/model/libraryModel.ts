@@ -2,17 +2,7 @@ import path from 'path'
 import Nedb from 'nedb'
 import { DB_DIR } from '../utils/path'
 import { getDir, genFile } from '../utils/file'
-
-export interface Music {
-    id: string;
-    path: string;
-    title: string;
-    artist: string;
-    album: string;
-    genre: string;
-    size: string;
-    extraInfo: {};
-}
+import { Music } from '../types/Music'
 
 class LibraryModel {
     private dbFile = path.resolve(DB_DIR, 'libraryModel')
@@ -21,6 +11,18 @@ class LibraryModel {
         getDir(DB_DIR)
         this.db = new Nedb({ filename: this.dbFile })
         this.db.loadDatabase()
+    }
+
+    async updateMusic(music: Music) {
+        return new Promise((r, j) => {
+            this.db.update({id: music.id}, music, {}, (e, data) => {
+                if (e) {
+                    j(e)
+                    return
+                }
+                r(data)
+            })
+        })
     }
 
     async updateMusicList(music: Music) {

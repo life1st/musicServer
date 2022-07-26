@@ -40,3 +40,7 @@ export const getMusicID3 = async (fileBuf) => {
         return {}
     }
 }
+
+export const updateMusicID3 = async (path, tags) => {
+    return ID3.update(tags, path)
+}

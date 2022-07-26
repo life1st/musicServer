@@ -7,4 +7,4 @@ RUN yarn && yarn build && yarn build-fe
 
 EXPOSE 3000
 
-CMD [ "yarn", "start" ]
+CMD [ "yarn", "prod" ]

@@ -16,6 +16,12 @@ apiRoute
         ctx.body = { isScan: false, e }
     }
 })
+.post('/music_meta/:id', async ctx => {
+    const { id } = ctx.params
+    const { body } = ctx.request
+    const isSuccess = await library.updateMeta(id, body)
+    ctx.body = { isSuccess }
+})
 .get('/music_list/:pageNum', async ctx => {
     const { pageNum } = ctx.params
 

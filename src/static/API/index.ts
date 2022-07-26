@@ -11,3 +11,9 @@ export const scanLibrary = () => {
 
     return axios.post(url)
 }
+
+export const updateMeta = (id, tags) => {
+    const url = '/api/music_meta/' + id
+
+    return axios.post(url, tags)
+}

@@ -1,9 +1,10 @@
 import fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import path from 'path'
-import { CONFIG_DIR, MUSIC_DIR } from '../utils/path'
-import { getFileId, isMusicFile, getMusicID3 } from '../utils/file'
-import { libraryModel, Music } from '../model/libraryModel'
+import { MUSIC_DIR } from '../utils/path'
+import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/file'
+import { libraryModel } from '../model/libraryModel'
+import { Music } from '../types/Music'
 
 class Library {
     isScanning = false
@@ -80,6 +81,31 @@ class Library {
             stream: createReadStream(music?.path), 
             size: music?.size
         }
+    }
+
+    async updateMeta(id, info) {
+        const {
+            title, artist, album, 
+        } = info
+        let tags = {
+            title, artist, album
+        }
+        tags = Object.keys(tags).reduce((acc, k) => {
+            if (tags[k]) {
+                acc[k] = tags[k]
+            }
+            return acc
+        }, {})
+        const music = await libraryModel.getMusic(id)
+        if (music.path) {
+            const isSuccess = await updateMusicID3(music.path, tags)
+            if (isSuccess) {
+                const musicMeta = await this.getMusicData(music.path)
+                return libraryModel.updateMusic(musicMeta)
+            }
+        }
+
+        return false
     }
 }
 const library = new Library()
