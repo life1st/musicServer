@@ -1,28 +1,33 @@
 import React, { useRef, useEffect } from 'react'
 
+interface IMusic {
+    id: string;
+    title: string;
+    artist: string;
+}
 interface IPlayer {
-    src: string;
+    music: IMusic;
     onPlayEnd: () => void;
 }
 export const Player = (props: IPlayer) => {
-    const { src, onPlayEnd } = props;
+    const { music, onPlayEnd } = props;
     const ref = useRef()
     useEffect(() => {
         setTimeout(() => {
-            ref.current && ref.current.play()
+            ref.current?.play()
         })
-    }, [src])
+    }, [music])
     useEffect(() => {
-        if (ref.current) {
-            ref.current.addEventListener('ended', onPlayEnd)
-        }
+        ref.current?.addEventListener('ended', onPlayEnd)
         return () => {
-            if (ref.current) {
-                ref.current.removeEventListener('ended', onPlayEnd)
-            }
+            ref.current?.removeEventListener('ended', onPlayEnd)
         }
     }, [])
     return (
-        <audio controls src={src} ref={ref} />
+        <div>
+            <audio controls src={`/api/music/${music.id}`} ref={ref} />
+            <p>{music.title}</p>
+            <p>{music.artist}</p>
+        </div>
     )
 }

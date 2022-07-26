@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { render } from 'react-dom'
 
 import { Library } from './Pages/Library'
@@ -6,18 +6,20 @@ import { Player } from './Components/Player'
 import { scanLibrary, getLibrary } from './API'
 
 const App = () => {
-    const [ audioId, setID ] = useState('')
-    const [list, setList] = useState([])
+    const [ music, setMusic ] = useState(null)
+    const [ list, setList ] = useState([])
 
     const handleItemClick = (item) => {
-        setID(item.id)
+        setMusic(item)
     }
     const handleScan = () => {
         scanLibrary()
     }
     const handlePlayEnd = () => {
-        const curIndex = list.findIndex(item => item.id === audioId)
-        setID(list[curIndex + 1].id)
+        const curIndex = list.findIndex(item => item.id === music.id)
+        if (curIndex + 1 < list.length) {
+            setMusic(list[curIndex + 1])
+        }
     }
     useEffect(() => {
         getLibrary(0).then(resp => {
@@ -31,7 +33,7 @@ const App = () => {
         <div >
             <button onClick={handleScan}>Scan</button>
             <Library onItemClick={handleItemClick} list={list} />
-            {audioId ? <Player src={`/api/music/${audioId}`} onPlayEnd={handlePlayEnd} /> : null}
+            {music ? <Player music={music} onPlayEnd={handlePlayEnd} /> : null}
         </div>
     )
     
