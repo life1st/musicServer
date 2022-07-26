@@ -23,11 +23,7 @@ const App = () => {
         getLibrary(0).then(resp => {
             const { status, data } = resp
             if (status === 200) {
-                setList(Object.keys(data).map(k => ({
-                    title: data[k].info.title,
-                    path: data[k].path,
-                    id: k
-                })))
+                setList(data)
             }
         })
     }, [])

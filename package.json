@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./dist/app.js",
-    "dev": "development=true yarn start",
+    "prod": "prod=true yarn start",
     "watch": "yarn build --watch",
-    "build": "esbuild app.ts --bundle --platform=node --target=node16 --outfile=./dist/app.js",
+    "build": "esbuild app.ts --bundle --platform=node --target=node18 --outfile=./dist/app.js",
     "fe": "parcel ./src/static/index.html",
     "build-fe": "parcel build ./src/static/index.html"
   },

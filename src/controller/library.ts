@@ -30,7 +30,7 @@ class Library {
                                 const music = await this.getMusicData(fullPath)
                                 await libraryModel.updateMusicList(music)
                             } catch (e) {
-                                console.log('scan music error', fullPath)
+                                console.log('scan music error', fullPath, e)
                             }
                         
                         } else if (stat.isDirectory()) {
@@ -69,12 +69,16 @@ class Library {
             }
         }
     }
+
+    async getMusicList(pageNum) {
+        return libraryModel.getMusicList(pageNum)
+    }
     
     async getMusic(id) {
         const music = await libraryModel.getMusic(id)
         return { 
-            stream: createReadStream(music.path), 
-            size: music.size
+            stream: createReadStream(music?.path), 
+            size: music?.size
         }
     }
 }
