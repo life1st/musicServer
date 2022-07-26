@@ -10,18 +10,29 @@ const App = () => {
     const [ music, setMusic ] = useState(null)
     const [ list, setList ] = useState([])
     const [ curPage, setCurPage ] = useState(0)
+    const [ curIndex, setCurIndex ] = useState(null)
     const loadedPages = useRef([])
 
-    const handleItemClick = (item) => {
+    const handleItemClick = (item, i) => {
+        setCurIndex(i)
         setMusic(item)
     }
     const handleScan = () => {
         scanLibrary()
     }
-    const handlePlayEnd = () => {
-        const curIndex = list.findIndex(item => item.id === music.id)
-        if (curIndex + 1 < list.length) {
-            setMusic(list[curIndex + 1])
+
+    const handlePlayPrev = () => {
+        const nextIndex = curIndex - 1
+        if (nextIndex >= 0) {
+            setMusic(list[nextIndex])
+            setCurIndex(nextIndex)
+        }
+    }
+    const handlePlayNext = () => {
+        const nextIndex = curIndex + 1
+        if (nextIndex < list.length) {
+            setMusic(list[nextIndex])
+            setCurIndex(nextIndex)
         }
     }
     useEffect(() => {
@@ -44,7 +55,14 @@ const App = () => {
                 curPage={curPage}
                 onLoadmore={() => setCurPage(curPage + 1)}
             />
-            {music ? <Player music={music} onPlayEnd={handlePlayEnd} /> : null}
+            {music ? (
+                <Player
+                    music={music}
+                    onPrevSong={handlePlayPrev}
+                    onNextSong={handlePlayNext}
+                    onPlayEnd={handlePlayNext}
+                />
+            ) : null}
         </div>
     )
 }

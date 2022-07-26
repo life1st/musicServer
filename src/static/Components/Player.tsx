@@ -10,9 +10,11 @@ interface IMusic {
 interface IPlayer {
     music: IMusic;
     onPlayEnd: () => void;
+    onPrevSong: () => void;
+    onNextSong: () => void;
 }
 export const Player = (props: IPlayer) => {
-    const { music, onPlayEnd } = props;
+    const { music, onPlayEnd, onPrevSong, onNextSong } = props;
     const { id, album, artist, title } = music || {};
     const [ isEditing, setEditing ] = useState(false)
     const ref = useRef()
@@ -38,6 +40,10 @@ export const Player = (props: IPlayer) => {
         <div>
             <audio controls src={`/api/music/${id}`} ref={ref} />
             <p>{music.title} - {music.artist}</p>
+            <div>
+                <button onClick={onPrevSong}>Prev</button>
+                <button onClick={onNextSong}>Next</button>
+            </div>
             <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
             { isEditing ? (
                 <TagEditer id={id} {...{album, artist, title}} onFinish={handleUpdated} />
