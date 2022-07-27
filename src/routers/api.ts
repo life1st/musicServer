@@ -9,8 +9,8 @@ apiRoute
 })
 .post('/scan', async ctx => {
     try {
-        library.scan()
-        ctx.body = { isScan: true }
+        const [scanning, finish] = await library.scan()
+        ctx.body = { isScan: true, waiting: scanning, finish }
     } catch (e) {
         ctx.status = 500
         ctx.body = { isScan: false, e }

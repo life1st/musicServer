@@ -71,7 +71,7 @@ export const Player = (props: IPlayer) => {
             </div>
             <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
             { isEditing ? (
-                <TagEditer id={id} album artist title onFinish={handleUpdated} />
+                <TagEditer id={id} {...{album, artist, title}} onFinish={handleUpdated} />
             ) : null}
         </div>
     )

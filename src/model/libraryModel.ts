@@ -2,6 +2,7 @@ import path from 'path'
 import Nedb from 'nedb'
 import { DB_DIR } from '../utils/path'
 import { getDir, genFile } from '../utils/file'
+import { genMusicKeyword } from '../utils/music'
 import { Music } from '../types/Music'
 
 const promiseResp = (resolve, reject, e, data) => {
@@ -21,30 +22,28 @@ class LibraryModel {
         this.db.loadDatabase()
     }
 
-    async updateMusic(music: Music): Promise<number> {
-        return new Promise((r, j) => {
-            this.db.update({id: music.id}, music, {}, (e, data) => {
-                promiseResp(r, j, e, data)
-            })
-        })
-    }
-
-    async updateMusicList(music: Music) {
-        console.log('library model -> update musicList: ', music)
+    async updateMusic(music: Music, prevId?: string): Promise<boolean> {
+        music.keyword = genMusicKeyword(music)
+        const id = prevId || music.id
         const hasExist: boolean = await new Promise((r, j) => {
-            this.db.findOne({id: music.id}, (e, data) => {
+            this.db.findOne({id}, (e, data) => {
                 promiseResp(r, j, e, data)
             })
         })
         let hasUpdate = false
         if (hasExist) {
-            hasUpdate = (await this.updateMusic(music)) > 0
-        }
-        hasUpdate = await new Promise((r, j) => {
-            this.db.insert(music, (e) => {
-                promiseResp(r, j, e, true)
+            hasUpdate = await new Promise((r, j) => {
+                this.db.update({id}, music, {}, (e, data) => {
+                    promiseResp(r, j, e, data)
+                })
             })
-        })
+        } else {
+            hasUpdate =  await new Promise((r, j) => {
+                this.db.insert(music, (e) => {
+                    promiseResp(r, j, e, true)
+                })
+            })
+        }
         return hasUpdate
     }
 

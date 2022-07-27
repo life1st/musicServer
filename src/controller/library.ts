@@ -2,7 +2,6 @@ import fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import path from 'path'
 import { MUSIC_DIR } from '../utils/path'
-import { genMusicKeyword } from '../utils/music'
 import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/file'
 import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
@@ -16,11 +15,13 @@ const excludeProps = (obj, excludes: string[]) => Object.keys(obj).reduce((acc, 
 
 class Library {
     isScanning = false
-    musics = {}
-    
-    async scan() {
-        if (!this.isScanning) {
-            this.isScanning = true      
+    scanningQueue: Music[] = []
+    finishQueue: Music[] = []
+
+    async scan(): Promise<[scanning: Music[], finish: Music[]]> {
+        const scanLibrary = async () => {
+            this.finishQueue = []
+            this.isScanning = true
             let folderStack = [MUSIC_DIR]
             while(folderStack.length > 0) {
                 const tmpFolders: string[] = []
@@ -37,8 +38,10 @@ class Library {
                         if (isMusic){
                             try {
                                 const music = await this.getMusicData(fullPath)
-                                music.keyword = genMusicKeyword(music)
-                                await libraryModel.updateMusicList(music)
+                                this.scanningQueue.push(music)
+                                await libraryModel.updateMusic(music)
+                                this.scanningQueue = this.scanningQueue.filter(m => m.id !== music.id)
+                                this.finishQueue.push(music)
                             } catch (e) {
                                 console.log('scan music error', fullPath, e)
                             }
@@ -52,6 +55,10 @@ class Library {
             this.isScanning = false
             console.log('scan finish.')
         }
+        if (!this.isScanning) {
+            scanLibrary()
+        }
+        return [this.scanningQueue, this.finishQueue]
     }
 
     async getMusicData(musicPath: string): Promise<Music> {
@@ -81,7 +88,7 @@ class Library {
         }
     }
 
-    async getMusicList(pageNum) {
+    async getMusicList(pageNum): Promise<Music[]> {
         const music = await libraryModel.getMusicList(pageNum)
         return music.map(item => excludeProps(item, ['path', '_id']))
     }
@@ -115,7 +122,7 @@ class Library {
             isSuccess = await updateMusicID3(music.path, tags)
             if (isSuccess) {
                 const musicMeta = await this.getMusicData(music.path)
-                return libraryModel.updateMusic(musicMeta)
+                return libraryModel.updateMusic(musicMeta, id)
             }
         }
         return isSuccess
