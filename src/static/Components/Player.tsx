@@ -63,6 +63,7 @@ export const Player = (props: IPlayer) => {
         <div>
             <audio controls src={`/api/music/${id}`} ref={ref} />
             <p>{music.title} - {music.artist}</p>
+            <p>{music.album}</p>
             <div>
                 <button onClick={onPrevSong}>Prev</button>
                 <button onClick={onNextSong}>Next</button>
