@@ -27,9 +27,15 @@ apiRoute
 
     ctx.body = await library.getMusicList(pageNum)
 })
+.get('/search_music', async ctx => {
+    const { query } = ctx.request
+    const { q } = query
+    ctx.body = await library.searchMusic(q)
+})
 .get('/music/:id', async ctx => {
     const { id } = ctx.params
-    const {stream, size} = await library.getMusic(id)
+    const { music, stream, size} = await library.getMusic(id)
+    console.log('resp music file', music)
     ctx.set('content-type', 'audio/mpeg')
     ctx.set('Accept-Ranges', 'bytes')
     ctx.set('Content-Length', size)

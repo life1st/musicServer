@@ -41,6 +41,6 @@ export const getMusicID3 = async (fileBuf) => {
     }
 }
 
-export const updateMusicID3 = async (path, tags) => {
-    return ID3.update(tags, path)
+export const updateMusicID3 = async (path, tags): Promise<boolean> => {
+    return Boolean(ID3.update(tags, path))
 }

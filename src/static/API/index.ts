@@ -17,3 +17,9 @@ export const updateMeta = (id, tags) => {
 
     return axios.post(url, tags)
 }
+
+export const searchMusic = (t: string) => {
+    const url = `/api/search_music?q=` + t
+
+    return axios.get(url)
+}

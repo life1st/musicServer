@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./dist/app.js",
-    "prod": "prod=true yarn start",
+    "prod": "NODE_ENV=production yarn start",
     "watch": "yarn build --watch",
     "build": "esbuild app.ts --bundle --platform=node --target=node18 --outfile=./dist/app.js",
     "fe": "parcel ./src/static/index.html",
@@ -25,6 +25,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/node": "^18.6.1",
     "@parcel/transformer-less": "2.6.2",
     "assert": "^2.0.0",
     "browserify-zlib": "^0.2.0",

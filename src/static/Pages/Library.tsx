@@ -1,9 +1,10 @@
 import React from 'react'
 import style from './Library.module.less'
+import { Music } from '../../types/Music'
 
 interface ILibrary {
     onItemClick: (any, number) => void;
-    list: [];
+    list: Music[];
 }
 export const Library = (props: ILibrary) => {
     const { onItemClick, list } = props
@@ -13,12 +14,10 @@ export const Library = (props: ILibrary) => {
     }
 
     return (
-        <ul class={style.libraryContainer}>
-            {
-                list.map((item, i) => (
-                    <li onClick={() => {handleItemClick(item, i)}}>{item.title}</li>
-                ))
-            }
+        <ul className={style.libraryContainer}>
+            { list.map((item, i) => (
+                <li key={item.id} onClick={() => {handleItemClick(item, i)}}>{item.title}</li>
+            )) }
         </ul>
     )
 }

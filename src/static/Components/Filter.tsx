@@ -17,9 +17,7 @@ export const Filter = (props) => {
 
     return (
         <ul>
-
-            <li>
-            </li>
+            
         </ul>
     )
 }

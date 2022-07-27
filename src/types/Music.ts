@@ -5,6 +5,6 @@ export interface Music {
     artist: string;
     album: string;
     genre: string;
-    size: string;
+    size: string | number;
     extraInfo: {};
 }

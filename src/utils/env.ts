@@ -1,3 +1,3 @@
 export const env = {
-    isDev: !process.env.prod,
+    isDev: process.env.NODE_ENV !== 'production',
 }

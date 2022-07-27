@@ -1,10 +1,9 @@
 FROM node:18
 
-WORKDIR /usr/src/app
+WORKDIR /usr/app
 COPY . .
 
-RUN yarn && yarn build && yarn build-fe
-RUN rm -r ./node_modules
+RUN yarn && yarn build && yarn build-fe && rm -r ./node_modules
 
 EXPOSE 3000
 

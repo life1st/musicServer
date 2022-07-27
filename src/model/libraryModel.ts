@@ -61,6 +61,20 @@ class LibraryModel {
             })
         })
     }
+
+    async getMusicBy(query): Promise<Music[]> {
+        const LIMIT = 10
+        const { title } = query
+        return new Promise((r, j) => {
+            this.db.find({title}).limit(LIMIT).exec((e, data) => {
+                if (e) {
+                    j(e)
+                    return
+                }
+                r(data)
+            })
+        })
+    }
 }
 
 const libraryModel = new LibraryModel()

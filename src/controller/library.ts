@@ -40,7 +40,6 @@ class Library {
                             } catch (e) {
                                 console.log('scan music error', fullPath, e)
                             }
-                        
                         } else if (stat.isDirectory()) {
                             tmpFolders.push(fullPath)
                         }
@@ -55,8 +54,10 @@ class Library {
 
     async getMusicData(musicPath: string): Promise<Music> {
 
-        const buf = await fs.readFile(musicPath)
-        const stat = await fs.stat(musicPath)
+        const [ buf, stat ] = await Promise.all([
+            fs.readFile(musicPath),
+            fs.stat(musicPath)
+        ])
 
         const [id, info] = await Promise.all([
             getFileId(buf),
@@ -65,12 +66,12 @@ class Library {
         console.log('id, info: ', id, info, musicPath)
 
         const {
-            title = path.basename(musicPath), artist = '', album = '', genre = '',
+            title, artist = '', album = '', genre = '',
             trackNumber, unsynchronisedLyrics, 
         } = info
         return {
             id, path: musicPath,
-            title, artist, album, genre,
+            title: title || path.basename(musicPath), artist, album, genre,
             size: stat.size,
             extraInfo: {
                 trackNumber, unsynchronisedLyrics, 
@@ -79,12 +80,14 @@ class Library {
     }
 
     async getMusicList(pageNum) {
-        return (await libraryModel.getMusicList(pageNum)).map(item => excludeProps(item, ['path', '_id']))
+        const music = await libraryModel.getMusicList(pageNum)
+        return music.map(item => excludeProps(item, ['path', '_id']))
     }
     
     async getMusic(id) {
         const music = await libraryModel.getMusic(id)
-        return { 
+        return {
+            music,
             stream: createReadStream(music?.path), 
             size: music?.size
         }
@@ -104,15 +107,21 @@ class Library {
             return acc
         }, {})
         const music = await libraryModel.getMusic(id)
+
+        let isSuccess = false
         if (music.path) {
-            const isSuccess = await updateMusicID3(music.path, tags)
+            isSuccess = await updateMusicID3(music.path, tags)
             if (isSuccess) {
                 const musicMeta = await this.getMusicData(music.path)
                 return libraryModel.updateMusic(musicMeta)
             }
         }
+        return isSuccess
+    }
 
-        return false
+    async searchMusic(keyWord) {
+        const musicList =  await libraryModel.getMusicBy({title: keyWord})
+        return musicList.map(item => excludeProps(item, ['path', '_id']))
     }
 }
 const library = new Library()
