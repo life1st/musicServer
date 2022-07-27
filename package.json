@@ -25,6 +25,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@parcel/transformer-less": "2.6.2",
     "assert": "^2.0.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",

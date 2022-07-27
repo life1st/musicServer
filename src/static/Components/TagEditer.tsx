@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { Fragment, useRef } from 'react'
 import { updateMeta } from '../API'
 
 export const TagEditer = (props) => {
@@ -17,10 +17,13 @@ export const TagEditer = (props) => {
 
     return (
         <div ref={editerRef}>
-            <input type="text" name='title' defaultValue={title} /><br />
-            <input type="text" name='artist' defaultValue={artist} /><br />
-            <input type="text" name='album' defaultValue={album} /><br />
-
+            {
+                ['title', 'artist', 'album'].map(k => (
+                    <Fragment>
+                        <input type="text" placeholder={k} name={k} defaultValue={props[k]} /><br />
+                    </Fragment> 
+                ))
+            }
             <button onClick={handleUpdate}>Update</button>
         </div>
     )

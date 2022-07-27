@@ -1,5 +1,5 @@
 import React from 'react'
-
+import style from './Library.module.less'
 
 interface ILibrary {
     onItemClick: (any, number) => void;
@@ -13,7 +13,7 @@ export const Library = (props: ILibrary) => {
     }
 
     return (
-        <ul>
+        <ul class={style.libraryContainer}>
             {
                 list.map((item, i) => (
                     <li onClick={() => {handleItemClick(item, i)}}>{item.title}</li>
