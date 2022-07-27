@@ -6,5 +6,6 @@ export interface Music {
     album: string;
     genre: string;
     size: string | number;
+    keyword?: string;
     extraInfo: {};
 }

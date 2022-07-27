@@ -4,6 +4,14 @@ import { DB_DIR } from '../utils/path'
 import { getDir, genFile } from '../utils/file'
 import { Music } from '../types/Music'
 
+const promiseResp = (resolve, reject, e, data) => {
+    if (e) {
+        reject(e)
+        return
+    }
+    resolve(data)
+}
+
 class LibraryModel {
     private dbFile = path.resolve(DB_DIR, 'libraryModel')
     private db
@@ -13,39 +21,37 @@ class LibraryModel {
         this.db.loadDatabase()
     }
 
-    async updateMusic(music: Music) {
+    async updateMusic(music: Music): Promise<number> {
         return new Promise((r, j) => {
             this.db.update({id: music.id}, music, {}, (e, data) => {
-                if (e) {
-                    j(e)
-                    return
-                }
-                r(data)
+                promiseResp(r, j, e, data)
             })
         })
     }
 
     async updateMusicList(music: Music) {
         console.log('library model -> update musicList: ', music)
-        return new Promise((r, j) => {
-            this.db.insert(music, (e, data) => {
-                if (e) {
-                    j(e)
-                    return
-                }
-                r(data)
+        const hasExist: boolean = await new Promise((r, j) => {
+            this.db.findOne({id: music.id}, (e, data) => {
+                promiseResp(r, j, e, data)
             })
         })
+        let hasUpdate = false
+        if (hasExist) {
+            hasUpdate = (await this.updateMusic(music)) > 0
+        }
+        hasUpdate = await new Promise((r, j) => {
+            this.db.insert(music, (e) => {
+                promiseResp(r, j, e, true)
+            })
+        })
+        return hasUpdate
     }
 
     async getMusic(id: string): Promise<Music> {
         return new Promise((r, j) => {
-            this.db.find({ id }, (e, data) => {
-                if (e) {
-                    j(e)
-                    return
-                }
-                r(data?.[0])
+            this.db.findOne({ id }, (e, data) => {
+                promiseResp(r, j, e, data)
             })
         })
     }
@@ -53,26 +59,27 @@ class LibraryModel {
     async getMusicList(page = 0, limit = 10): Promise<Music[]> {
         return new Promise((r, j) => {
             this.db.find({}).skip(page * limit).limit(limit).exec((e, data) => {
-                if (e) {
-                    j(e)
-                    return
-                }
-                r(data)
+                promiseResp(r, j, e, data)
             })
         })
     }
 
     async getMusicBy(query): Promise<Music[]> {
         const LIMIT = 10
-        const { title } = query
+        const { title, keyword } = query
         return new Promise((r, j) => {
-            this.db.find({title}).limit(LIMIT).exec((e, data) => {
-                if (e) {
-                    j(e)
-                    return
-                }
-                r(data)
-            })
+            if (keyword) {
+                this.db.find({keyword: {$regex: new RegExp(keyword)}}).limit(LIMIT).exec((e, data) => {
+                    promiseResp(r, j, e, data)
+                })
+            } else if (title) {
+                this.db.find({title}).limit(LIMIT).exec((e, data) => {
+                    promiseResp(r, j, e, data)
+                })
+            } else {
+                console.log(`getMusicBy didn't received any varible`)
+                j(null)
+            }
         })
     }
 }

@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import path from 'path'
 import { MUSIC_DIR } from '../utils/path'
+import { genMusicKeyword } from '../utils/music'
 import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/file'
 import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
@@ -36,6 +37,7 @@ class Library {
                         if (isMusic){
                             try {
                                 const music = await this.getMusicData(fullPath)
+                                music.keyword = genMusicKeyword(music)
                                 await libraryModel.updateMusicList(music)
                             } catch (e) {
                                 console.log('scan music error', fullPath, e)
@@ -119,8 +121,20 @@ class Library {
         return isSuccess
     }
 
-    async searchMusic(keyWord) {
-        const musicList =  await libraryModel.getMusicBy({title: keyWord})
+    async searchMusic(keyword: string) {
+        let musicList: Music[] = []
+        try {
+            musicList = await libraryModel.getMusicBy({keyword})
+        } catch (e) {
+            musicList = []
+        }
+        if (musicList.length === 0) {
+            try {
+                musicList = await libraryModel.getMusicBy({title: keyword})
+            } catch (e) {
+                musicList = []
+            }
+        }
         return musicList.map(item => excludeProps(item, ['path', '_id']))
     }
 }
