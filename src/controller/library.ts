@@ -23,11 +23,12 @@ const filterExistProps = <T>(obj: T): T => Object.keys(obj).reduce((acc, k) => {
 
 class Library {
     isScanning = false
-    scanningQueue: Music[] = []
+    scanningQueue: string[] = []
     finishQueue: Music[] = []
 
-    async scan(): Promise<[scanning: Music[], finish: Music[]]> {
+    async scan(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
         const scanLibrary = async () => {
+            console.log('scan start:', Date.now())
             this.finishQueue = []
             this.isScanning = true
             let folderStack = [MUSIC_DIR]
@@ -44,15 +45,19 @@ class Library {
                             fs.stat(fullPath)
                         ])
                         if (isMusic){
-                            try {
-                                const music = await this.getMusicData(fullPath)
-                                this.scanningQueue.push(music)
-                                await libraryModel.updateMusic(music)
-                                this.scanningQueue = this.scanningQueue.filter(m => m.id !== music.id)
+                            this.scanningQueue.push(fullPath)
+                            this.getMusicData(fullPath)
+                            .then(music => libraryModel.updateMusic(music).then(() => music))
+                            .then(music => {
+                                this.scanningQueue = this.scanningQueue.filter(p => p !== music.path)
                                 this.finishQueue.push(music)
-                            } catch (e) {
+                                if (this.scanningQueue.length === 0) {
+                                    this.isScanning = false
+                                    console.log('scan finished.', Date.now(), this.scanningQueue, this.finishQueue)
+                                }
+                            }).catch(e => {
                                 console.log('scan music error', fullPath, e)
-                            }
+                            })
                         } else if (stat.isDirectory()) {
                             tmpFolders.push(fullPath)
                         }
@@ -60,8 +65,7 @@ class Library {
                 }
                 folderStack = tmpFolders
             }
-            this.isScanning = false
-            console.log('scan finish.')
+            console.log('scan done.', Date.now(), this.scanningQueue, this.finishQueue)
         }
         if (!this.isScanning) {
             scanLibrary()

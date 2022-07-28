@@ -28,6 +28,10 @@ const App = () => {
             ) {
                 loadedPages.current.push(curPage)
                 setList(list.concat(data))
+                if (autoPlayNext.current) {
+                    autoPlayNext.current = false
+                    handlePlayNext()
+                }
                 return true
             }
             return false
@@ -94,12 +98,7 @@ const App = () => {
     }
 
     useEffect(() => {
-        loadNextPage().then((isLoad) => {
-            if (isLoad && autoPlayNext.current) {
-                autoPlayNext.current = false
-                handleSwitchPlaying(PLAY_MODE.next)()
-            }
-        })
+        loadNextPage()
     }, [curPage])
     useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - music center')
 
