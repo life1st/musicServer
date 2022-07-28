@@ -1,6 +1,8 @@
 import fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import path from 'path'
+import child_process from 'child_process'
+import os from 'os'
 import { MUSIC_DIR } from '../utils/path'
 import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/file'
 import { libraryModel } from '../model/libraryModel'
@@ -25,6 +27,17 @@ class Library {
     isScanning = false
     scanningQueue: string[] = []
     finishQueue: Music[] = []
+
+    async scanMulticore(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
+        const scanDirs = [MUSIC_DIR]
+        const processCount = os.cpus().length
+        const scanProcess = child_process.fork('./scanDir.js')
+        const musicMetaProcess = child_process.fork('./getMusicMeta.js')
+        scanProcess.on('message', ([dirs, musicFiles]) => {
+            
+        })
+        scanProcess.send(MUSIC_DIR)
+    }
 
     async scan(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
         const scanLibrary = async () => {
