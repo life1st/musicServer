@@ -23,3 +23,9 @@ export const searchMusic = (t: string) => {
 
     return axios.get(url)
 }
+
+export const deleteMusic = (id: string) => {
+    const url = '/api/music/' + id
+
+    return axios.delete(url)
+}

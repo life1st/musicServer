@@ -5,6 +5,7 @@ import { MUSIC_DIR } from '../utils/path'
 import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/file'
 import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
+import { RESP_STATE } from '../shareCommon/consts'
 
 const excludeProps = (obj, excludes: string[]) => Object.keys(obj).reduce((acc, k) => {
     if (!excludes.includes(k)) {
@@ -143,6 +144,18 @@ class Library {
             }
         }
         return musicList.map(item => excludeProps(item, ['path', '_id']))
+    }
+
+    async deleteMusic(id) {
+        const music = await libraryModel.getMusic(id)
+        try {
+            await fs.access(music.path)
+            await fs.unlink(music.path)
+        } catch (e) {
+            console.log('music file not exist.', e)
+        }
+        const deleteNumber = await libraryModel.deleteMusic(id)
+        return deleteNumber > 0 ? RESP_STATE.success : RESP_STATE.alreadyDone
     }
 }
 const library = new Library()

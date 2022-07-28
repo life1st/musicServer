@@ -81,6 +81,14 @@ class LibraryModel {
             }
         })
     }
+
+    async deleteMusic(id: string): Promise<number> {
+        return new Promise((r, j) => {
+            this.db.remove({ id }, {}, (e, data) => {
+                promiseResp(r, j, e, data)
+            })
+        })
+    }
 }
 
 const libraryModel = new LibraryModel()

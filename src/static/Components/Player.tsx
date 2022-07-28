@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react'
+import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react'
 import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 
@@ -11,7 +11,7 @@ interface IMusic {
 interface IPlayer {
     music: IMusic;
     onPlayEnd: (PLAY_MODE) => () => void;
-    onPlayError?: () => void;
+    onPlayError?: (m: IMusic) => void;
     onPrevSong: () => void;
     onNextSong: () => void;
 }
@@ -21,19 +21,23 @@ export const Player = (props: IPlayer) => {
     const [ isEditing, setEditing ] = useState(false)
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
-    const ref = useRef()
+    const audioRef = useRef()
     useEffect(() => {
-        ref.current?.play()
+        audioRef.current?.play()
         setEditing(false)
-    }, [music])
+    }, [music, audioRef])
     useEffect(() => {
-        ref.current?.addEventListener('ended', onPlayEnd(playMode))
-        ref.current?.addEventListener('error', onPlayError)
+        audioRef.current?.addEventListener('ended', onPlayEnd(playMode))
         return () => {
-            ref.current?.removeEventListener('ended', onPlayEnd(playMode))
-            ref.current?.removeEventListener('error', onPlayError)
+            audioRef.current?.removeEventListener('ended', onPlayEnd(playMode))
         }
-    }, [playMode])
+    }, [playMode, audioRef])
+    useEffect(() => {
+        audioRef.current?.addEventListener('error', onPlayError)
+        return () => {
+            audioRef.current?.removeEventListener('error', onPlayError)
+        }
+    }, [onPlayError, audioRef])
 
     const handleEditToggle = () => {
         setEditing(!isEditing)
@@ -61,7 +65,7 @@ export const Player = (props: IPlayer) => {
 
     return (
         <div>
-            <audio controls src={`/api/music/${id}`} ref={ref} />
+            <audio controls src={`/api/music/${id}`} ref={audioRef} />
             <p>{music.title} - {music.artist}</p>
             <p>{music.album}</p>
             <div>

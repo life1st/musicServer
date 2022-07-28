@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { createRoot } from 'react-dom'
 import { Search } from './Components/Search'
 import { Library } from './Pages/Library'
 import { Player } from './Components/Player'
 import { Pagenation } from './Components/Pagenation'
-import { scanLibrary, getLibrary, searchMusic } from './API'
+import { scanLibrary, getLibrary, searchMusic, deleteMusic } from './API'
 import { Music } from '../types/Music'
 import { PLAY_MODE } from './consts'
+import { RESP_STATE } from '../shareCommon/consts'
 import { useDocTitle } from './hooks/useDocTitle'
 
 const App = () => {
@@ -41,7 +42,7 @@ const App = () => {
         scanLibrary()
     }
 
-    const handleSwitchPlaying = (type) => async () => {
+    const handleSwitchPlaying = useCallback((type) => async () => {
         let nextIndex: number = -1
         if (type === PLAY_MODE.prev) {
             nextIndex  = curIndex - 1
@@ -60,11 +61,25 @@ const App = () => {
             setMusic(list[nextIndex])
             setCurIndex(nextIndex)
         }
-    }
+    }, [curIndex, list, curPage])
 
-    const handlePlayError = () => {
+    const handlePlayNext = useCallback(handleSwitchPlaying(PLAY_MODE.next), [handleSwitchPlaying])
+
+    const handlePlayError = async (curMusic) => {
         console.log('play cur audio error, check next.', curIndex)
-        handleSwitchPlaying(PLAY_MODE.next)()
+        const isSure = confirm(`play ${curMusic ? curMusic.title + '-' + curMusic.artist : 'cur music'} error, delete it?`)
+        if (isSure) {
+            const {status, data} = await deleteMusic(music.id)
+            if (status === 200) {
+                if (data.status === RESP_STATE.success) {
+                    console.log('delete success')
+                }
+                if (data.status === RESP_STATE.alreadyDone) {
+                    console.log('already deleted')
+                }
+            }
+        }
+        await handlePlayNext()
     }
 
     const handleSearch = async (val) => {

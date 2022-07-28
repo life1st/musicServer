@@ -41,5 +41,10 @@ apiRoute
     ctx.set('Content-Length', size)
     ctx.body = stream
 })
+.delete('/music/:id', async ctx => {
+    const { id } = ctx.params
+    const status = await library.deleteMusic(id)
+    ctx.body = { status }
+})
 
 export { apiRoute }
