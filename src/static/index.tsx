@@ -42,7 +42,7 @@ const App = () => {
         scanLibrary()
     }
 
-    const handleSwitchPlaying = useCallback((type) => async () => {
+    const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
         if (type === PLAY_MODE.prev) {
             nextIndex  = curIndex - 1
@@ -65,9 +65,9 @@ const App = () => {
 
     const handlePlayNext = useCallback(handleSwitchPlaying(PLAY_MODE.next), [handleSwitchPlaying])
 
-    const handlePlayError = async (curMusic) => {
-        console.log('play cur audio error, check next.', curIndex)
-        const isSure = confirm(`play ${curMusic ? curMusic.title + '-' + curMusic.artist : 'cur music'} error, delete it?`)
+    const handlePlayError = async () => {
+        console.log('play cur audio error, check next.', curIndex, music)
+        const isSure = confirm(`play ${music ? music.title + '-' + music.artist : 'cur music'} error, delete it?`)
         if (isSure) {
             const {status, data} = await deleteMusic(music.id)
             if (status === 200) {
@@ -79,7 +79,7 @@ const App = () => {
                 }
             }
         }
-        await handlePlayNext()
+        handlePlayNext()
     }
 
     const handleSearch = async (val) => {

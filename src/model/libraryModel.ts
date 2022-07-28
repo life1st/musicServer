@@ -15,11 +15,9 @@ const promiseResp = (resolve, reject, e, data) => {
 
 class LibraryModel {
     private dbFile = path.resolve(DB_DIR, 'libraryModel')
-    private db
+    private db = new Nedb({ filename: this.dbFile, autoload: true })
     constructor() {
         getDir(DB_DIR)
-        this.db = new Nedb({ filename: this.dbFile })
-        this.db.loadDatabase()
     }
 
     async updateMusic(music: Music, prevId?: string): Promise<boolean> {

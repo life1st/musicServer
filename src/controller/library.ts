@@ -7,12 +7,19 @@ import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
 
-const excludeProps = (obj, excludes: string[]) => Object.keys(obj).reduce((acc, k) => {
+const excludeProps = <T>(obj: T, excludes: string[]): T => Object.keys(obj).reduce((acc, k) => {
     if (!excludes.includes(k)) {
         acc[k] = obj[k]
     }
     return acc;
-}, {})
+}, {} as T)
+
+const filterExistProps = <T>(obj: T): T => Object.keys(obj).reduce((acc, k) => {
+    if (obj[k]) {
+        acc[k] = obj[k]
+    }
+    return acc
+}, {} as T)
 
 class Library {
     isScanning = false
@@ -107,15 +114,9 @@ class Library {
         const {
             title, artist, album, 
         } = info
-        let tags = {
+        let tags = filterExistProps({
             title, artist, album
-        }
-        tags = Object.keys(tags).reduce((acc, k) => {
-            if (tags[k]) {
-                acc[k] = tags[k]
-            }
-            return acc
-        }, {})
+        })
         const music = await libraryModel.getMusic(id)
 
         let isSuccess = false
