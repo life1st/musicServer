@@ -38,9 +38,11 @@ class Library {
 
         let scanProcess = child_process.fork('./dist/scanDir.js')
         let musicMetaProcesses = Array(musicProcessCount).fill(0).map(() => child_process.fork('./dist/getMusicMeta.js'))
+        let musicCount = 0
         musicMetaProcesses.map((process) => {
             process.on('message', async (music: Music) => {
                 console.log('message from music process: ', music)
+                musicCount++
                 await libraryModel.updateMusic(music)
                 const i = musicMetaTasks.findIndex(t => t === music.path)
                 if (scanMusicCache.length > 0 && i >= 0) {
@@ -51,6 +53,7 @@ class Library {
                     // @ts-ignore
                     musicMetaProcesses[i] = null
                     if (musicMetaProcesses.every(p => p === null)) {
+                        console.log('scan finish', musicCount)
                         scanProcess.kill('SIGINT')
                         // @ts-ignore
                         scanProcess = null
