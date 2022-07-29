@@ -69,7 +69,7 @@ const buildServer = async () => {
         _args.push('--watch', '--sourcemap=inline')
     }
     if (isBuild) {
-        _args.push('-minify')
+        _args.push('--minify')
     }
     const build = child_process.spawn(`esbuild`, _args, { shell: true })
     build.stdout.on('data', data => {
