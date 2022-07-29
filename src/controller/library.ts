@@ -4,7 +4,8 @@ import path from 'path'
 import child_process from 'child_process'
 import os from 'os'
 import { MUSIC_DIR } from '../utils/path'
-import { getFileId, isMusicFile, getMusicID3, updateMusicID3 } from '../utils/file'
+import { isMusicFile, updateMusicID3 } from '../utils/file'
+import { getMusicData } from '../utils/music'
 import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
@@ -28,15 +29,53 @@ class Library {
     scanningQueue: string[] = []
     finishQueue: Music[] = []
 
-    async scanMulticore(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
+    async scanMulticore() {
         const scanDirs = [MUSIC_DIR]
         const processCount = os.cpus().length
-        const scanProcess = child_process.fork('./scanDir.js')
-        const musicMetaProcess = child_process.fork('./getMusicMeta.js')
-        scanProcess.on('message', ([dirs, musicFiles]) => {
-            
+        const musicProcessCount = processCount - 1
+        const scanMusicCache: string[] = []
+        const musicMetaTasks: string[] = Array(musicProcessCount).fill(null)
+
+        let scanProcess = child_process.fork('./dist/scanDir.js')
+        let musicMetaProcesses = Array(musicProcessCount).fill(0).map(() => child_process.fork('./dist/getMusicMeta.js'))
+        musicMetaProcesses.map((process) => {
+            process.on('message', async (music: Music) => {
+                console.log('message from music process: ', music)
+                await libraryModel.updateMusic(music)
+                const i = musicMetaTasks.findIndex(t => t === music.path)
+                if (scanMusicCache.length > 0 && i >= 0) {
+                    musicMetaTasks[i] = scanMusicCache.pop() as string
+                    process.send(musicMetaTasks[i])
+                } else {
+                    process.kill('SIGINT')
+                    // @ts-ignore
+                    musicMetaProcesses[i] = null
+                    if (musicMetaProcesses.every(p => p === null)) {
+                        scanProcess.kill('SIGINT')
+                        // @ts-ignore
+                        scanProcess = null
+                    }
+                }
+            })
         })
-        scanProcess.send(MUSIC_DIR)
+        scanProcess.on('message', ([dirs, musicFiles]: [string[], string[]]) => {
+            console.log('message from scan process: ', dirs, musicFiles)
+            if (dirs.length > 0) {
+                dirs.map(dir => scanProcess.send(dir))
+            }
+            if (musicFiles.length > 0) {
+                scanMusicCache.push(...musicFiles)
+            }
+            musicMetaTasks.forEach((task, i) => {
+                if (!task && scanMusicCache.length > 0) {
+                    const curTask = scanMusicCache.pop() as string
+                    console.log('curTask', curTask, i)
+                    musicMetaTasks[i] = curTask
+                    musicMetaProcesses[i].send(curTask)
+                }
+            })
+        })
+        scanProcess.send(scanDirs.pop() as string)
     }
 
     async scan(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
@@ -59,7 +98,7 @@ class Library {
                         ])
                         if (isMusic){
                             this.scanningQueue.push(fullPath)
-                            this.getMusicData(fullPath)
+                            getMusicData(fullPath)
                             .then(music => libraryModel.updateMusic(music).then(() => music))
                             .then(music => {
                                 this.scanningQueue = this.scanningQueue.filter(p => p !== music.path)
@@ -81,36 +120,10 @@ class Library {
             console.log('scan done.', Date.now(), this.scanningQueue, this.finishQueue)
         }
         if (!this.isScanning) {
-            scanLibrary()
+            // scanLibrary()
+            this.scanMulticore()
         }
         return [this.scanningQueue, this.finishQueue]
-    }
-
-    async getMusicData(musicPath: string): Promise<Music> {
-
-        const [ buf, stat ] = await Promise.all([
-            fs.readFile(musicPath),
-            fs.stat(musicPath)
-        ])
-
-        const [id, info] = await Promise.all([
-            getFileId(buf),
-            getMusicID3(buf)
-        ])
-        console.log('id, info: ', id, info, musicPath)
-
-        const {
-            title, artist = '', album = '', genre = '',
-            trackNumber, unsynchronisedLyrics, 
-        } = info
-        return {
-            id, path: musicPath,
-            title: title || path.basename(musicPath), artist, album, genre,
-            size: stat.size,
-            extraInfo: {
-                trackNumber, unsynchronisedLyrics, 
-            }
-        }
     }
 
     async getMusicList(pageNum): Promise<Music[]> {
@@ -140,7 +153,7 @@ class Library {
         if (music.path) {
             isSuccess = await updateMusicID3(music.path, tags)
             if (isSuccess) {
-                const musicMeta = await this.getMusicData(music.path)
+                const musicMeta = await getMusicData(music.path)
                 return libraryModel.updateMusic(musicMeta, id)
             }
         }

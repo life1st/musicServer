@@ -28,7 +28,7 @@ const runServer = async () => {
     const server = child_process.spawn('nodemon', [`${OUT_DIR}/app.js`, '--watch dist/app.js'], { shell: true })
     hasRunServer = true
     server.stdout.on('data', data => {
-        console.log(`[runServer]stdout: ${data}`)
+        console.log(`[runServer]stdout:\n${data}`)
     })
     server.stderr.on('data', data => {
         console.log(`[runServer]stderr: ${data}`)
