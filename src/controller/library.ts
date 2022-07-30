@@ -165,16 +165,21 @@ class Library {
         return isSuccess
     }
 
-    async searchMusic(keyword: string) {
+    async searchMusic(
+        keyword: string,
+        conf: {
+            pageNum: number,
+        }) {
+        const { pageNum } = conf
         let musicList: Music[] = []
         try {
-            musicList = await libraryModel.getMusicBy({keyword})
+            musicList = await libraryModel.getMusicBy({keyword}, pageNum)
         } catch (e) {
             musicList = []
         }
         if (musicList.length === 0) {
             try {
-                musicList = await libraryModel.getMusicBy({title: keyword})
+                musicList = await libraryModel.getMusicBy({title: keyword}, pageNum)
             } catch (e) {
                 musicList = []
             }

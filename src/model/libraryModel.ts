@@ -13,6 +13,8 @@ const promiseResp = (resolve, reject, e, data) => {
     resolve(data)
 }
 
+const DEFAULT_LIMIT = 20
+
 class LibraryModel {
     private dbFile = path.resolve(DB_DIR, 'libraryModel')
     private db = new Nedb({ filename: this.dbFile, autoload: true })
@@ -53,7 +55,7 @@ class LibraryModel {
         })
     }
 
-    async getMusicList(page = 0, limit = 10): Promise<Music[]> {
+    async getMusicList(page = 0, limit = DEFAULT_LIMIT): Promise<Music[]> {
         return new Promise((r, j) => {
             this.db.find({}).skip(page * limit).limit(limit).exec((e, data) => {
                 promiseResp(r, j, e, data)
@@ -61,16 +63,22 @@ class LibraryModel {
         })
     }
 
-    async getMusicBy(query): Promise<Music[]> {
-        const LIMIT = 10
+    async getMusicBy(
+        query: {
+            keyword?: string,
+            title?: string,
+        }, 
+        pageNum: number
+    ): Promise<Music[]> {
         const { title, keyword } = query
+        const limit = DEFAULT_LIMIT
         return new Promise((r, j) => {
             if (keyword) {
-                this.db.find({keyword: {$regex: new RegExp(keyword)}}).limit(LIMIT).exec((e, data) => {
+                this.db.find({keyword: {$regex: new RegExp(keyword)}}).skip(pageNum * limit).limit(limit).exec((e, data) => {
                     promiseResp(r, j, e, data)
                 })
             } else if (title) {
-                this.db.find({title}).limit(LIMIT).exec((e, data) => {
+                this.db.find({title}).limit(limit).exec((e, data) => {
                     promiseResp(r, j, e, data)
                 })
             } else {
