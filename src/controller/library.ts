@@ -30,6 +30,7 @@ class Library {
     finishQueue: Music[] = []
 
     async scanMulticore() {
+        const startTime = Date.now()
         const scanDirs = [MUSIC_DIR]
         const processCount = os.cpus().length
         const musicProcessCount = processCount - 1
@@ -53,7 +54,7 @@ class Library {
                     // @ts-ignore
                     musicMetaProcesses[i] = null
                     if (musicMetaProcesses.every(p => p === null)) {
-                        console.log('scan finish', musicCount)
+                        console.log('scan finish', musicCount, (Date.now() - startTime) / 1000 + 's')
                         scanProcess.kill('SIGINT')
                         // @ts-ignore
                         scanProcess = null
@@ -83,7 +84,8 @@ class Library {
 
     async scan(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
         const scanLibrary = async () => {
-            console.log('scan start:', Date.now())
+            const startTime = Date.now()
+            console.log('scan start:', startTime)
             this.finishQueue = []
             this.isScanning = true
             let folderStack = [MUSIC_DIR]
@@ -108,7 +110,7 @@ class Library {
                                 this.finishQueue.push(music)
                                 if (this.scanningQueue.length === 0) {
                                     this.isScanning = false
-                                    console.log('scan finished.', Date.now(), this.scanningQueue, this.finishQueue)
+                                    console.log('scan finished.', (Date.now() - startTime) / 1000 + 's', this.scanningQueue, this.finishQueue)
                                 }
                             }).catch(e => {
                                 console.log('scan music error', fullPath, e)
