@@ -14,13 +14,21 @@ const App = () => {
     const [ music, setMusic ] = useState<Music>(null)
     const [ list, setList ] = useState<Music[]>([])
     const [ searchList, setSearchList ] = useState<Music[]>([])
+    const [ searchPage, setSearchPage ] = useState(0)
     const [ curPage, setCurPage ] = useState(0)
     const [ curIndex, setCurIndex ] = useState(null)
     const loadedPages = useRef([])
     const autoPlayNext = useRef(false)
 
     const loadNextPage = () => {
-        return getLibrary(curPage).then(resp => {
+        let reqFunc = getLibrary
+        let page = curPage
+        if (searchList.length > 0) {
+            reqFunc = searchMusic
+            page = searchPage
+        }
+        
+        return getLibrary(page).then(resp => {
             const { status, data } = resp
             if (status === 200 
                 && !loadedPages.current.includes(curPage)
@@ -57,7 +65,7 @@ const App = () => {
         if (type === PLAY_MODE.random) {
             nextIndex = Math.floor(Math.random() * list.length)
         }
-        if (type === PLAY_MODE.next && nextIndex >= list.length) {
+        if (type === PLAY_MODE.next && nextIndex >= list.length && searchList.length === 0) {
             setCurPage(curPage + 1)
             autoPlayNext.current = true
         }
@@ -95,6 +103,10 @@ const App = () => {
     }
     const handleClearSearch = () => {
         setSearchList([])
+        setSearchPage(0)
+    }
+    const handleLoadmore = () => {
+        searchList.length > 0 ? setSearchPage(searchPage + 1) : setCurPage(curPage + 1)
     }
 
     useEffect(() => {
@@ -109,7 +121,7 @@ const App = () => {
             <Library onItemClick={handleItemClick} list={searchList.length > 0 ? searchList : list} />
             <Pagenation
                 curPage={curPage}
-                onLoadmore={() => setCurPage(curPage + 1)}
+                onLoadmore={handleLoadmore}
             />
             {music ? (
                 <Player
