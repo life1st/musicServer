@@ -7,6 +7,5 @@ process.on('message', async (musicPath: string) => {
         return
     }
     const music = await getMusicData(musicPath)
-    console.log('getMusicMeta', music)
     process.send?.(music)
 })

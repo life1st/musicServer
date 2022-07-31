@@ -27,10 +27,9 @@ apiRoute
 
     ctx.body = await library.getMusicList(pageNum)
 })
-.get('/search_music/:pageNum', async ctx => {
-    const { pageNum } = ctx.params
+.get('/search_music', async ctx => {
     const { query } = ctx.request
-    const { q } = query
+    const { q, pageNum = 0 } = query as { q: string, pageNum: number }
     ctx.body = await library.searchMusic(q, { pageNum })
 })
 .get('/music/:id', async ctx => {

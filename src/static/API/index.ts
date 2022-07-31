@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+const buildKvStr = (obj) => Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&')
+
 export const getLibrary = (pageNum) => {
     const url = '/api/music_list/' + pageNum
 
@@ -18,8 +20,10 @@ export const updateMeta = (id, tags) => {
     return axios.post(url, tags)
 }
 
-export const searchMusic = (t: string) => {
-    const url = `/api/search_music?q=` + t
+export const searchMusic = (q: string, pageNum: number = 0) => {
+    const url = `/api/search_music?${buildKvStr({
+        q, pageNum
+    })}`
 
     return axios.get(url)
 }

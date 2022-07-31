@@ -38,11 +38,11 @@ class Library {
         const musicMetaTasks: string[] = Array(musicProcessCount).fill(null)
 
         let scanProcess = child_process.fork('./dist/scanDir.js')
-        let musicMetaProcesses = Array(musicProcessCount).fill(0).map(() => child_process.fork('./dist/getMusicMeta.js'))
+        let musicMetaProcesses = Array(musicProcessCount).fill(null).map(() => child_process.fork('./dist/getMusicMeta.js'))
         let musicCount = 0
         musicMetaProcesses.map((process) => {
             process.on('message', async (music: Music) => {
-                console.log('message from music process: ', music)
+                console.log('message from music process: ', music?.path)
                 musicCount++
                 await libraryModel.updateMusic(music)
                 const i = musicMetaTasks.findIndex(t => t === music.path)
@@ -70,7 +70,7 @@ class Library {
             if (musicFiles.length > 0) {
                 scanMusicCache.push(...musicFiles)
             }
-            musicMetaTasks.forEach((task, i) => {
+            musicMetaTasks.map((task, i) => {
                 if (!task && scanMusicCache.length > 0) {
                     const curTask = scanMusicCache.pop() as string
                     console.log('curTask', curTask, i)
@@ -138,9 +138,13 @@ class Library {
     
     async getMusic(id) {
         const music = await libraryModel.getMusic(id)
+        const stream = createReadStream(music?.path)
+        const close = () => { stream.close() }
+        stream.on('error', close)
+        stream.on('en', close)
         return {
             music,
-            stream: createReadStream(music?.path), 
+            stream, 
             size: music?.size
         }
     }

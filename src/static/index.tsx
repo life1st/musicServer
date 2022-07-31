@@ -26,24 +26,34 @@ const App = () => {
         if (searchList.length > 0) {
             reqFunc = searchMusic
             page = searchPage
-        }
-        
-        return getLibrary(page).then(resp => {
-            const { status, data } = resp
-            if (status === 200 
-                && !loadedPages.current.includes(curPage)
-                && data.length > 0
-            ) {
-                loadedPages.current.push(curPage)
-                setList(list.concat(data))
-                if (autoPlayNext.current) {
-                    autoPlayNext.current = false
-                    handlePlayNext()
+            return searchMusic(searchPage).then(resp => {
+                const { status, data } = resp
+                if (status === 200
+                    && data.length > 0
+                ) {
+                    setSearchList(searchList.concat(data))
+                    return true
                 }
-                return true
-            }
-            return false
-        })
+                return false
+            })
+        } else {
+            return getLibrary(curPage).then(resp => {
+                const { status, data } = resp
+                if (status === 200 
+                    && !loadedPages.current.includes(curPage)
+                    && data.length > 0
+                ) {
+                    loadedPages.current.push(curPage)
+                    setList(list.concat(data))
+                    if (autoPlayNext.current) {
+                        autoPlayNext.current = false
+                        handlePlayNext()
+                    }
+                    return true
+                }
+                return false
+            })
+        }
     }
 
     const handleItemClick = (item, i) => {
