@@ -5,7 +5,7 @@ interface Props {
   onClear: () => void;
 }
 
-export const Search = (props: Props) => {
+export const SearchInput = (props: Props) => {
   const { onSearch, onClear } = props
   const [ searchText, setSearchText ] = useState<string>('')
 

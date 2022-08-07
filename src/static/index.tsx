@@ -1,150 +1,35 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { createRoot } from 'react-dom'
-import { Search } from './Components/Search'
-import { Library } from './Pages/Library'
+import * as React from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { RecoilRoot, useRecoilValue } from 'recoil'
+import { musicState } from './model/music'
 import { Player } from './Components/Player'
-import { Pagenation } from './Components/Pagenation'
-import { scanLibrary, getLibrary, searchMusic, deleteMusic } from './API'
-import { Music } from '../types/Music'
-import { PLAY_MODE } from './consts'
-import { RESP_STATE } from '../shareCommon/consts'
+import { scanLibrary } from './API'
 import { useDocTitle } from './hooks/useDocTitle'
+import { Pages } from './router'
+import Navibar from './Components/Navibar'
 
 const App = () => {
-    const [ music, setMusic ] = useState<Music>(null)
-    const [ list, setList ] = useState<Music[]>([])
-    const [ searchList, setSearchList ] = useState<Music[]>([])
-    const [ searchPage, setSearchPage ] = useState(0)
-    const [ curPage, setCurPage ] = useState(0)
-    const [ curIndex, setCurIndex ] = useState(null)
-    const loadedPages = useRef([])
-    const autoPlayNext = useRef(false)
+    const { music } = useRecoilValue(musicState)
 
-    const loadNextPage = () => {
-        let reqFunc = getLibrary
-        let page = curPage
-        if (searchList.length > 0) {
-            reqFunc = searchMusic
-            page = searchPage
-            return searchMusic(searchPage).then(resp => {
-                const { status, data } = resp
-                if (status === 200
-                    && data.length > 0
-                ) {
-                    setSearchList(searchList.concat(data))
-                    return true
-                }
-                return false
-            })
-        } else {
-            return getLibrary(curPage).then(resp => {
-                const { status, data } = resp
-                if (status === 200 
-                    && !loadedPages.current.includes(curPage)
-                    && data.length > 0
-                ) {
-                    loadedPages.current.push(curPage)
-                    setList(list.concat(data))
-                    if (autoPlayNext.current) {
-                        autoPlayNext.current = false
-                        handlePlayNext()
-                    }
-                    return true
-                }
-                return false
-            })
-        }
-    }
-
-    const handleItemClick = (item, i) => {
-        setCurIndex(i)
-        setMusic(item)
-    }
     const handleScan = () => {
         scanLibrary()
     }
-
-    const handleSwitchPlaying = useCallback((type) => () => {
-        let nextIndex: number = -1
-        if (type === PLAY_MODE.prev) {
-            nextIndex  = curIndex - 1
-        }
-        if (type === PLAY_MODE.next) {
-            nextIndex = curIndex + 1
-        }
-        if (type === PLAY_MODE.random) {
-            nextIndex = Math.floor(Math.random() * list.length)
-        }
-        if (type === PLAY_MODE.next && nextIndex >= list.length && searchList.length === 0) {
-            setCurPage(curPage + 1)
-            autoPlayNext.current = true
-        }
-        if (nextIndex >= 0 && nextIndex < list.length) {
-            setMusic(list[nextIndex])
-            setCurIndex(nextIndex)
-        }
-    }, [curIndex, list, curPage])
-
-    const handlePlayNext = useCallback(handleSwitchPlaying(PLAY_MODE.next), [handleSwitchPlaying])
-
-    const handlePlayError = async () => {
-        console.log('play cur audio error, check next.', curIndex, music)
-        const isSure = confirm(`play ${music ? music.title + '-' + music.artist : 'cur music'} error, delete it?`)
-        if (isSure) {
-            const {status, data} = await deleteMusic(music.id)
-            if (status === 200) {
-                if (data.status === RESP_STATE.success) {
-                    console.log('delete success')
-                }
-                if (data.status === RESP_STATE.alreadyDone) {
-                    console.log('already deleted')
-                }
-            }
-        }
-        handlePlayNext()
-    }
-
-    const handleSearch = async (val) => {
-        const resp = await searchMusic(val)
-        const { status, data } = resp
-        if (status === 200 && data) {
-            setSearchList(data)
-        }
-    }
-    const handleClearSearch = () => {
-        setSearchList([])
-        setSearchPage(0)
-    }
-    const handleLoadmore = () => {
-        searchList.length > 0 ? setSearchPage(searchPage + 1) : setCurPage(curPage + 1)
-    }
-
-    useEffect(() => {
-        loadNextPage()
-    }, [curPage])
     useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - music center')
 
     return (
-        <div >
+        <Router>
             <button onClick={handleScan}>Scan</button>
-            <Search onSearch={handleSearch} onClear={handleClearSearch} />
-            <Library onItemClick={handleItemClick} list={searchList.length > 0 ? searchList : list} />
-            <Pagenation
-                curPage={curPage}
-                onLoadmore={handleLoadmore}
-            />
-            {music ? (
-                <Player
-                    music={music}
-                    onPrevSong={handleSwitchPlaying(PLAY_MODE.prev)}
-                    onNextSong={handleSwitchPlaying(PLAY_MODE.next)}
-                    onPlayEnd={handleSwitchPlaying}
-                    onPlayError={handlePlayError}
-                />
-            ) : null}
-        </div>
+            <Pages />
+            <Player />
+            <Navibar />
+        </Router>
     )
 }
 
 const root = createRoot(document.querySelector('.root'))
-root.render(<App />)
+root.render(
+    <RecoilRoot>
+        <App />
+    </RecoilRoot>
+)

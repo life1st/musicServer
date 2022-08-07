@@ -8,7 +8,7 @@ export const useDocTitle = (title: string) => {
 
   useEffect(() => {
     document.title = title
-    return () => reset
+    return () => reset()
   }, [title])
 
   return { reset }
