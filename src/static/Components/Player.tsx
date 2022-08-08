@@ -31,6 +31,8 @@ export const Player = (props: IPlayer) => {
     
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
     const [isPlaying, setIsPlaying] = useState(false)
+    const [ time, setTime ] = useState(0)
+    const curDuration = useRef(0)
     const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
         if (type === PLAY_MODE.prev) {
@@ -114,9 +116,11 @@ export const Player = (props: IPlayer) => {
         }
         audioRef.current?.addEventListener('pause', handlePlayStatusChange)
         audioRef.current?.addEventListener('play', handlePlayStatusChange)
+        audioRef.current?.addEventListener('timeupdate', handlePlayTimeupdate)
         return () => {
             audioRef.current?.removeEventListener('pause', handlePlayStatusChange)
             audioRef.current?.removeEventListener('play', handlePlayStatusChange)
+            audioRef.current?.addEventListener('timeupdate', handlePlayTimeupdate)
         }
     }, [audioRef])
     
@@ -133,6 +137,14 @@ export const Player = (props: IPlayer) => {
         }
         if (playMode === PLAY_MODE.random) {
             setPlayMode(PLAY_MODE.next)
+        }
+    }
+
+    const handlePlayTimeupdate = (e) => {
+        const { duration, currentTime } = audioRef.current || {}
+        if (duration && currentTime) {
+            curDuration.current = duration
+            setTime(currentTime)
         }
     }
 
@@ -173,6 +185,9 @@ export const Player = (props: IPlayer) => {
                 </div>
             ) : (
                 <div className={style.miniContainer}>
+                    <div className={style.progressContainer}>
+                        <div className={style.progress} style={{width: `${Math.floor(time / curDuration.current * 100)}%`}} />
+                    </div>
                     <img src={info.cover || require('../imgs/ic-album-default.svg')} className={style.cover} />
                     <p className={style.infoText}>{info.title}</p>
                     <div>

@@ -7,6 +7,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
     .cover {
         @s: 32px;
         width: @s;
@@ -22,5 +23,20 @@
     .infoText {
         flex: 1;
         margin: 0;
+    }
+    .progressContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 1px;
+        width: 100%;
+        background: transparent;
+    }
+    .progress {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 1px;
+        background-color: rgb(192, 62, 62);
     }
 }
