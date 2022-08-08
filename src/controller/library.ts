@@ -31,11 +31,13 @@ class Library {
 
     async scanMulticore() {
         const startTime = Date.now()
-        const scanDirs = [MUSIC_DIR]
         const processCount = os.cpus().length
-        const musicProcessCount = processCount - 1
-        const scanMusicCache: string[] = []
+
+        const musicProcessCount = processCount - 1 || 1
         const musicMetaTasks: string[] = Array(musicProcessCount).fill(null)
+        let scanDirs = [MUSIC_DIR]
+        let scanMusicCache: string[] = []
+
 
         let scanProcess = child_process.fork('./dist/scanDir.js')
         let musicMetaProcesses = Array(musicProcessCount).fill(null).map(() => child_process.fork('./dist/getMusicMeta.js'))
@@ -65,10 +67,10 @@ class Library {
         scanProcess.on('message', ([dirs, musicFiles]: [string[], string[]]) => {
             console.log('message from scan process: ', dirs, musicFiles)
             if (dirs.length > 0) {
-                dirs.map(dir => scanProcess.send(dir))
+                scanDirs = scanDirs.concat(dirs)
             }
             if (musicFiles.length > 0) {
-                scanMusicCache.push(...musicFiles)
+                scanMusicCache = scanMusicCache.concat(musicFiles)
             }
             musicMetaTasks.map((task, i) => {
                 if (!task && scanMusicCache.length > 0) {
@@ -78,6 +80,13 @@ class Library {
                     musicMetaProcesses[i].send(curTask)
                 }
             })
+            if (scanDirs.length > 0) {
+                scanProcess.send(scanDirs.pop() as string)
+            } else {
+                scanProcess.kill('SIGINT')
+                // @ts-ignore
+                scanProcess = null
+            }
         })
         scanProcess.send(scanDirs.pop() as string)
     }

@@ -193,7 +193,7 @@ export const Player = (props: IPlayer) => {
                         <div className={style.progress} style={{width: `${Math.floor(time / curDuration.current * 100)}%`}} />
                     </div>
                     <img src={info.cover || require('../imgs/ic-album-default.svg')} className={style.cover} />
-                    <p className={style.infoText}>{info.title}</p>
+                    <p className={style.infoText} title={info.title}>{info.title}</p>
                     <div>
                         <img
                             onClick={isPlaying ? handlePause : handlePlay}
