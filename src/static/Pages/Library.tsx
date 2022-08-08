@@ -19,18 +19,24 @@ const Library = (props) => {
   const { curIndex } = useRecoilValue(musicState)
   const setMusic = useSetRecoilState(musicState)
 
+  const [ hasMore, setHasMore ] = useState(true)
+
   const loadedPages = useRef<number[]>([])
 
   const loadNextPage = (page = curPage) => {
+    if (!hasMore) {
+      return false;
+    }
     return getLibrary(page).then(resp => {
         const { status, data } = resp
-        if (status === 200 
-            && !loadedPages.current.includes(page)
-            && data.length > 0
-        ) {
+        if (status === 200 && !loadedPages.current.includes(page)) {
+          if (data.length > 0) {
             loadedPages.current.push(page)
             setList(list.concat(data))
             return true
+          } else {
+            setHasMore(false)
+          }
         }
         return false
     })
@@ -47,11 +53,16 @@ const Library = (props) => {
     loadNextPage(nextPage)
   }
 
+  useEffect(() => {
+    loadNextPage()
+  }, [])
+
   return (
     <Songlist
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
-        list={list} 
+        list={list}
+        hasMore={hasMore}
     />
   )
 }

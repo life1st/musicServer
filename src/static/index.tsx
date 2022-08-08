@@ -8,6 +8,7 @@ import { scanLibrary } from './API'
 import { useDocTitle } from './hooks/useDocTitle'
 import { Pages } from './router'
 import Navibar from './Components/Navibar'
+import './global.less'
 
 const App = () => {
     const { music } = useRecoilValue(musicState)

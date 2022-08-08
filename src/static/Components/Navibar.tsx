@@ -1,8 +1,5 @@
 import * as React from 'react'
 import * as style from './Navibar.module.less'
-import icLibrary from '../imgs/ic-library.svg'
-import icSearch from '../imgs/ic-search.svg'
-import icPlayer from '../imgs/ic-play.svg'
 import { useNavigate } from 'react-router-dom'
 
 const Navibar = (props) => {
@@ -10,15 +7,15 @@ const Navibar = (props) => {
 
   const menus = [{
       title: 'Playing',
-      icon: icPlayer,
-      onClick: () => { navigator('/player') }
+      icon: require('../imgs/ic-play.svg'),
+      onClick: () => { navigator('/playing') }
     }, {
       title: 'Library',
-      icon: icLibrary,
+      icon: require('../imgs/ic-library.svg'),
       onClick: () => { navigator('/library') }
     }, {
       title: 'Search',
-      icon: icSearch,
+      icon: require('../imgs/ic-search.svg'),
       onClick: () => { navigator('/search') }
     }
   ]

@@ -1,4 +1,6 @@
-import React, { useRef, useEffect, useState, useMemo, useCallback, ReactComponentElement } from 'react'
+import * as React from 'react'
+import { useMatch } from 'react-router-dom'
+import * as style from './Player.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { libraryState, pageState } from '../model/library'
 import { musicState } from '../model/music'
@@ -7,6 +9,7 @@ import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { deleteMusic } from '../API'
 
+const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 interface IMusic {
     id: string;
     title: string;
@@ -23,9 +26,11 @@ export const Player = (props: IPlayer) => {
     const { curIndex, music } = useRecoilValue(musicState)
     const setMusic = useSetRecoilState(musicState)
 
+    const match = useMatch('playing')
     const list = useRecoilValue(libraryState)
     
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
+    const [isPlaying, setIsPlaying] = useState(false)
     const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
         if (type === PLAY_MODE.prev) {
@@ -66,6 +71,14 @@ export const Player = (props: IPlayer) => {
         }
         handlePlayNext()
     }
+    const handlePause = () => {
+        setIsPlaying(false)
+        audioRef.current?.pause()
+    }
+    const handlePlay = () => {
+        setIsPlaying(true)
+        audioRef.current?.play()
+    }
 
     const { id, album, artist, title } = music || {};
     const [ isEditing, setEditing ] = useState(false)
@@ -73,9 +86,12 @@ export const Player = (props: IPlayer) => {
 
     const audioRef = useRef<HTMLAudioElement>()
     useEffect(() => {
-        audioRef.current?.play()
-        setEditing(false)
+        if (music) {
+            audioRef.current?.play()
+            setEditing(false)
+        }
     }, [music, audioRef])
+    
     useEffect(() => {
         audioRef.current?.addEventListener('ended', handlePlayEnd)
         return () => {
@@ -88,7 +104,22 @@ export const Player = (props: IPlayer) => {
             audioRef.current?.removeEventListener('error', handlePlayError)
         }
     }, [onPlayError, audioRef])
-
+    useEffect(() => {
+        const handlePlayStatusChange = () => {
+            if (audioRef.current?.paused) {
+                setIsPlaying(false)
+            } else {
+                setIsPlaying(true)
+            }
+        }
+        audioRef.current?.addEventListener('pause', handlePlayStatusChange)
+        audioRef.current?.addEventListener('play', handlePlayStatusChange)
+        return () => {
+            audioRef.current?.removeEventListener('pause', handlePlayStatusChange)
+            audioRef.current?.removeEventListener('play', handlePlayStatusChange)
+        }
+    }, [audioRef])
+    
     const handleEditToggle = () => {
         setEditing(!isEditing)
     }
@@ -113,28 +144,53 @@ export const Player = (props: IPlayer) => {
         return `Mode: ${transTable[playMode]}`
     }, [playMode])
 
-    if (!music) {
-        return (
-            <div>
-                <p>No music</p>
-            </div>
-        )
-    }
+    const info = useMemo(() => {
+        if (!music) {
+            return {
+                title: 'No Playing',
+                src: '',
+                cover: ''
+            }
+        }
+        return {
+            title: `${music.title} - ${music.artist}`,
+            src: `/api/music/${music.id}`,
+            cover: ''
+        }
+    }, [music])
 
     return (
-        <div>
-            <audio controls src={`/api/music/${id}`} ref={audioRef} />
-            <p>{music.title} - {music.artist}</p>
-            <p>{music.album}</p>
-            <div>
-                <button onClick={handlePlayPrev}>Prev</button>
-                <button onClick={handlePlayNext}>Next</button>
-                <button onClick={switchPlayMode}>{playModeText}</button>
-            </div>
-            <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
-            { isEditing ? (
-                <TagEditer id={id} {...{album, artist, title}} onFinish={handleUpdated} />
-            ) : null}
-        </div>
+        <Fragment>
+            <audio controls src={info.src} ref={audioRef} style={{width: 0, height: 0}} />
+            { match ? (
+                <div className={style.fullContainer}>
+                    <button onClick={switchPlayMode}>{playModeText}</button>
+                    <button onClick={handlePlayPrev}>Prev</button>
+                    <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
+                    { isEditing ? (
+                        <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
+                    ) : null}
+                </div>
+            ) : (
+                <div className={style.miniContainer}>
+                    <img src={info.cover || require('../imgs/ic-album-default.svg')} className={style.cover} />
+                    <p className={style.infoText}>{info.title}</p>
+                    <div>
+                        <img
+                            onClick={isPlaying ? handlePause : handlePlay}
+                            src={isPlaying ? require('../imgs/ic-pause.svg') : require('../imgs/ic-play.svg') } 
+                            className={style.icOperation}
+                        />
+                        <img
+                            onClick={handlePlayNext}
+                            src={require('../imgs/ic-next.svg')}
+                            className={style.icOperation}
+                        />
+                        
+                    </div>
+                </div>
+            ) }
+        </Fragment>
+        
     )
 }

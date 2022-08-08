@@ -1,4 +1,44 @@
 .container {
-  max-height: 220px;
+  height: 220px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.iconEnd {
+  @s: 40px;
+  width: @s;
+  height: @s;
+  padding-bottom: 12px;
+}
+
+.tipsLine {
+  width: 40px;
+  border-bottom: 1px solid #ccc;
+  transform: translateY(-50%);
+}
+.icEmpty {
+  @s: 20px;
+  width: @s;
+  height: @s;
+  margin-right: 6px;
+}
+.tipsText {
+  line-height: 16px;
+} 
+.emptyTips {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  &::before {
+    content: '';
+    margin-right: 8px;
+    .tipsLine();
+  }
+  &::after {
+    content: '';
+    margin-left: 8px;
+    .tipsLine();
+  }
 }

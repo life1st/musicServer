@@ -12,15 +12,15 @@ export const Pages = () => {
   const pages = [{
       name: 'Library',
       path: '/library',
-      comp: Library
+      comp: <Library />
     }, {
       name: 'Serach',
       path: '/search',
-      comp: Search
+      comp: <Search />
     }, {
       name: 'Playing',
       path: '/playing',
-      comp: () => <div>Playing</div>
+      comp: <div>Playing</div>
     }
   ]  
 

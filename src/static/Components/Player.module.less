@@ -1,0 +1,26 @@
+.fullContainer {
+
+}
+
+.miniContainer {
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .cover {
+        @s: 32px;
+        width: @s;
+        height: @s;
+        margin-right: 8px;
+    }
+    .icOperation {
+        @s: 32px;
+        width: @s;
+        height: @s;
+        margin-left: 4px;
+    }
+    .infoText {
+        flex: 1;
+        margin: 0;
+    }
+}
