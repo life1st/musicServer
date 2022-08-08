@@ -176,6 +176,10 @@ export const Player = (props: IPlayer) => {
             <audio controls src={info.src} ref={audioRef} style={{width: 0, height: 0}} />
             { match ? (
                 <div className={style.fullContainer}>
+                    <div className={style.progressContainer}>
+                        <div className={style.progress} style={{width: `${Math.floor(time / curDuration.current * 100)}%`}} />
+                        <div className={style.progressDot} style={{left: `${Math.floor(time / curDuration.current * 100)}%`}} />
+                    </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
                     <button onClick={handlePlayPrev}>Prev</button>
                     <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
@@ -206,6 +210,5 @@ export const Player = (props: IPlayer) => {
                 </div>
             ) }
         </Fragment>
-        
     )
 }
