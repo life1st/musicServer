@@ -1,0 +1,6 @@
+
+class Album {
+
+    async getAlbumList() {
+    }
+}
