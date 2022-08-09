@@ -8,6 +8,7 @@ import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { deleteMusic } from '../API'
+import useProgress from '../hooks/useProgress'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 interface IMusic {
@@ -30,6 +31,7 @@ export const Player = (props: IPlayer) => {
     const list = useRecoilValue(libraryState)
     
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
+    const fullProgressRef = useRef()
     const [isPlaying, setIsPlaying] = useState(false)
     const [ time, setTime ] = useState(0)
     const curDuration = useRef(0)
@@ -147,6 +149,18 @@ export const Player = (props: IPlayer) => {
             setTime(currentTime)
         }
     }
+    const handleProgressSet = (progress: number) => {
+        if (audioRef.current && audioRef.current.currentTime) {
+            audioRef.current.currentTime = progress / 100 * curDuration.current
+        }
+    }
+    const {
+        handleProgressDown,
+        handleProgressMove,
+        handleProgressUp
+    } = useProgress({ref: fullProgressRef, onProgressSet: handleProgressSet})
+
+    const progressPercent = Number((time / curDuration.current * 100).toFixed(2))
 
     const playModeText = useMemo(() => {
         const transTable = {
@@ -176,9 +190,15 @@ export const Player = (props: IPlayer) => {
             <audio controls src={info.src} ref={audioRef} style={{width: 0, height: 0}} />
             { match ? (
                 <div className={style.fullContainer}>
-                    <div className={style.progressContainer}>
-                        <div className={style.progress} style={{width: `${Math.floor(time / curDuration.current * 100)}%`}} />
-                        <div className={style.progressDot} style={{left: `${Math.floor(time / curDuration.current * 100)}%`}} />
+                    <div
+                        className={style.progressContainer}
+                        ref={fullProgressRef}
+                        onMouseDown={handleProgressDown}
+                        onMouseMove={handleProgressMove}
+                        onMouseUp={handleProgressUp}
+                    >
+                        <div className={style.progress} style={{width: `${progressPercent}%`}} />
+                        <div className={style.progressDot} style={{left: `${progressPercent}%`}} />
                     </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
                     <button onClick={handlePlayPrev}>Prev</button>
@@ -190,7 +210,7 @@ export const Player = (props: IPlayer) => {
             ) : (
                 <div className={style.miniContainer}>
                     <div className={style.progressContainer}>
-                        <div className={style.progress} style={{width: `${Math.floor(time / curDuration.current * 100)}%`}} />
+                        <div className={style.progress} style={{width: `${progressPercent}%`}} />
                     </div>
                     <img src={info.cover || require('../imgs/ic-album-default.svg')} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
