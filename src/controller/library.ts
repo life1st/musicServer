@@ -57,9 +57,11 @@ class Library {
                     musicMetaProcesses[i] = null
                     if (musicMetaProcesses.every(p => p === null)) {
                         console.log('scan finish', musicCount, (Date.now() - startTime) / 1000 + 's')
-                        scanProcess.kill('SIGINT')
-                        // @ts-ignore
-                        scanProcess = null
+                        if (scanProcess) {
+                            scanProcess.kill('SIGINT')
+                            // @ts-ignore
+                            scanProcess = null
+                        }
                     }
                 }
             })
@@ -67,7 +69,7 @@ class Library {
         scanProcess.on('message', ([dirs, musicFiles]: [string[], string[]]) => {
             console.log('message from scan process: ', dirs, musicFiles)
             if (dirs.length > 0) {
-                scanDirs = scanDirs.concat(dirs)
+                scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb'].some(k => dir.includes(k))))
             }
             if (musicFiles.length > 0) {
                 scanMusicCache = scanMusicCache.concat(musicFiles)
