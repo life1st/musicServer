@@ -25,7 +25,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
-    "recoil": "^0.7.4"
+    "recoil": "^0.7.4",
+    "reset-css": "^5.0.1"
   },
   "devDependencies": {
     "@parcel/transformer-less": "2.6.2",

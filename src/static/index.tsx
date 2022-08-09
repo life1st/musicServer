@@ -9,6 +9,7 @@ import { useDocTitle } from './hooks/useDocTitle'
 import { Pages } from './router'
 import Navibar from './Components/Navibar'
 import './global.less'
+import 'reset-css'
 
 const App = () => {
     const { music } = useRecoilValue(musicState)

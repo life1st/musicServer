@@ -10,6 +10,10 @@ const Navibar = (props) => {
       icon: require('../imgs/ic-play.svg'),
       onClick: () => { navigator('/playing') }
     }, {
+      title: 'Albums',
+      icon: require('../imgs/ic-album.svg'),
+      onClick: () => { navigator('/albums') }
+    }, {
       title: 'Library',
       icon: require('../imgs/ic-library.svg'),
       onClick: () => { navigator('/library') }
@@ -17,7 +21,7 @@ const Navibar = (props) => {
       title: 'Search',
       icon: require('../imgs/ic-search.svg'),
       onClick: () => { navigator('/search') }
-    }
+    },
   ]
 
   return (

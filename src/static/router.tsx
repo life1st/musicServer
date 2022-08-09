@@ -4,9 +4,9 @@ import {
   Route,
   Link
 } from 'react-router-dom'
-const { useEffect } = React
 import Library from './Pages/Library'
 import Search from './Pages/Search'
+import Albums from './Pages/Albums'
 
 export const Pages = () => {
   const pages = [{
@@ -21,6 +21,10 @@ export const Pages = () => {
       name: 'Playing',
       path: '/playing',
       comp: <div>Playing</div>
+    }, {
+      name: 'Albums',
+      path: '/albums',
+      comp: <Albums />
     }
   ]  
 
