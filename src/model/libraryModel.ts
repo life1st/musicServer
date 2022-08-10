@@ -42,7 +42,15 @@ class LibraryModel {
         const { title, keyword } = query
         const limit = DEFAULT_LIMIT
         if (keyword) {
-            return this.db.find({keyword: {$regex: new RegExp(keyword)}}).skip(pageNum * limit).limit(limit).exec()
+            let words = keyword.split(' ')
+            if (words.length > 2) {
+                console.log('keywords too mach, only can detect 2.')
+                words = words.slice(0, 2)
+            }
+            const regStr1 = `(.*${words.join('.*')}.*)`
+            const regStr2 = `(.*${words.reverse().join('.*')}.*)`
+            const reg = new RegExp(`${regStr1}|${regStr2}`)
+            return this.db.find({keyword: {$regex: reg}}).skip(pageNum * limit).limit(limit).exec()
         } else if (title) {
             return this.db.find({title}).limit(limit).exec()
         } else {
