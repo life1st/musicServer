@@ -1,17 +1,14 @@
 FROM node:alpine AS builder
-
 WORKDIR /usr/app
-COPY package.json yarn.lock ./
-RUN yarn
-
-
-FROM node:alpine
-
-WORKDIR /usr/app
-COPY --from=builder /usr/app/node_modules ./node_modules
 COPY . .
+RUN yarn && rm -rf ./dist && yarn build && yarn build-fe
 
-RUN yarn build && yarn build-fe && rm -r ./node_modules
+
+FROM alpine
+WORKDIR /usr/app
+RUN apk add --no-cache --update nodejs yarn
+COPY --from=builder /usr/app/dist ./dist
+COPY package.json ./
 
 EXPOSE 3000
 
