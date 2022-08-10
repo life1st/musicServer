@@ -13,6 +13,7 @@ export const genCoverInfo = async (params: {
 }): Promise<{
   coverUrl: string,
   coverId: string,
+  coverBuf: Buffer | undefined,
 }> => {
     let { music, id3Tags, coverBuf } = params
     let coverUrl = ''
@@ -42,7 +43,7 @@ export const genCoverInfo = async (params: {
       }
     }
 
-    return { coverUrl, coverId }
+    return { coverUrl, coverId, coverBuf }
   }
   
   export const saveCoverFile = async (cover: Buffer, albumName: string, config: {

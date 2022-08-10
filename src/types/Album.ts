@@ -1,8 +1,10 @@
+import { Music } from './Music'
 export interface Album {
-    id: string;
+    albumId: string;
     name: string;
     artist: string;
-    coverId: string;
-    coverUrl: string;
     musicIds: string[];
+    coverId?: string;
+    coverUrl?: string;
+    songs?: Music[];
 }

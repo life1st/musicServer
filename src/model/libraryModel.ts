@@ -24,6 +24,16 @@ class LibraryModel {
         return this.db.find({}).skip(page * limit).limit(limit).exec()
     }
 
+    async getMusicListBy(params: {
+        ids?: string[],
+    }): Promise<Music[]> {
+        const { ids } = params
+        if (Array.isArray(ids)) {
+            return this.db.find({ id: { $in: ids } })
+        }
+        return []
+    }
+
     async getMusicBy(
         query: {
             keyword?: string,
@@ -52,15 +62,15 @@ class LibraryModel {
         const id = prevId || music.id
         const existMusic = await this.db.findOne({id}) as Music
         let hasUpdate = false
+        const { coverId, coverUrl } = await genCoverInfo({ music, coverBuf: coverBuffer })
         if (existMusic) {
-            const coverId = md5(coverBuffer)
             const { coverId: prevCoverId } = existMusic
-            if (prevCoverId !== coverId) {
-                // TODO: 替换 or 递增
+            if (!prevCoverId && coverId) {
+                existMusic.coverId = coverId
+                existMusic.coverUrl = coverUrl
             }
             hasUpdate = await this.db.update({id}, music, {}) > 0 
         } else {
-            const { coverId, coverUrl } = await genCoverInfo({ music, coverBuf: coverBuffer })
             music.coverId = coverId
             music.coverUrl = coverUrl
             hasUpdate = await this.db.insert(music) !== null
