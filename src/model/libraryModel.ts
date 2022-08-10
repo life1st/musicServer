@@ -1,13 +1,11 @@
 import path from 'path'
 import Nedb from 'nedb-promises'
-import md5 from 'md5'
 import { DB_DIR } from '../utils/path'
-import { getDir, genFile } from '../utils/file'
+import { getDir } from '../utils/file'
 import { genMusicKeyword } from '../utils/music'
 import { genCoverInfo } from '../utils/cover'
 import { Music } from '../types/Music'
-
-const DEFAULT_LIMIT = 30
+import { DEFAULT_LIMIT } from '../shareCommon/consts'
 
 class LibraryModel {
     private dbFile = path.resolve(DB_DIR, 'libraryModel')

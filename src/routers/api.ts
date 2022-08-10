@@ -1,5 +1,6 @@
 import Router from 'koa-router'
 import { library } from '../controller/library'
+import { album } from '../controller/album'
 
 const apiRoute = new Router()
 
@@ -45,6 +46,20 @@ apiRoute
     const { id } = ctx.params
     const status = await library.deleteMusic(id)
     ctx.body = { status }
+})
+.get('/album_list/:pageNum', async ctx => {
+    const { pageNum } = ctx.params
+    const { artist } = ctx.request.query
+    ctx.body = await album.getAlbumList({pageNum, artist})
+})
+.get('/album/:id', async ctx => {
+    const { id } = ctx.params
+
+    ctx.body = await album.getAlbum(id)
+})
+.get('/album_scan', async ctx => {
+    album.createAlbumFromLibrary()
+    ctx.body = { status: 'ok' }
 })
 
 export { apiRoute }
