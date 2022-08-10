@@ -1,4 +1,4 @@
-FROM node:alpine AS builder
+FROM node:18 AS builder
 WORKDIR /usr/app
 COPY . .
 RUN yarn && rm -rf ./dist && yarn build && yarn build-fe
