@@ -11,6 +11,7 @@ import { deleteMusic } from '../API'
 import useProgress from '../hooks/useProgress'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
+const { host } = window.location
 interface IMusic {
     id: string;
     title: string;
@@ -180,7 +181,7 @@ export const Player = (props: IPlayer) => {
         }
         return {
             title: `${music.title} - ${music.artist}`,
-            src: `/api/music/${music.id}`,
+            src: `${host}/api/music/${music.id}`,
             cover: ''
         }
     }, [music])
