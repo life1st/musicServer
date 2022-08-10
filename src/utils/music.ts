@@ -2,14 +2,15 @@ import fs from 'fs/promises'
 import path from 'path'
 import { getFileId, getMusicID3 } from './file'
 import { Music } from '../types/Music'
+import { genCoverInfo } from './cover'
 export const genMusicKeyword = (music: Music) => {
   const {
     title = '', artist = '', album = '', genre = ''
   } = music
-  return [title, artist, album, genre].join(' ')
+  return [title, artist, album, genre].filter(Boolean).join(' ')
 }
 
-export const getMusicData = async(musicPath: string): Promise<Music> => {
+export const getMusicData = async (musicPath: string): Promise<Music> => {
 
   const [ buf, stat ] = await Promise.all([
       fs.readFile(musicPath),
@@ -26,7 +27,7 @@ export const getMusicData = async(musicPath: string): Promise<Music> => {
       title, artist = '', album = '', genre = '',
       trackNumber, unsynchronisedLyrics, 
   } = info
-  return {
+  const meta: Music = {
       id, path: musicPath,
       title: title || path.basename(musicPath), artist, album, genre,
       size: stat.size,
@@ -34,4 +35,15 @@ export const getMusicData = async(musicPath: string): Promise<Music> => {
           trackNumber, unsynchronisedLyrics, 
       }
   }
+
+  const { coverUrl, coverId } = await genCoverInfo({
+    music: meta,
+    id3Tags: info
+  })
+  if (coverUrl && coverId) {
+    meta.coverUrl = coverUrl
+    meta.coverId = coverId
+  }
+  
+  return meta
 }

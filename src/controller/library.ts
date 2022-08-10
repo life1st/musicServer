@@ -38,7 +38,6 @@ class Library {
         let scanDirs = [MUSIC_DIR]
         let scanMusicCache: string[] = []
 
-
         let scanProcess = child_process.fork('./dist/scanDir.js')
         let musicMetaProcesses = Array(musicProcessCount).fill(null).map(() => child_process.fork('./dist/getMusicMeta.js'))
         let musicCount = 0
@@ -174,7 +173,7 @@ class Library {
             isSuccess = await updateMusicID3(music.path, tags)
             if (isSuccess) {
                 const musicMeta = await getMusicData(music.path)
-                return libraryModel.updateMusic(musicMeta, id)
+                return libraryModel.updateMusic(musicMeta, { prevId: id })
             }
         }
         return isSuccess

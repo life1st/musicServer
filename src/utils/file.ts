@@ -31,7 +31,7 @@ export const getFileId = async (fileBuf): Promise<string> => {
     }
 }
 
-export const getMusicID3 = async (fileBuf) => {
+export const getMusicID3 = async (fileBuf: Buffer): Promise<ID3.Tags> => {
     try {
         const tags = ID3.read(fileBuf)
         return tags
