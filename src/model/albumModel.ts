@@ -23,7 +23,7 @@ class AlbumModel {
     }
 
     async getAlbumListBy(
-        param: { artist: string; },
+        param: { artist?: string; },
         config: {
             pageNum: number;
             limit: number;
@@ -31,8 +31,11 @@ class AlbumModel {
     ) {
         const { artist } = param
         const { pageNum = 0, limit = 20 } = config
-        
-        return await this.db.find({artist}).skip(pageNum * limit).limit(limit).exec()
+        const condition = {}
+        if (artist) {
+            condition.artist = artist
+        }
+        return await this.db.find(condition).skip(pageNum * limit).limit(limit).exec()
     }
 
     async updateAlbum({ albumInfo, musicId }: {

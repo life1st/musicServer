@@ -12,7 +12,7 @@ class Album {
 
     async getAlbumList({pageNum, artist, needSongs}: {
         pageNum: number,
-        artist: string,
+        artist?: string,
         needSongs?: boolean
     }) {
         const limit = DEFAULT_LIMIT
@@ -43,7 +43,7 @@ class Album {
         let hasMore = true
         let page = 0
         while(hasMore) {
-            const list = await libraryModel.getMusicList(page, LIMIT)
+            const list = await libraryModel.getMusicList(page++, LIMIT)
             if (list.length === 0) {
                 hasMore = false
                 break

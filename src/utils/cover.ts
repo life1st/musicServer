@@ -5,6 +5,7 @@ import { Tags } from 'node-id3'
 import { getMusicID3, getFileId } from './file'
 import { Music } from '../types/Music'
 import { COVER_DIR } from './path'
+import { getDir } from './file'
 
 export const genCoverInfo = async (params: {
   music: Music,
@@ -50,6 +51,7 @@ export const genCoverInfo = async (params: {
     overwrite?: boolean
   } = {}) => {
     const { overwrite = false } = config
+    
     const coverPath = path.join(COVER_DIR, albumName)
     if (overwrite || !(existsSync(coverPath))) {
       await fs.writeFile(coverPath, cover)
@@ -59,3 +61,4 @@ export const genCoverInfo = async (params: {
     return coverPath
   }
   
+  getDir(COVER_DIR)
