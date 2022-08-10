@@ -1,3 +1,4 @@
+import { createReadStream } from 'fs'
 import { DEFAULT_LIMIT } from '../shareCommon/consts'
 import { albumModel } from '../model/albumModel'
 import { libraryModel } from '../model/libraryModel'
@@ -5,6 +6,14 @@ import { Music } from '../types/Music'
 import { genAlbumInfo } from '../utils/album'
 import { genCoverInfo } from '../utils/cover'
 class Album {
+
+    async getCover(albumId: string) {
+        const album = await albumModel.getAlbum(albumId)
+        if (album?.coverUrl) {
+            return createReadStream(album.coverUrl)
+        }
+        return null
+    }
 
     async getAlbum(id: string) {
         return albumModel.getAlbum(id)

@@ -61,5 +61,10 @@ apiRoute
     album.createAlbumFromLibrary()
     ctx.body = { status: 'ok' }
 })
+.get('/album_cover/:albumId', async ctx => {
+    const { albumId } = ctx.params
+    ctx.set('content-type', 'image/jpeg')
+    ctx.body = await album.getCover(albumId)
+})
 
 export { apiRoute }

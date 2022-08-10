@@ -55,8 +55,6 @@ export const genCoverInfo = async (params: {
     const coverPath = path.join(COVER_DIR, albumName)
     if (overwrite || !(existsSync(coverPath))) {
       await fs.writeFile(coverPath, cover)
-    } else {
-        return false
     }
     return coverPath
   }

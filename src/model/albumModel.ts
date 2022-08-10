@@ -31,9 +31,9 @@ class AlbumModel {
     ) {
         const { artist } = param
         const { pageNum = 0, limit = 20 } = config
-        const condition = {}
+        let condition = {}
         if (artist) {
-            condition.artist = artist
+            condition = { artist }
         }
         return await this.db.find(condition).skip(pageNum * limit).limit(limit).exec()
     }

@@ -11,7 +11,7 @@ import { deleteMusic } from '../API'
 import useProgress from '../hooks/useProgress'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
-const { host } = window.location
+const { origin } = window.location
 interface IMusic {
     id: string;
     title: string;
@@ -52,8 +52,8 @@ export const Player = (props: IPlayer) => {
         // }
         if (nextIndex >= 0 && nextIndex < list.length) {
             setMusic((_) => ({
-            curIndex: nextIndex,
-            music: list[nextIndex]
+                curIndex: nextIndex,
+                music: list[nextIndex]
             }))
         }
     }, [curIndex, list])
@@ -181,7 +181,7 @@ export const Player = (props: IPlayer) => {
         }
         return {
             title: `${music.title} - ${music.artist}`,
-            src: `${host}/api/music/${music.id}`,
+            src: `${origin}/api/music/${music.id}`,
             cover: ''
         }
     }, [music])
