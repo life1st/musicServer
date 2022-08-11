@@ -2,9 +2,9 @@ import Router from 'koa-router'
 import { library } from '../controller/library'
 import { album } from '../controller/album'
 
-const fileRouter = new Router()
+const fileRoute = new Router()
 
-fileRouter
+fileRoute
 .get('/music/:id', async ctx => {
     const { id } = ctx.params
     const { music, stream, size} = await library.getMusic(id)
@@ -20,4 +20,4 @@ fileRouter
     ctx.body = await album.getCover(albumId)
 })
 
-export { fileRouter }
+export { fileRoute }

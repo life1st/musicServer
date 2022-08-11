@@ -1,5 +1,6 @@
 .albumContainer {
-  width: 92px;
+  @s: 92px;
+  width: @s;
   margin: 12px;
   padding: 0 4px;
   flex-shrink: 0;
@@ -8,15 +9,21 @@
     outline: 1px solid #ccc;
   }
   .albumCoverImg {
-    width: 100%;
-    height: 100%;
+    width: @s;
+    height: @s;
     border-radius: 8px;
     object-fit: contain;
+    background-color: #eee;
   }
   .albumTitle {
-    font-size: 15px;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 8px;
     color: rgb(30, 30, 30);
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

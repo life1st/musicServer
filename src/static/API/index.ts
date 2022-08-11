@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Music } from '../../types/Music'
 
 const buildKvStr = (obj) => Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&')
 
@@ -25,7 +26,7 @@ export const searchMusic = (q: string, pageNum: number = 0) => {
         q, pageNum
     })}`
 
-    return axios.get(url)
+    return axios.get<Music[]>(url)
 }
 
 export const deleteMusic = (id: string) => {
@@ -35,9 +36,7 @@ export const deleteMusic = (id: string) => {
 }
 
 export const getAlbums = (pageNum: number = 0) => {
-    const url = `/api/album_list?${buildKvStr({
-        pageNum
-    })}`
+    const url = `/api/album_list/${pageNum}`
 
     return axios.get(url)
 }

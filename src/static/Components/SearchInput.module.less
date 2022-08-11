@@ -1,0 +1,37 @@
+.container {
+  height: 40px;
+  border-radius: 4px;
+  background-color: rgba(0,0,0,.1);
+  @icSize: 20px;
+  @icMargin: 8px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  .searchIcon {
+    width: @icSize;
+    height: @icSize;
+    margin: 0 @icMargin;
+    cursor: pointer;
+  }
+  .input {
+    padding: 0 0 0 @icMargin;
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 14px;
+    color: #333;
+    padding: 0 8px;
+    &::placeholder {
+      color: #666;
+    }
+  }
+  .icClose {
+    @s: 20px;
+    width: @s;
+    height: @s;
+    margin-right: 12px;
+    cursor: pointer;
+  }
+}
