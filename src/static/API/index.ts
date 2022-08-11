@@ -33,3 +33,11 @@ export const deleteMusic = (id: string) => {
 
     return axios.delete(url)
 }
+
+export const getAlbums = (pageNum: number = 0) => {
+    const url = `/api/album_list?${buildKvStr({
+        pageNum
+    })}`
+
+    return axios.get(url)
+}

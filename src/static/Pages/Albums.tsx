@@ -1,6 +1,9 @@
 import * as React from 'react'
 import * as style from './Albums.module.less'
+import { useLibrary } from '../hooks/useLibrary'
+import { getAlbums } from '../API'
 
+const { useCallback } = React
 const Album = (props) => {
   const { coverUrl, name } = props
 
@@ -13,42 +16,10 @@ const Album = (props) => {
 }
 
 const Albums = () => {
-  const list = [
-    {
-      id: '123',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album 1',
-    },{
-      id: '1232',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album 2',
-    },{
-      id: '1233',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album 3',
-    },{
-      id: '1231',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album 4',
-    },{
-      id: '12311',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album 5',
-    },{
-      id: '123121',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album1 5',
-    },{
-      id: '1231212',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album1 7',
-    },{
-      id: '1231211',
-      coverUrl: require('../imgs/ic-album-default.svg'),
-      name: 'Album1 8',
-    },
-  ]
-
+  const fetchData = useCallback((pageNum) => {
+    return getAlbums(pageNum)
+  }, [])
+  const { list, setCurPage, curPage } = useLibrary({fetchData})
   return (
     <div className={style.albumsContainer}>
       { list.map(album => (
