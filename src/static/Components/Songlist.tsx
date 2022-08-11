@@ -31,10 +31,11 @@ interface ILibrary {
     onReachEnd: () => void;
     list: Music[];
     hasMore?: boolean;
+    showLoading?: boolean;
 }
 const Songlist = (props: ILibrary) => {
     const { 
-      list, hasMore,
+      list, hasMore, showLoading,
       onItemClick, onReachEnd
     } = props
     const listRef = useRef<HTMLElement>()
@@ -45,20 +46,33 @@ const Songlist = (props: ILibrary) => {
     const { run: handleScroll, cancel, flush} = useThrottleFn(() => {
       if (listRef.current) {
         const { clientHeight, scrollTop, scrollHeight } = listRef.current
-        if (clientHeight + scrollTop >= scrollHeight) {
+        if (clientHeight + scrollTop >= scrollHeight - 20) {
           onReachEnd?.()
         }
       }
     }, { wait: 300 })
+
+    const renderEnd = () => {
+      if (showLoading && hasMore) {
+        return <img src={require('../imgs/ic-loading.svg')} className={style.iconEnd} />
+      }
+      if (!hasMore) {
+        return (
+          <div className={style.emptyTips}>
+            <img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} />
+            <span className={style.tipsText}>没有了</span>
+          </div>
+        )
+      }
+      return null
+    }
 
     return (
         <ul className={style.container} onScroll={handleScroll} ref={listRef}>
             { list.map((item, i) => (
                 <SongItem key={item.id} music={item} onClick={() => { handleItemClick(item, i) }} />
             )) }
-            { hasMore 
-              ? <img src={require('../imgs/ic-loading.svg')} className={style.iconEnd} /> 
-              : (<div className={style.emptyTips}><img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} /><span className={style.tipsText}>没有了</span></div>)  }
+            { renderEnd() }
         </ul>
     )
 }

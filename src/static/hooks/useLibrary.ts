@@ -12,7 +12,7 @@ export const useLibrary = ({
   list: Music[];
   loadNextPage: () => Promise<boolean>;
 } => {
-  const [list, setList] = useState<Music[]>([])
+  const [ list, setList ] = useState<Music[]>([])
   const [ curPage, setCurPage ] = useState<number>(0)
   const loadedPages = useRef<number[]>([])
 
@@ -23,6 +23,7 @@ export const useLibrary = ({
           && !loadedPages.current.includes(curPage)
           && data.length > 0
       ) {
+          setCurPage(curPage + 1)
           if (curPage === 0) {
             loadedPages.current = [curPage]
             setList(data)
@@ -35,18 +36,20 @@ export const useLibrary = ({
       return false
     })
   }
-  useEffect(() => {
-    loadNextPage()
-  }, [curPage])
 
   useEffect(() => {
     setCurPage(0)
     loadNextPage()
   }, [fetchData])
+
+  const reset = () => {
+    setList([])
+    setCurPage(0)
+  }
   
   return {
     loadNextPage,
     curPage, setCurPage,
-    list
+    list, reset
   }
 }

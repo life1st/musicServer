@@ -12,7 +12,6 @@ const { useCallback, useState } = React
 const Search = (props) => {
   const [ hasMore, setHasMore ] = useState(true)
   const [ searchText, setSearchText ] = useState('')
-  const [ searchList, setSearchList ] = useState<Music[]>([])
   
   const setMusic = useSetRecoilState(musicState)
 
@@ -23,7 +22,7 @@ const Search = (props) => {
       return Promise.resolve([])
     }
   }, [searchText])
-  const { list, curPage, setCurPage } = useLibrary({fetchData})
+  const { list, curPage, setCurPage, reset } = useLibrary({fetchData})
 
   const handleItemClick = (music, i) => {
     setMusic((_) => ({
@@ -36,6 +35,9 @@ const Search = (props) => {
     setSearchText('')
   }
   const handleSearch = async (val) => {
+    if (!val) {
+      reset()
+    }
     setSearchText(val)
   }
 
@@ -53,7 +55,8 @@ const Search = (props) => {
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
         list={list}
-        hasMore={hasMore} 
+        hasMore={hasMore}
+        showLoading={searchText.length > 0}
       />
     </div>
   )
