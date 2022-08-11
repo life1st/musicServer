@@ -7,6 +7,7 @@ import { MUSIC_DIR } from '../utils/path'
 import { isMusicFile, updateMusicID3 } from '../utils/file'
 import { getMusicData } from '../utils/music'
 import { libraryModel } from '../model/libraryModel'
+import { album } from './album'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
 
@@ -45,7 +46,10 @@ class Library {
             process.on('message', async (music: Music) => {
                 console.log('message from music process: ', music?.path)
                 musicCount++
-                await libraryModel.updateMusic(music)
+                await Promise.all([
+                    album.updateAlbum(music),
+                    libraryModel.updateMusic(music)
+                ])
                 const i = musicMetaTasks.findIndex(t => t === music.path)
                 if (scanMusicCache.length > 0 && i >= 0) {
                     musicMetaTasks[i] = scanMusicCache.pop() as string
