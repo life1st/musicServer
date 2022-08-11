@@ -14,12 +14,12 @@ class LibraryModel {
         getDir(DB_DIR)
     }
 
-    async getMusic(id: string): Promise<Music> {
-        return this.db.findOne({ id })
+    async getMusic(id: string) {
+        return this.db.findOne<Music>({ id })
     }
 
-    async getMusicList(page = 0, limit = DEFAULT_LIMIT): Promise<Music[]> {
-        return this.db.find({}).skip(page * limit).limit(limit).exec()
+    async getMusicList(page = 0, limit = DEFAULT_LIMIT) {
+        return this.db.find<Music>({}).skip(page * limit).limit(limit).exec()
     }
 
     async getMusicListBy(params: {
@@ -50,9 +50,9 @@ class LibraryModel {
             const regStr1 = `(.*${words.join('.*')}.*)`
             const regStr2 = `(.*${words.reverse().join('.*')}.*)`
             const reg = new RegExp(`${regStr1}|${regStr2}`)
-            return this.db.find({keyword: {$regex: reg}}).skip(pageNum * limit).limit(limit).exec()
+            return this.db.find<Music>({keyword: {$regex: reg}}).skip(pageNum * limit).limit(limit).exec()
         } else if (title) {
-            return this.db.find({title}).limit(limit).exec()
+            return this.db.find<Music>({title}).limit(limit).exec()
         } else {
             console.log(`getMusicBy didn't received any varible`)
             return Promise.reject(null)
@@ -66,7 +66,7 @@ class LibraryModel {
         const { prevId, coverBuffer } = params || {}
         music.keyword = genMusicKeyword(music)
         const id = prevId || music.id
-        const existMusic = await this.db.findOne({id}) as Music
+        const existMusic = await this.db.findOne<Music>({id})
         let hasUpdate = false
         const { coverId, coverUrl } = await genCoverInfo({ music, coverBuf: coverBuffer })
         if (existMusic) {

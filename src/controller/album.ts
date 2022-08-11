@@ -6,7 +6,6 @@ import { Music } from '../types/Music'
 import { genAlbumInfo } from '../utils/album'
 import { genCoverInfo } from '../utils/cover'
 class Album {
-
     async getCover(albumId: string) {
         const album = await albumModel.getAlbum(albumId)
         if (album?.coverUrl) {

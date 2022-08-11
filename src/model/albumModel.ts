@@ -14,7 +14,7 @@ class AlbumModel {
     }
 
     async getAlbum(id) {
-        const album = await this.db.findOne({albumId: id}) as Album
+        const album = await this.db.findOne<Album>({albumId: id})
         if (album) {
             const songs = await libraryModel.getMusicListBy({ids: album.musicIds})            
             return { ...album, songs }
@@ -35,7 +35,7 @@ class AlbumModel {
         if (artist) {
             condition = { artist }
         }
-        return await this.db.find(condition).skip(pageNum * limit).limit(limit).exec()
+        return await this.db.find<Album>(condition).skip(pageNum * limit).limit(limit).exec()
     }
 
     async updateAlbum({ albumInfo, musicId }: {
@@ -43,7 +43,7 @@ class AlbumModel {
         musicId: string
     }) {
         const { albumId, coverUrl, coverId } = albumInfo
-        const existAlbum = await this.db.findOne({albumId}) as Album
+        const existAlbum = await this.db.findOne<Album>({albumId})
         let hasUpdate = false
         if (existAlbum) {
             const { coverId: existCoverId } = existAlbum
