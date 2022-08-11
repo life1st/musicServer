@@ -10,16 +10,16 @@ const useProgress = (params: Params) => {
     const { ref, onProgressSet = () => {}, onMove = () => {} } = params || {}
     const progressLong = ref.current?.clientWidth
     const [isKeyDonw, setIsKeyDonw] = useState(false)
-    const handleProgressDown = (e) => {
+    const mouseDown = (e) => {
         setIsKeyDonw(true)
     }
-    const { run: handleProgressMove, cancel: cancelMove } = useThrottleFn((e) => {
+    const { run: mouseMove, cancel: cancelMove } = useThrottleFn((e) => {
         if (isKeyDonw) {
             const { clientX } = e
             onMove(Number((clientX / progressLong * 100).toFixed(2)))
         }
     }, { wait: 16 })
-    const handleProgressUp = (e) => {
+    const mouseUp = (e) => {
         setIsKeyDonw(false)
         cancelMove()
         const { clientX } = e
@@ -27,9 +27,9 @@ const useProgress = (params: Params) => {
     }
 
     return {
-        handleProgressDown,
-        handleProgressMove,
-        handleProgressUp,
+        mouseDown,
+        mouseMove,
+        mouseUp,
     }
 }
 

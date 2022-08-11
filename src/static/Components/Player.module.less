@@ -40,6 +40,39 @@
             background-color: rgb(192, 62, 62);
         }
     }
+
+    .volumenContainer {
+        width: 80%;
+        height: 4px;
+        background-color: #666;
+        margin: 12px 0;
+        border-radius: 2px;
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            @s: 14px;
+            height: @s;
+            left: 0;
+            width: 100%;
+            top: -@s * 0.5;
+        }
+        .volumeProgress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 4px;
+            background-color: rgb(192, 62, 62);
+        }
+        .volumeDot {
+            position: absolute;
+            top: -2px;
+            width: 5px;
+            height: 5px;
+            border-radius: 5px;
+            background-color: rgb(192, 62, 62);
+        }
+    }
 }
 
 .miniContainer {

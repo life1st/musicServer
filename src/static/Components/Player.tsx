@@ -32,7 +32,6 @@ export const Player = (props: IPlayer) => {
     const list = useRecoilValue(libraryState)
     
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
-    const fullProgressRef = useRef()
     const [isPlaying, setIsPlaying] = useState(false)
     const [ time, setTime ] = useState(0)
     const curDuration = useRef(0)
@@ -150,18 +149,33 @@ export const Player = (props: IPlayer) => {
             setTime(currentTime)
         }
     }
+
+    const fullProgressRef = useRef()
     const handleProgressSet = (progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
             audioRef.current.currentTime = progress / 100 * curDuration.current
         }
     }
     const {
-        handleProgressDown,
-        handleProgressMove,
-        handleProgressUp
+        mouseDown: handleProgressDown,
+        mouseMove: handleProgressMove,
+        mouseUp: handleProgressUp
     } = useProgress({ref: fullProgressRef, onProgressSet: handleProgressSet})
-
     const progressPercent = Number((time / curDuration.current * 100).toFixed(2))
+
+    const volumeRef = useRef()
+    const handleVolumeSet = (progress: number) => {
+        console.log(progress)
+        if (audioRef.current) {
+            audioRef.current.volume = progress / 100
+        }
+    }
+    const {
+        mouseDown: handleVolumeDown,
+        mouseMove: handleVolumeMove,
+        mouseUp: handleVolumeUp
+    } = useProgress({ref: volumeRef, onProgressSet: handleVolumeSet })
+    const volumePercent = Number((audioRef.current?.volume * 100).toFixed(2))
 
     const playModeText = useMemo(() => {
         const transTable = {
@@ -207,6 +221,17 @@ export const Player = (props: IPlayer) => {
                     { isEditing ? (
                         <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
                     ) : null}
+
+                    <div 
+                        className={style.volumeContainer}
+                        ref={volumeRef}
+                        onMouseDown={handleVolumeDown}
+                        onMouseMove={handleVolumeMove}
+                        onMouseUp={handleVolumeUp}
+                    >
+                        <div className={style.volumeProgress} />
+                        <div className={style.volumeDot} />
+                    </div>
                 </div>
             ) : (
                 <div className={style.miniContainer}>

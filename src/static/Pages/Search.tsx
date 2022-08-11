@@ -12,7 +12,6 @@ const { useCallback, useState } = React
 const Search = (props) => {
   const [ hasMore, setHasMore ] = useState(true)
   const [ searchText, setSearchText ] = useState('')
-  const [ searchList, setSearchList ] = useState<Music[]>([])
   
   const setMusic = useSetRecoilState(musicState)
 
@@ -53,7 +52,8 @@ const Search = (props) => {
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
         list={list}
-        hasMore={hasMore} 
+        hasMore={hasMore}
+        showLoading={searchText.length > 0}
       />
     </div>
   )
