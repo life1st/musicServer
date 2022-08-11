@@ -1,5 +1,5 @@
 .container {
-  height: 220px;
+  height: 280px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -40,5 +40,66 @@
     content: '';
     margin-left: 8px;
     .tipsLine();
+  }
+}
+
+.songItem {
+  @pl: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  padding: 8px 0 8px @pl;
+  &::after {
+    content: '';
+    position: absolute;
+    left: @pl - 2;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: #ccc;
+  }
+  .content {
+    flex: 1;
+  }
+  .name {
+    font-size: 15px;
+    height: 18px;
+    margin-bottom: 4px;
+  }
+  .artist {
+    font-size: 9px;
+    height: 12px;
+  }
+  .icPlaying {
+    @s: 18px;
+    width: @s;
+    height: @s;
+    flex: 0 0 @s;
+    margin-right: 8px;
+    animation: rotate 3s linear infinite;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes playAnime {
+  0% {
+    transform: translate(0, 0);
+  }
+  35% {
+    transform: translate(-2px, -1px);
+  }
+  65% {
+    transform: translate(1px, 0);
+  }
+  100% {
+    transform: translate(2px, -1px);
   }
 }
