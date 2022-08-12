@@ -49,7 +49,7 @@ class AlbumModel {
             const { coverId: existCoverId } = existAlbum
             const curAlbumInfo = {
                 ...existAlbum,
-                musicIds: existAlbum.musicIds.concat(musicId),
+                musicIds: Array.from(new Set(existAlbum.musicIds.concat(musicId))),
             }
             if (!existCoverId) {
                 if (coverId) {

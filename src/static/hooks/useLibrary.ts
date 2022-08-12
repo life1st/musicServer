@@ -39,7 +39,7 @@ export const useLibrary = <T>({
         setCurPage(page)
     }
     setLoading(false)
-    return data?.length > 0
+    return data?.length
   }
 
   useEffect(() => {
