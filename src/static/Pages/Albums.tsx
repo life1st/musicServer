@@ -17,9 +17,9 @@ const Album = (props: Album) => {
   }
 
   return (
-    <div className={style.albumContainer}>
+    <div className={style.albumContainer} title={name}>
       <img src={coverUrl} onError={handleLoadError} className={style.albumCoverImg} />
-      <p className={style.albumTitle} title={name}>{name}</p>
+      <p className={style.albumTitle}>{name}</p>
     </div>
   )
 }
