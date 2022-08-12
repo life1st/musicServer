@@ -51,7 +51,10 @@ class Album {
     
     async updateAlbum(music: Music) {
         let albumInfo = genAlbumInfo(music)
-        const { albumId } = albumInfo
+        const { albumId, name } = albumInfo
+        if (!name) {
+            return null
+        }
         const existAlbum = await albumModel.getAlbum(albumId)
         if (existAlbum) {
             albumInfo = existAlbum
