@@ -95,11 +95,29 @@
         height: @s;
         margin-right: 8px;
     }
+    .oprations {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    @ic_ops: 32px;
     .icOperation {
-        @s: 32px;
+        width: @ic_ops;
+        height: @ic_ops;
+        align-self: center;
+        margin-left: 4px;
+    }
+    .icPause {
+        @s: 26px;
         width: @s;
         height: @s;
-        margin-left: 4px;
+        margin: 0 (@ic_ops - @s)*0.5;
+    }
+    .icNext {
+        @s: 26px;
+        width: @s;
+        height: @s;
+        margin: 0 (@ic_ops - @s)*0.5;
     }
     .infoText {
         flex: 1;

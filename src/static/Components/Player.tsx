@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useMatch } from 'react-router-dom'
 import * as style from './Player.module.less'
+import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { libraryState, pageState } from '../model/library'
 import { musicState } from '../model/music'
@@ -245,16 +246,22 @@ export const Player = (props: IPlayer) => {
                     </div>
                     <img src={coverUrl} onError={handleCoverError} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
-                    <div>
+                    <div className={style.oprations}>
                         <img
                             onClick={isPlaying ? handlePause : handlePlay}
                             src={isPlaying ? require('../imgs/ic-pause.svg') : require('../imgs/ic-play.svg') } 
-                            className={style.icOperation}
+                            className={cls(
+                                style.icOperation,
+                                isPlaying ? style.icPause : ''
+                            )}
                         />
                         <img
                             onClick={handlePlayNext}
                             src={require('../imgs/ic-next.svg')}
-                            className={style.icOperation}
+                            className={cls(
+                                style.icOperation,
+                                style.icNext
+                            )}
                         />
                     </div>
                 </div>
