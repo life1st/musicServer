@@ -8,20 +8,16 @@ import { playListState } from '../model/music'
 import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
+import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
 import useProgress from '../hooks/useProgress'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
-interface IMusic {
-    id: string;
-    title: string;
-    artist: string;
-    album: string;
-}
+const defaultCoverUrl = require('../imgs/ic-album-default.svg')
 interface IPlayer {
     onPlayEnd?: (PLAY_MODE) => () => void;
-    onPlayError?: (m: IMusic) => void;
+    onPlayError?: (m: Music) => void;
     onPrevSong?: () => void;
     onNextSong?: () => void;
 }
@@ -177,7 +173,7 @@ export const Player = (props: IPlayer) => {
         mouseMove: handleVolumeMove,
         mouseUp: handleVolumeUp
     } = useProgress({ref: volumeRef, onProgressSet: handleVolumeSet })
-    const volumePercent = Number((audioRef.current?.volume * 100).toFixed(2))
+    // const volumePercent = Number((audioRef.current?.volume * 100).toFixed(2))
 
     const playModeText = useMemo(() => {
         const transTable = {
@@ -188,6 +184,7 @@ export const Player = (props: IPlayer) => {
     }, [playMode])
 
     const info = useMemo(() => {
+        console.log(music)
         if (!music) {
             return {
                 title: 'No Playing',
@@ -198,9 +195,13 @@ export const Player = (props: IPlayer) => {
         return {
             title: `${music.title} - ${music.artist}`,
             src: `${origin}/api/music/${music.id}`,
-            cover: ''
+            cover: `${origin}/file/album_cover/${music.albumId}`,
         }
     }, [music])
+    const [coverUrl, setCoverUrl] = useState(info.cover)
+    const handleCoverError = () => {
+        setCoverUrl(defaultCoverUrl)
+    }
 
     return (
         <Fragment>
@@ -240,7 +241,7 @@ export const Player = (props: IPlayer) => {
                     <div className={style.progressContainer}>
                         <div className={style.progress} style={{width: `${progressPercent}%`}} />
                     </div>
-                    <img src={info.cover || require('../imgs/ic-album-default.svg')} className={style.cover} />
+                    <img src={coverUrl} onError={handleCoverError} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
                     <div>
                         <img
@@ -253,7 +254,6 @@ export const Player = (props: IPlayer) => {
                             src={require('../imgs/ic-next.svg')}
                             className={style.icOperation}
                         />
-                        
                     </div>
                 </div>
             ) }
