@@ -13,13 +13,16 @@ class AlbumModel {
         getDir(DB_DIR)
     }
 
-    async getAlbum(id) {
+    async getAlbum(id, config?:{
+        needSongs?: boolean;
+    }) {
+        const { needSongs = false } = config || {}
         const album = await this.db.findOne<Album>({albumId: id})
-        if (album) {
+        if (album && needSongs) {
             const songs = await libraryModel.getMusicListBy({ids: album.musicIds})            
             return { ...album, songs }
         }
-        return null
+        return album
     }
 
     async getAlbumListBy(

@@ -8,17 +8,12 @@ export const getAlbumId = (music: Music) => {
 }
 
 export const genAlbumInfo = (music: Music): Album => {
-    const { album, artist, coverUrl, coverId } = music
+    const { album, artist } = music
     const albumId = getAlbumId(music)
     const info: Album = {
         albumId, name: album, artist,
         musicIds: [music.id]
     }
-    if (coverUrl) {
-        info.coverUrl = coverUrl
-    }
-    if (coverId) {
-        info.coverId = coverId
-    }
+
     return info
 }

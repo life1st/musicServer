@@ -50,7 +50,17 @@ class Album {
     }
     
     async updateAlbum(music: Music) {
-        const albumInfo = genAlbumInfo(music)
+        let albumInfo = genAlbumInfo(music)
+        const { albumId } = albumInfo
+        const existAlbum = await albumModel.getAlbum(albumId)
+        if (existAlbum) {
+            albumInfo = existAlbum
+        }
+        if (!existAlbum || !existAlbum.coverId) {
+            const { coverId, coverUrl } = await genCoverInfo({ music })
+            albumInfo.coverId = coverId
+            albumInfo.coverUrl = coverUrl
+        }
 
         const hasUpdate = await albumModel.updateAlbum({
             musicId: music.id,
@@ -59,7 +69,7 @@ class Album {
         return hasUpdate ? albumInfo : null
     }
 
-    async createAlbumFromLibrary () {
+    async createAlbumFromLibrary() {
         const LIMIT = 100
         let hasMore = true
         let page = 0
@@ -70,12 +80,7 @@ class Album {
                 break
             }
             for (const music of list) {
-                const { coverUrl, coverId, coverBuf } = await genCoverInfo({ music })
-                console.log(coverUrl, coverId, music.album)
-                const albumInfo = await this.updateAlbum({
-                    ...music,
-                    coverUrl, coverId
-                })
+                const albumInfo = await this.updateAlbum(music)
                 if (albumInfo) {
                     await libraryModel.updateMusic({
                         ...music,
