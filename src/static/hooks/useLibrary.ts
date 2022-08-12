@@ -1,6 +1,4 @@
-import { AxiosResponse } from 'axios';
 import { useState, useRef, useEffect } from 'react'
-import { Music } from '../../types/Music'
 
 export const useLibrary = <T>({
   fetchData,
@@ -8,43 +6,51 @@ export const useLibrary = <T>({
   fetchData: (page: number, limit?: number) => Promise<any>
 }): {
   curPage: number;
-  setCurPage: (curPage: number) => void;
   list: T[];
-  loadNextPage: () => Promise<boolean>;
+  loading: boolean;
+  loadNextPage: (n?: number) => Promise<boolean>;
 } => {
+  const [ loading, setLoading ] = useState(false)
   const [ list, setList ] = useState<T[]>([])
   const [ curPage, setCurPage ] = useState<number>(0)
   const loadedPages = useRef<number[]>([])
 
-  const loadNextPage = async () => {
-    if (loadedPages.current.includes(curPage)) {
+  const loadNextPage = async (page = curPage + 1) => {
+    if (loading) {
+      return true
+    }
+    if (loadedPages.current.includes(page)) {
       return false
     }
-    return fetchData(curPage).then(resp => {
-      const { status, data } = resp
-      if (status === 200 && data) {
-          if (curPage === 0) {
-            loadedPages.current = [curPage]
-            setList(data)
-          } else {
-            loadedPages.current.push(curPage)
-            setList(list.concat(data))
-          }
-          return true
-      }
-      return false
-    })
+    setLoading(true)
+    const resp = await fetchData(page)
+    const { status, data } = resp
+    if (!status && page === 0 && !data?.length) {
+      setList([])
+    }
+    if (status === 200 && data) {
+        if (page === 0) {
+          loadedPages.current = [page]
+          setList(data)
+        } else {
+          loadedPages.current.push(page)
+          setList(list.concat(data))
+        }
+        setCurPage(page)
+    }
+    setLoading(false)
+    return data?.length > 0
   }
 
   useEffect(() => {
     loadedPages.current = []
-    setCurPage(0)
-    loadNextPage()
+    loadNextPage(0)
   }, [fetchData])
   
   return {
     loadNextPage,
-    curPage, setCurPage,
-    list
+    curPage,
+    list,
+    loading,
   }
 }

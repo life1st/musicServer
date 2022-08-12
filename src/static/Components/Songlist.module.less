@@ -10,6 +10,7 @@
   width: @s;
   height: @s;
   padding-bottom: 12px;
+  padding-left: 12px;
 }
 
 .tipsLine {
@@ -66,14 +67,18 @@
   }
   .content {
     flex: 1;
+    overflow: hidden;
   }
   .name {
     font-size: 15px;
     height: 18px;
-    margin-bottom: 4px;
+    margin: 0 12px 4px 0;
     color: rgb(25, 25, 25);
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
   }
-  .artist {
+  .desc {
     font-size: 9px;
     height: 12px;
     color: rgb(66, 66, 66);

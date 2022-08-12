@@ -28,7 +28,7 @@ const Albums = () => {
   const fetchData = useCallback((pageNum) => {
     return getAlbums(pageNum)
   }, [])
-  const { list, setCurPage, curPage } = useLibrary<Album>({fetchData})
+  const { list, curPage } = useLibrary<Album>({fetchData})
   return (
     <div className={style.albumsContainer}>
       { list.map(album => (
