@@ -6,6 +6,7 @@ import { getMusicID3, getFileId } from './file'
 import { Music } from '../types/Music'
 import { COVER_DIR } from './path'
 import { getDir } from './file'
+import { genAlbumInfo } from './album'
 
 export const genCoverInfo = async (params: {
   music: Music,
@@ -14,7 +15,6 @@ export const genCoverInfo = async (params: {
 }): Promise<{
   coverUrl: string,
   coverId: string,
-  coverBuf: Buffer | undefined,
 }> => {
     let { music, id3Tags, coverBuf } = params
     let coverUrl = ''
@@ -22,41 +22,42 @@ export const genCoverInfo = async (params: {
 
     if (!id3Tags && music) {
       const { path } = music
-      const buf = await fs.readFile(path)
-      id3Tags = await getMusicID3(buf)
+      const musicBuf = await fs.readFile(path)
+      id3Tags = await getMusicID3(musicBuf)
     }
     if (id3Tags && !coverBuf) {
       const { image } = id3Tags
-      if (image) {
-        if (typeof image === 'string') {
-          coverUrl = image
-          coverId = `url-${image}`
-        } else {
-          coverBuf = image.imageBuffer
-        }
+      if (typeof image !== 'string' && image?.imageBuffer) {
+        coverBuf = image.imageBuffer
       }
     }
     if (coverBuf) {
-      const savePath = await saveCoverFile(coverBuf, music?.album || `未知专辑${music.title}`)
+      const albumInfo = genAlbumInfo(music)
+      const savePath = await saveCoverFile(coverBuf, albumInfo.albumId)
       if (savePath) {
         coverUrl = savePath
         coverId = await getFileId(coverBuf)
       }
     }
 
-    return { coverUrl, coverId, coverBuf }
+    return { coverUrl, coverId }
   }
   
-  export const saveCoverFile = async (cover: Buffer, albumName: string, config: {
+  export const saveCoverFile = async (cover: Buffer, coverName: string, config: {
     overwrite?: boolean
   } = {}) => {
     const { overwrite = false } = config
     
-    const coverPath = path.join(COVER_DIR, albumName)
+    const coverPath = path.join(COVER_DIR, `${coverName}.jpg`)
     if (overwrite || !(existsSync(coverPath))) {
-      await fs.writeFile(coverPath, cover)
+      try {
+        await fs.writeFile(coverPath, cover)
+        return coverPath
+      } catch(e) {
+        console.log('saveCoverFile error:', e)
+        return null
+      }
     }
-    return coverPath
   }
   
   getDir(COVER_DIR)
