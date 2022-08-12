@@ -22,7 +22,7 @@ const Search = (props) => {
       return Promise.resolve([])
     }
   }, [searchText])
-  const { list, curPage, setCurPage } = useLibrary({fetchData})
+  const { list, curPage, loading, loadNextPage } = useLibrary<Music>({fetchData})
 
   const handleItemClick = (music, i) => {
     setMusic((_) => ({
@@ -38,11 +38,12 @@ const Search = (props) => {
     setSearchText(val)
   }
 
-  const handleLoadMore = (page = curPage) => {
-    if (!hasMore) {
+  const handleLoadMore = async () => {
+    if (!hasMore && loading) {
       return false;
     }
-    setCurPage(page + 1)
+    const hasData = await loadNextPage(curPage + 1)
+    setHasMore(hasData)
   }
 
   return (
@@ -53,7 +54,7 @@ const Search = (props) => {
         onReachEnd={handleLoadMore}
         list={list}
         hasMore={hasMore}
-        showLoading={searchText.length > 0}
+        showLoading={loading}
       />
     </div>
   )

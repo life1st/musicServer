@@ -4,12 +4,21 @@ import {
 import { Music } from '../../types/Music'
 
 export const musicState = atom<{
-  curIndex: number | null,
   music: Music | null,
 }>({
   key: 'musicState',
   default: {
-    curIndex: null,
     music: null,
+  }
+})
+
+export const playListState = atom<{
+  list: Music[],
+  curIndex: number | null,
+}>({
+  key: 'playListState',
+  default: {
+    list: [],
+    curIndex: null,
   }
 })

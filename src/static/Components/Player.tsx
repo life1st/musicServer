@@ -4,6 +4,7 @@ import * as style from './Player.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { libraryState, pageState } from '../model/library'
 import { musicState } from '../model/music'
+import { playListState } from '../model/music'
 import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
@@ -25,8 +26,9 @@ interface IPlayer {
     onNextSong?: () => void;
 }
 export const Player = (props: IPlayer) => {
-    const { curIndex, music } = useRecoilValue(musicState)
+    const { music } = useRecoilValue(musicState)
     const setMusic = useSetRecoilState(musicState)
+    const { curIndex, list: playList } = useRecoilValue(playListState)
 
     const match = useMatch('playing')
     const list = useRecoilValue(libraryState)
