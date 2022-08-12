@@ -184,7 +184,6 @@ export const Player = (props: IPlayer) => {
     }, [playMode])
 
     const info = useMemo(() => {
-        console.log(music)
         if (!music) {
             return {
                 title: 'No Playing',
@@ -202,6 +201,9 @@ export const Player = (props: IPlayer) => {
     const handleCoverError = () => {
         setCoverUrl(defaultCoverUrl)
     }
+    useEffect(() => {
+        setCoverUrl(info.cover)
+    }, [info])
 
     return (
         <Fragment>
