@@ -5,11 +5,12 @@ interface Props {
   src: string;
   defaultSrc?: string;
   className?: string;
+  style?: React.CSSProperties;
   onClick?: () => void;
 }
 const icCoverDefault = require('../imgs/ic-album-default.svg')
 const Cover = (props: Props) => {
-  const { src, defaultSrc = icCoverDefault, className } = props
+  const { src, defaultSrc = icCoverDefault, className, style } = props
   const { onClick = () => {} } = props
   const [url, setUrl] = React.useState(src)
   const handleLoadError = () => {
@@ -22,9 +23,10 @@ const Cover = (props: Props) => {
   return (
     <img
       onClick={onClick}
+      onError={handleLoadError}
       className={className}
       src={url || defaultSrc}
-      onError={handleLoadError}
+      style={style}
     />
   )
 }
