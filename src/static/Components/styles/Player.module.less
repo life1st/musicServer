@@ -6,45 +6,101 @@
     left: -999px;
 }
 .fullContainer {
-    height: 200px;
-
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+    .fullCover {
+        @s: 180px;
+        width: @s;
+        height: @s;
+        margin-bottom: 62px;
+        border-radius: 12px;
+    }
+    .fullContent {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .fullTitle {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .fullArtist {
+            font-size: 18px;
+            color: #999;
+        }
+    }
     .progressContainer {
+        @s: 4px;
+        @dotS: 8px;
         position: relative;
-        width: 100%;
-        height: 2px;
+        width: 80%;
+        height: @s;
         background: #ccc;
         margin: 12px 0;
+        border-radius: 2px;
         &::before {
+            @moreS: 12px;
             content: '';
             position: absolute;
-            @s: 14px;
-            height: @s;
+            height: @s + @moreS;
             left: 0;
             width: 100%;
-            top: -@s * 0.5;
+            top: -@moreS * 0.5;
         }
         &:hover {
             .progressDot {
-                width: 7px;
-                height: 7px;
-                top: -3px;
+                width: @dotS + 4;
+                height: @dotS + 4;
+                top: -(@dotS - @s + 4) * 0.5;
+                border-radius: (@dotS + 4) * 0.5;
             }
         }
         .progress {
             position: absolute;
             left: 0;
             top: 0;
-            height: 2px;
+            height: @s;
+            border-radius: @s * 0.5;
             background-color: rgb(192, 62, 62);
         }
         .progressDot {
             position: absolute;
-            top: -2px;
-            width: 5px;
-            height: 5px;
-            border-radius: 5px;
+            top: -(@dotS - @s) * 0.5;
+            width: @dotS;
+            height: @dotS;
+            border-radius: @dotS * 0.5;
             transition: all .2s;
             background-color: rgb(192, 62, 62);
+        }
+    }
+
+    .controlBtns {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        .btnCommon(@s: 40px;) {
+            width: @s;
+            height: @s;
+            margin: 0 10px;
+        }
+        .btnNext {
+            .btnCommon();
+        }
+        .btnPrev {
+            .btnCommon();
+            transform: rotate(180deg);
+        }
+        .btnPause {
+            .btnCommon();
+        }
+        .btnPlay {
+            .btnCommon(46);
+            margin: 0 7px;
         }
     }
 
