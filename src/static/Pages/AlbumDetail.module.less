@@ -1,0 +1,33 @@
+.container {
+  font-size: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.detailContent {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+
+@info_s: 128px;
+.coverImg {
+  width: @info_s;
+  height: @info_s;
+  margin-right: 18px;
+  border-radius: 6px;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.detailInfo {
+  height: @info_s;
+  flex: 1;
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .artist {
+    font-size: 14px;
+    color: #636363;
+  }
+}

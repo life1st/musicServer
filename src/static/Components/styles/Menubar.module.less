@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 0 0 0;
+}
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 8px;
+  border-radius: 8px;
+  width: 60px;
+  padding: 4px;
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+  &:hover {
+    background-color: #ccc;
+  }
+}
+.menuIcon {
+  @s: 24px;
+  width: @s;
+  height: @s;
+}
+.menuText {
+  font-size: 12px;
+}

@@ -7,6 +7,7 @@ import {
 import Library from './Pages/Library'
 import Search from './Pages/Search'
 import Albums from './Pages/Albums'
+import AlbumDetail from './Pages/AlbumDetail'
 
 export const Pages = () => {
   const pages = [{
@@ -25,8 +26,12 @@ export const Pages = () => {
       name: 'Albums',
       path: '/albums',
       comp: <Albums />
+    }, {
+      name: 'Album Detail',
+      path: '/album/:albumId',
+      comp: <AlbumDetail />
     }
-  ]  
+  ]
 
   return (
     <Routes>

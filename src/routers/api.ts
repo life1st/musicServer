@@ -35,12 +35,16 @@ apiRoute
 })
 .get('/music/:id', async ctx => {
     const { id } = ctx.params
-    const { music, stream, size} = await library.getMusic(id)
-    console.log('resp music file', music)
-    ctx.set('content-type', 'audio/mpeg')
-    ctx.set('Accept-Ranges', 'bytes')
-    ctx.set('Content-Length', size)
-    ctx.body = stream
+    const { music, stream, size} = await library.getMusic(id) || {}
+    if (music) {
+        console.log('resp music file', music)
+        ctx.set('content-type', 'audio/mpeg')
+        ctx.set('Accept-Ranges', 'bytes')
+        ctx.set('Content-Length', size)
+        ctx.body = stream
+    } else {
+        ctx.throw(404, 'music not found')
+    }
 })
 .delete('/music/:id', async ctx => {
     const { id } = ctx.params
@@ -54,8 +58,9 @@ apiRoute
 })
 .get('/album/:id', async ctx => {
     const { id } = ctx.params
+    const { needSongs } = ctx.request.query
 
-    ctx.body = await album.getAlbum(id)
+    ctx.body = await album.getAlbum(id, { needSongs })
 })
 .get('/album_scan', async ctx => {
     album.createAlbumFromLibrary()

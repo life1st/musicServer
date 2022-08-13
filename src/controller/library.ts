@@ -155,15 +155,18 @@ class Library {
     
     async getMusic(id) {
         const music = await libraryModel.getMusic(id)
-        const stream = createReadStream(music?.path)
-        const close = () => { stream.close() }
-        stream.on('error', close)
-        stream.on('en', close)
-        return {
-            music,
-            stream, 
-            size: music?.size
+        if (music) {
+            const stream = createReadStream(music.path)
+            const close = () => { stream.close() }
+            stream.on('error', close)
+            stream.on('en', close)
+            return {
+                music,
+                stream,
+                size: music?.size
+            }
         }
+        return null
     }
 
     async updateMeta(id, info) {

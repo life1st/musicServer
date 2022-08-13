@@ -35,9 +35,9 @@ const SongItem = (props: ItemProps) => {
     </li>
   )
 }
-interface ILibrary {
+interface ISonglist {
     onItemClick: (m: Music, n: number) => void;
-    onReachEnd: () => void;
+    onReachEnd?: () => void;
     onScroll?: (scrollTop: number) => void;
     list: Music[];
     hasMore?: boolean;
@@ -45,7 +45,7 @@ interface ILibrary {
     initScrollTop?: number;
     className?: string;
 }
-const Songlist = (props: ILibrary) => {
+const Songlist = (props: ISonglist) => {
     const { 
       list, hasMore, initScrollTop, showLoading, className,
       onItemClick, onReachEnd, onScroll
