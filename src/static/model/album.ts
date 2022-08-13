@@ -1,12 +1,22 @@
 import { atom } from 'recoil'
 import { Album } from '../../types/Album'
 
-export const albumState = atom<Album[]>({
+export const albumState = atom<{
+  list: Album[];
+  curPage: number | null;
+  loadedPages: number[];
+  hasMore: boolean
+}>({
   key: 'albumState',
-  default: [],
+  default: {
+    list: [],
+    curPage: null,
+    loadedPages: [],
+    hasMore: true,
+  },
 })
 
-export const pageState = atom({
-  key: 'pageState',
-  default: 0,
+export const albumScrollState = atom<number>({
+  key: 'albumScrollState',
+  default: 0
 })
