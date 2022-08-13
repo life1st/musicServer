@@ -23,19 +23,21 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        margin-bottom: 20px;
         .fullTitle {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
-        .fullArtist {
-            font-size: 18px;
+        .fullDesc {
+            font-size: 16px;
             color: #999;
         }
     }
     .progressContainer {
         @s: 4px;
         @dotS: 8px;
+        @pc: rgb(192, 62, 62);
         position: relative;
         width: 80%;
         height: @s;
@@ -65,7 +67,7 @@
             top: 0;
             height: @s;
             border-radius: @s * 0.5;
-            background-color: rgb(192, 62, 62);
+            background-color: @pc;
         }
         .progressDot {
             position: absolute;
@@ -74,7 +76,7 @@
             height: @dotS;
             border-radius: @dotS * 0.5;
             transition: all .2s;
-            background-color: rgb(192, 62, 62);
+            background-color: @pc;
         }
     }
 
@@ -83,6 +85,7 @@
         align-items: center;
         justify-content: center;
         height: 50px;
+        margin: 18px 0;
         .btnCommon(@s: 40px;) {
             width: @s;
             height: @s;
@@ -105,35 +108,56 @@
     }
 
     .volumeContainer {
-        width: 80%;
-        height: 4px;
+        width: 60%;
+        @h: 4px;
+        height: @h;
         background-color: #666;
-        margin: 12px 0;
+        margin: auto 0 12px;
         border-radius: 2px;
         position: relative;
+        @vc: rgb(192, 62, 62);
         &::before {
+            @th: @h + 10;
             content: '';
             position: absolute;
-            @s: 14px;
-            height: @s;
+            height: @th;
             left: 0;
             width: 100%;
-            top: -@s * 0.5;
+            top: -@th * 0.5;
         }
         .volumeProgress {
             position: absolute;
             left: 0;
             top: 0;
-            height: 4px;
-            background-color: rgb(192, 62, 62);
+            height: @h;
+            background-color: @vc;
+        }
+        @dh: @h + 4;
+        &:hover {
+            .volumeDot {
+                @dhh: @dh + 2;
+                width: @dhh;
+                height: @dhh;
+                top: -(@dhh - @h) * 0.5;
+                border-radius: @dhh * 0.5;
+            }
         }
         .volumeDot {
             position: absolute;
-            top: -2px;
-            width: 5px;
-            height: 5px;
-            border-radius: 5px;
-            background-color: rgb(192, 62, 62);
+            top: -(@dh - @h) * 0.5;
+            width: @dh;
+            height: @dh;
+            border-radius: @dh * 0.5;
+            background-color: @vc;
+            transition: all .3s;
+        }
+        .icVolume {
+            @s: 24px;
+            width: @s;
+            height: @s;
+            position: absolute;
+            left: -@s - 12;
+            top: -(@s - @h) * 0.5;
         }
     }
 }
@@ -145,11 +169,12 @@
     align-items: center;
     position: relative;
     padding: 0 8px;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     .cover {
         @s: 32px;
         width: @s;
         height: @s;
-        margin-right: 8px;
+        margin-right: 16px;
     }
     .oprations {
         display: flex;
@@ -183,20 +208,22 @@
         text-overflow: ellipsis;
         overflow: hidden;
         line-height: 1.5;
+        font-size: 15px;
     }
     .progressContainer {
         position: absolute;
         left: 0;
-        top: 0;
+        bottom: 0;
         height: 1px;
         width: 100%;
-        background: #ccc;
+        background: rgba(204, 204, 204, 0.3);
     }
     .progress {
         position: absolute;
         left: 0;
         top: 0;
-        height: 1px;
+        height: 2px;
+        border-radius: 2px;
         background-color: rgb(192, 62, 62);
     }
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useThrottleFn } from 'ahooks'
 
 interface Params {
-    el: HTMLElement,
+    el: HTMLElement | undefined,
     onProgressSet: (progress: number) => void;
     onMove?: (progress: number) => void;
 }
@@ -47,7 +47,6 @@ const useProgress = (params: Params) => {
         const { clientX } = e
         const moveX = Number(clientX - elRef.current.left)
         const percent = Number((moveX / elRef.current.width * 100).toFixed(2))
-        console.log(percent)
         onProgressSet(percent)
     }
 }

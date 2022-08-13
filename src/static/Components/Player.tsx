@@ -35,6 +35,7 @@ export const Player = (props: IPlayer) => {
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
     const [isPlaying, setIsPlaying] = useState(false)
     const [ time, setTime ] = useState(0)
+    const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
     const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
@@ -94,7 +95,7 @@ export const Player = (props: IPlayer) => {
         })
     }
 
-    const { id, album, artist, title } = music || {};
+    const { album, artist, title } = music || {};
     const [ isEditing, setEditing ] = useState(false)
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
@@ -171,13 +172,12 @@ export const Player = (props: IPlayer) => {
 
     const volumeRef = useRef()
     const handleVolumeSet = (progress: number) => {
-        console.log(progress)
+        setVolume(progress / 100)
         if (audioRef.current) {
             audioRef.current.volume = progress / 100
         }
     }
-    // useProgress({el: volumeRef.current, onProgressSet: handleVolumeSet })
-    // const volumePercent = Number((audioRef.current?.volume * 100).toFixed(2))
+    useProgress({el: volumeRef.current, onProgressSet: handleVolumeSet })
 
     const playModeText = useMemo(() => {
         const transTable = {
@@ -201,6 +201,16 @@ export const Player = (props: IPlayer) => {
             cover: `${origin}/file/album_cover/${music.albumId}`,
         }
     }, [music])
+    const desc = useMemo(() => {
+        if (!music) {
+            return ''
+        }
+        const { album, artist } = music
+        if (album) {
+            return `${artist} - ${album}`
+        }
+        return artist
+    } , [music])
 
     return (
         <Fragment>
@@ -212,7 +222,7 @@ export const Player = (props: IPlayer) => {
                         { music ? (
                             <Fragment>
                                 <p className={style.fullTitle}>{music.title}</p>
-                                <p className={style.fullArtist}>{music.artist}</p>
+                                <p className={style.fullDesc}>{desc}</p>
                             </Fragment>
                         ) : <p>{info.title}</p> }
                     </div>
@@ -239,20 +249,17 @@ export const Player = (props: IPlayer) => {
                     { isEditing ? (
                         <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
                     ) : null}
-
                     <div 
                         className={style.volumeContainer}
                         ref={volumeRef}
                     >
-                        <div className={style.volumeProgress} />
-                        <div className={style.volumeDot} />
+                        <img src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
+                        <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
+                        <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
                     </div>
                 </div>
             ) : (
                 <div className={style.miniContainer}>
-                    <div className={style.progressContainer}>
-                        <div className={style.progress} style={{width: `${progressPercent}%`}} />
-                    </div>
                     <Cover src={info.cover} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
                     <div className={style.oprations}>
@@ -272,6 +279,9 @@ export const Player = (props: IPlayer) => {
                                 style.icNext
                             )}
                         />
+                    </div>
+                    <div className={style.progressContainer}>
+                        <div className={style.progress} style={{width: `${progressPercent}%`}} />
                     </div>
                 </div>
             ) }
