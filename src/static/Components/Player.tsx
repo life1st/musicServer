@@ -11,6 +11,7 @@ import { RESP_STATE } from '../../shareCommon/consts'
 import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
 import useProgress from '../hooks/useProgress'
+import { useDocTitle } from '../hooks/useDocTitle'
 import Cover from './Cover'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
@@ -27,6 +28,7 @@ export const Player = (props: IPlayer) => {
     const setMusic = useSetRecoilState(musicState)
     const { curIndex, list: playList } = useRecoilValue(playListState)
 
+    useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - Music Server')
     const match = useMatch('playing')
     const list = useRecoilValue(libraryState)
     
@@ -194,11 +196,6 @@ export const Player = (props: IPlayer) => {
             cover: `${origin}/file/album_cover/${music.albumId}`,
         }
     }, [music])
-    const [coverUrl, setCoverUrl] = useState(info.cover)
-
-    useEffect(() => {
-        setCoverUrl(info.cover)
-    }, [info])
 
     return (
         <Fragment>
@@ -238,7 +235,7 @@ export const Player = (props: IPlayer) => {
                     <div className={style.progressContainer}>
                         <div className={style.progress} style={{width: `${progressPercent}%`}} />
                     </div>
-                    <Cover src={coverUrl} className={style.cover} />
+                    <Cover src={info.cover} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
                     <div className={style.oprations}>
                         <img

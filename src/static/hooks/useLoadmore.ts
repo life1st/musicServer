@@ -25,7 +25,6 @@ export const useLoadmore = <T>({
   const setListState = useSetRecoilState(listState)
   const [ loading, setLoading ] = useState(false)
   const loadNextPage = async (page = typeof curPage === 'number' ? curPage + 1 : 0) => {
-    console.log('loadNextPage', page, loadedPages)
     if (loading) {
       return true
     }
@@ -36,8 +35,11 @@ export const useLoadmore = <T>({
     const resp = await fetchData(page)
     const { status, data } = resp
     if (status === 200 && data) {
-      let _loadedPages = [0]
+      let _loadedPages = [...loadedPages]
       let _list = data
+      if (page === 0) {
+        _loadedPages = [page]
+      }
       if (page > 0) {
         _loadedPages.push(page)
         _list = list.concat(data)

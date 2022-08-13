@@ -31,7 +31,6 @@ const Scroller = (props: React.PropsWithChildren<Props>) => {
   const { run: handleScroll, cancel, flush} = useThrottleFn(() => {
     if (listRef.current) {
       const { clientHeight, scrollTop, scrollHeight } = listRef.current
-      console.log(clientHeight, scrollTop, scrollHeight)
       onScroll(scrollTop)
       if (clientHeight + scrollTop >= scrollHeight - 20) {
         onReachEnd?.()

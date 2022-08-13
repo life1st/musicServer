@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+const { useEffect } = React
 interface Props {
   src: string;
   defaultSrc?: string;
@@ -12,11 +13,14 @@ const Cover = (props: Props) => {
   const handleLoadError = () => {
     setUrl(defaultSrc)
   }
+  useEffect(() =>  {
+    setUrl(src)
+  }, [src])
 
   return (
     <img
       className={className}
-      src={url}
+      src={url || defaultSrc}
       onError={handleLoadError}
     />
   )
