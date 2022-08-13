@@ -39,7 +39,6 @@ const Album = (props: Album & {
       <Cover
         src={`${origin}/file/album_cover/${albumId}`} 
         className={style.albumCoverImg}
-        style={style.cover}
         onClick={handleLClick}
       />
       <p className={style.albumTitle}>{name}</p>
