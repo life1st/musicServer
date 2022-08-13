@@ -2,14 +2,20 @@ import {
   atom,
 } from 'recoil'
 import { Music } from '../../types/Music'
+import { listState } from '../hooks/useLoadmore'
 
 
-export const libraryState = atom<Music[]>({
+export const libraryState = atom<listState<Music>>({
   key: 'libraryState',
-  default: [],
+  default: {
+    list: [],
+    curPage: null,
+    loadedPages: [],
+    hasMore: false,
+  },
 })
 
-export const pageState = atom({
-  key: 'pageState',
+export const libraryScrollState = atom({
+  key: 'libraryScrollState',
   default: 0,
 })

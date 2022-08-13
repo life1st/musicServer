@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './Navibar.module.less'
+import * as style from './styls/Navibar.module.less'
 import { useNavigate } from 'react-router-dom'
 
 const Navibar = (props) => {

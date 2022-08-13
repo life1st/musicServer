@@ -1,18 +1,26 @@
 import { useState, useRef, useEffect } from "react";
 import { RecoilState, RecoilValue, useRecoilValue, useSetRecoilState } from 'recoil'
 
+export interface listState<T> {
+  list: T[];
+  curPage: number | null;
+  loadedPages: number[];
+  hasMore: boolean;
+}
+
 export const useLoadmore = <T>({
   fetchData,
   listState,
 }: {
   fetchData: (page: number, limit?: number) => Promise<any>;
-  listState: RecoilState<{
-    list: T[];
-    curPage: number | null;
-    loadedPages: number[];
-    hasMore: boolean;
-  }>;
-}) => {
+  listState: RecoilState<listState<T>>;
+}): {
+  loadNextPage: (n?: number) => Promise<boolean>;
+  curPage: number | null;
+  list: T[];
+  hasMore: boolean;
+  loading: boolean;
+} => {
   const { list, curPage, loadedPages, hasMore } = useRecoilValue(listState)
   const setListState = useSetRecoilState(listState)
   const [ loading, setLoading ] = useState(false)
@@ -42,7 +50,7 @@ export const useLoadmore = <T>({
       }))
     }
     setLoading(false)
-    return data?.length
+    return Boolean(data?.length)
   }
   useEffect(() => {
     loadNextPage(0)

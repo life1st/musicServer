@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './Scroller.module.less'
+import * as style from './styles/Scroller.module.less'
 import { useThrottleFn } from 'ahooks'
 
 const { useRef, useEffect } = React
