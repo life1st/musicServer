@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { RecoilRoot } from 'recoil'
 import { Player } from './Components/Player'
 import { Pages } from './router'
-import Navibar from './Components/Navibar'
+import MenuBar from './Components/MenuBar'
 import './global.less'
 import 'reset-css'
 
@@ -16,7 +16,7 @@ const App = () => {
                 <Pages />
             </div>
             <Player />
-            <Navibar />
+            <MenuBar />
         </Router>
     )
 }

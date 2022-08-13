@@ -192,7 +192,7 @@ export const Player = (props: IPlayer) => {
         }
         return {
             title: `${music.title} - ${music.artist}`,
-            src: `${origin}/api/music/${music.id}`,
+            src: `${origin}/file/music/${music.id}`,
             cover: `${origin}/file/album_cover/${music.albumId}`,
         }
     }, [music])

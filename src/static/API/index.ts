@@ -22,11 +22,9 @@ export const updateMeta = (id, tags) => {
 }
 
 export const searchMusic = (q: string, pageNum: number = 0) => {
-    const url = `/api/search_music?${buildKvStr({
-        q, pageNum
-    })}`
+    const url = `/api/search_music`
 
-    return axios.get<Music[]>(url)
+    return axios.get<Music[]>(url, { params: { q, pageNum } })
 }
 
 export const deleteMusic = (id: string) => {
@@ -39,4 +37,10 @@ export const getAlbums = (pageNum: number = 0) => {
     const url = `/api/album_list/${pageNum}`
 
     return axios.get(url)
+}
+
+export const getAlbumDetail = (id: string, needSongs = true) => {
+    const url = '/api/album/' + id
+
+    return axios.get(url, { params: { needSongs } })
 }

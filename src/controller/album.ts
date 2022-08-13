@@ -26,8 +26,8 @@ class Album {
         return null
     }
 
-    async getAlbum(albumId: string) {
-        return albumModel.getAlbum(albumId)
+    async getAlbum(albumId: string, config: { needSongs?: boolean } = {}) {
+        return albumModel.getAlbum(albumId, config)
     }
 
     async getAlbumList({pageNum, artist, needSongs}: {

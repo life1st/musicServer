@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as style from './Albums.module.less'
+import { useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumState, albumScrollState } from '../model/album'
 import { getAlbums } from '../API'
@@ -11,12 +12,17 @@ import Cover from '../Components/Cover'
 const { origin } = window.location
 const Album = (props: Album) => {
   const { name, albumId } = props
+  const naviTo = useNavigate()
+  const handleLClick = () => {
+    naviTo('/album/' + albumId)
+  }
 
   return (
     <div className={style.albumContainer} title={name}>
       <Cover
         src={`${origin}/file/album_cover/${albumId}`} 
         className={style.albumCoverImg}
+        onClick={handleLClick}
       />
       <p className={style.albumTitle}>{name}</p>
     </div>

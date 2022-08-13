@@ -24,11 +24,12 @@ export const getMusicData = async (musicPath: string): Promise<Music> => {
 
   const {
       title, artist = '', album = '', genre = '',
-      trackNumber, unsynchronisedLyrics, 
+      trackNumber, unsynchronisedLyrics, year,
   } = info
   const meta: Music = {
       id, path: musicPath,
-      title: title || path.basename(musicPath), artist, album, genre,
+      title: title || path.basename(musicPath), 
+      artist, album, genre, year,
       size: stat.size,
       extraInfo: {
           trackNumber, unsynchronisedLyrics, 
