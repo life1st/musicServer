@@ -4,18 +4,18 @@ import * as style from './styles/Player.module.less'
 import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { libraryState } from '../model/library'
-import { musicState } from '../model/music'
-import { playListState } from '../model/music'
+import { musicState, playListState} from '../model/music'
 import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
 import useProgress from '../hooks/useProgress'
+import Cover from './Cover'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
-const defaultCoverUrl = require('../imgs/ic-album-default.svg')
+
 interface IPlayer {
     onPlayEnd?: (PLAY_MODE) => () => void;
     onPlayError?: (m: Music) => void;
@@ -109,11 +109,7 @@ export const Player = (props: IPlayer) => {
     }, [onPlayError, audioRef])
     useEffect(() => {
         const handlePlayStatusChange = () => {
-            if (audioRef.current?.paused) {
-                setIsPlaying(false)
-            } else {
-                setIsPlaying(true)
-            }
+            setIsPlaying(!audioRef.current?.paused)
         }
         audioRef.current?.addEventListener('pause', handlePlayStatusChange)
         audioRef.current?.addEventListener('play', handlePlayStatusChange)
@@ -199,9 +195,7 @@ export const Player = (props: IPlayer) => {
         }
     }, [music])
     const [coverUrl, setCoverUrl] = useState(info.cover)
-    const handleCoverError = () => {
-        setCoverUrl(defaultCoverUrl)
-    }
+
     useEffect(() => {
         setCoverUrl(info.cover)
     }, [info])
@@ -244,7 +238,7 @@ export const Player = (props: IPlayer) => {
                     <div className={style.progressContainer}>
                         <div className={style.progress} style={{width: `${progressPercent}%`}} />
                     </div>
-                    <img src={coverUrl} onError={handleCoverError} className={style.cover} />
+                    <Cover src={coverUrl} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
                     <div className={style.oprations}>
                         <img
