@@ -1,0 +1,43 @@
+.tipsLine {
+  width: 40px;
+  border-bottom: 1px solid #ccc;
+  align-self: center;
+}
+
+.icLoading {
+  @s: 40px;
+  width: @s;
+  height: @s;
+  padding-bottom: 12px;
+  padding-left: 12px;
+}
+.emptyTips {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  padding: 12px 0;
+  &::before {
+    content: '';
+    margin-right: 8px;
+    .tipsLine();
+  }
+  &::after {
+    content: '';
+    margin-left: 8px;
+    .tipsLine();
+  }
+  .icEmpty {
+    @s: 20px;
+    width: @s;
+    height: @s;
+    margin-right: 6px;
+  }
+  .tipsText {
+    line-height: 16px;
+  } 
+}
+.endFix {
+  flex: 1;
+}
