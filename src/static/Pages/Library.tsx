@@ -3,10 +3,10 @@ import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { libraryState, libraryScrollState } from '../model/library'
 import { musicState } from '../model/music'
 import { useLoadmore } from '../hooks/useLoadmore'
-import { getLibrary  } from '../API'
+import { getLibrary, scanLibrary } from '../API'
 import Songlist from '../Components/Songlist'
-import { Pagenation } from '../Components/Pagenation'
 
+const { Fragment } = React
 const Library = (props) => {
   const setMusic = useSetRecoilState(musicState)
   const memScrollTop = useRecoilValue(libraryScrollState)
@@ -30,14 +30,18 @@ const Library = (props) => {
   }
 
   return (
-    <Songlist
+    <Fragment>
+      <button onClick={scanLibrary}>Scan</button>
+      <Songlist
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
         onScroll={setLibraryScroll}
         list={list}
         hasMore={hasMore}
         initScrollTop={memScrollTop}
-    />
+        showLoading={hasMore}
+      />
+    </Fragment>
   )
 }
 

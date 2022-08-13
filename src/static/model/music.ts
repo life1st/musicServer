@@ -1,6 +1,4 @@
-import {
-  atom
-} from 'recoil'
+import { atom } from 'recoil'
 import { Music } from '../../types/Music'
 
 export const musicState = atom<{

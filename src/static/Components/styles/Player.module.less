@@ -83,7 +83,7 @@
 }
 
 .miniContainer {
-    height: 40px;
+    height: 54px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -97,27 +97,28 @@
     }
     .oprations {
         display: flex;
-        justify-content: flex-start;
+        justify-content: flex-end;
         align-items: center;
     }
     @ic_ops: 32px;
+    @ic_ml: 12px;
     .icOperation {
         width: @ic_ops;
         height: @ic_ops;
         align-self: center;
-        margin-left: 4px;
+        margin: 0 @ic_ml;
     }
     .icPause {
         @s: 26px;
         width: @s;
         height: @s;
-        margin: 0 (@ic_ops - @s)*0.5;
+        margin: 0 (@ic_ops - @s)*0.5+@ic_ml;
     }
     .icNext {
         @s: 26px;
         width: @s;
         height: @s;
-        margin: 0 (@ic_ops - @s)*0.5;
+        margin: 0 (@ic_ops - @s)*0.5+@ic_ml;
     }
     .infoText {
         flex: 1;

@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as style from './styles/Songlist.module.less'
 import { musicState } from '../model/music'
 import { useRecoilValue } from 'recoil'
+import cls from 'classnames'
 import { Music } from '../../types/Music'
 import Scroller from './Scroller'
 
@@ -37,15 +38,16 @@ const SongItem = (props: ItemProps) => {
 interface ILibrary {
     onItemClick: (m: Music, n: number) => void;
     onReachEnd: () => void;
-    onScroll: (scrollTop: number) => void;
+    onScroll?: (scrollTop: number) => void;
     list: Music[];
     hasMore?: boolean;
     showLoading?: boolean;
     initScrollTop?: number;
+    className?: string;
 }
 const Songlist = (props: ILibrary) => {
     const { 
-      list, hasMore, initScrollTop,
+      list, hasMore, initScrollTop, showLoading, className,
       onItemClick, onReachEnd, onScroll
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
@@ -56,12 +58,12 @@ const Songlist = (props: ILibrary) => {
 
     return (
       <Scroller
-        onReachEnd={onReachEnd}
         onScroll={onScroll}
-        showLoading={hasMore}
+        onReachEnd={onReachEnd}
         hasMore={hasMore}
+        showLoading={showLoading}
         initScrollTop={initScrollTop}
-        className={style.container}
+        className={cls(style.container, className)}
       >
         { list.map((item, i) => (
           <SongItem 
@@ -71,6 +73,7 @@ const Songlist = (props: ILibrary) => {
             curPlaying={curPlaying}
           />
         )) }
+        <li style={{height: 40}} />
       </Scroller>
     )
 }
