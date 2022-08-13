@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './styles/Scroller.module.less'
 import { useThrottleFn } from 'ahooks'
 
-const { useRef, useEffect } = React
+const { useRef, useEffect, useImperativeHandle, forwardRef } = React
 
 interface Props {
   onReachEnd?: () => void;
@@ -12,7 +12,7 @@ interface Props {
   className?: string;
   initScrollTop?: number;
 }
-const Scroller = (props: React.PropsWithChildren<Props>) => {
+const Scroller = (props: React.PropsWithChildren<Props>, ref) => {
   const {
     onReachEnd = () => {},
     onScroll = () => {},
@@ -28,6 +28,9 @@ const Scroller = (props: React.PropsWithChildren<Props>) => {
       listRef.current.scrollTop = initScrollTop
     }
   }, [])
+  useImperativeHandle(ref, () => ({
+    clientWidth: listRef.current?.clientWidth,
+  }))
   const { run: handleScroll, cancel, flush} = useThrottleFn(() => {
     if (listRef.current) {
       const { clientHeight, scrollTop, scrollHeight } = listRef.current
@@ -60,4 +63,4 @@ const Scroller = (props: React.PropsWithChildren<Props>) => {
   )
 }
 
-export default Scroller
+export default forwardRef(Scroller)
