@@ -1,35 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useThrottleFn } from 'ahooks'
 
 interface Params {
-    ref: any,
+    el: HTMLElement,
     onProgressSet: (progress: number) => void;
-    onMove?: (progress: number) => {}
+    onMove?: (progress: number) => void;
 }
 const useProgress = (params: Params) => {
-    const { ref, onProgressSet = () => {}, onMove = () => {} } = params || {}
-    const progressLong = ref.current?.clientWidth
-    const [isKeyDonw, setIsKeyDonw] = useState(false)
+    const { el, onProgressSet = () => {}, onMove = () => {} } = params || {}
+    const [isKeyDown, setIsKeyDown] = useState(false)
+
+    const elRef = useRef({})
+    useEffect(() => {
+        if (!el) {
+            return
+        }
+        elRef.current = {
+            left: el.offsetLeft,
+            width: el.offsetWidth,
+        }
+        el?.addEventListener('mousedown', mouseDown)
+        el?.addEventListener('mouseup', mouseUp)
+        return () => {
+            console.log('unmounted', el)
+            el.removeEventListener('mousedown', mouseDown)
+            el.removeEventListener('mouseup', mouseUp)
+            document.body.removeEventListener('mousemove', mouseMove)
+        }
+    }, [el])
     const mouseDown = (e) => {
-        setIsKeyDonw(true)
+        setIsKeyDown(true)
+        document.body.addEventListener('mousemove', mouseMove)
     }
     const { run: mouseMove, cancel: cancelMove } = useThrottleFn((e) => {
-        if (isKeyDonw) {
+        if (isKeyDown) {
             const { clientX } = e
-            onMove(Number((clientX / progressLong * 100).toFixed(2)))
+            const moveX = clientX - elRef.current.left
+            const percent = Number((moveX / elRef.current.width * 100).toFixed(2))
+            onMove(percent)
         }
     }, { wait: 16 })
     const mouseUp = (e) => {
-        setIsKeyDonw(false)
+        setIsKeyDown(false)
+        document.body.removeEventListener('mousemove', mouseMove)
         cancelMove()
         const { clientX } = e
-        onProgressSet(Number((clientX / progressLong * 100).toFixed(2)))
-    }
-
-    return {
-        mouseDown,
-        mouseMove,
-        mouseUp,
+        const moveX = Number(clientX - elRef.current.left)
+        const percent = Number((moveX / elRef.current.width * 100).toFixed(2))
+        console.log(percent)
+        onProgressSet(percent)
     }
 }
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { useMatch } from 'react-router-dom'
 import * as style from './styles/Player.module.less'
+import { useMatch } from 'react-router-dom'
 import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { libraryState } from '../model/library'
@@ -76,13 +76,22 @@ export const Player = (props: IPlayer) => {
         }
         handlePlayNext()
     }
+    const checkHasMusic = (afterFunc) => {
+        if (music) {
+            afterFunc()
+        }
+    }
     const handlePause = () => {
         setIsPlaying(false)
-        audioRef.current?.pause()
+        checkHasMusic(() => {
+            audioRef.current?.pause()
+        })
     }
     const handlePlay = () => {
         setIsPlaying(true)
-        audioRef.current?.play()
+        checkHasMusic(() => {
+            audioRef.current?.play()
+        })
     }
 
     const { id, album, artist, title } = music || {};
@@ -147,17 +156,17 @@ export const Player = (props: IPlayer) => {
         }
     }
 
-    const fullProgressRef = useRef()
-    const handleProgressSet = (progress: number) => {
+    const fullProgressRef = useRef<HTMLElement>()
+    const handleProgressSet = useCallback((progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
             audioRef.current.currentTime = progress / 100 * curDuration.current
         }
+    }, [])
+    const handleProgressMove = (p) => {
+        // TODO: change ui first, change audio progress at last call
+        // handleProgressSet(p)
     }
-    const {
-        mouseDown: handleProgressDown,
-        mouseMove: handleProgressMove,
-        mouseUp: handleProgressUp
-    } = useProgress({ref: fullProgressRef, onProgressSet: handleProgressSet})
+    useProgress({el: fullProgressRef.current, onProgressSet: handleProgressSet, onMove: handleProgressMove})
     const progressPercent = Number((time / curDuration.current * 100).toFixed(2))
 
     const volumeRef = useRef()
@@ -167,11 +176,7 @@ export const Player = (props: IPlayer) => {
             audioRef.current.volume = progress / 100
         }
     }
-    const {
-        mouseDown: handleVolumeDown,
-        mouseMove: handleVolumeMove,
-        mouseUp: handleVolumeUp
-    } = useProgress({ref: volumeRef, onProgressSet: handleVolumeSet })
+    // useProgress({el: volumeRef.current, onProgressSet: handleVolumeSet })
     // const volumePercent = Number((audioRef.current?.volume * 100).toFixed(2))
 
     const playModeText = useMemo(() => {
@@ -202,18 +207,34 @@ export const Player = (props: IPlayer) => {
             <audio controls src={info.src} ref={audioRef} className={style.audioRef} />
             { match ? (
                 <div className={style.fullContainer}>
+                    <Cover src={info.cover} className={style.fullCover} />
+                    <div className={style.fullContent}>
+                        { music ? (
+                            <Fragment>
+                                <p className={style.fullTitle}>{music.title}</p>
+                                <p className={style.fullArtist}>{music.artist}</p>
+                            </Fragment>
+                        ) : <p>{info.title}</p> }
+                    </div>
                     <div
                         className={style.progressContainer}
                         ref={fullProgressRef}
-                        onMouseDown={handleProgressDown}
-                        onMouseMove={handleProgressMove}
-                        onMouseUp={handleProgressUp}
                     >
                         <div className={style.progress} style={{width: `${progressPercent}%`}} />
                         <div className={style.progressDot} style={{left: `${progressPercent}%`}} />
                     </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
-                    <button onClick={handlePlayPrev}>Prev</button>
+                    <div className={style.controlBtns}>
+                        <img src={require('../imgs/ic-next.svg')} className={style.btnPrev} onClick={handlePlayPrev} />
+                        {
+                            isPlaying ? (
+                                <img src={require('../imgs/ic-pause.svg')} className={style.btnPause} onClick={handlePause} />
+                            ) : (
+                                <img src={require('../imgs/ic-play.svg')} className={style.btnPlay} onClick={handlePlay} />
+                            )
+                        }
+                        <img src={require('../imgs/ic-next.svg')} className={style.btnNext} onClick={handlePlayNext} />
+                    </div>
                     <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
                     { isEditing ? (
                         <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
@@ -222,9 +243,6 @@ export const Player = (props: IPlayer) => {
                     <div 
                         className={style.volumeContainer}
                         ref={volumeRef}
-                        onMouseDown={handleVolumeDown}
-                        onMouseMove={handleVolumeMove}
-                        onMouseUp={handleVolumeUp}
                     >
                         <div className={style.volumeProgress} />
                         <div className={style.volumeDot} />
