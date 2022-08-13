@@ -3,7 +3,7 @@ import { Music } from '../../types/Music'
 
 const buildKvStr = (obj) => Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&')
 
-export const getLibrary = (pageNum) => {
+export const getLibrary = (pageNum: number) => {
     const url = '/api/music_list/' + pageNum
 
     return axios.get(url)

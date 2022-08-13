@@ -1,10 +1,11 @@
 import * as React from 'react'
-import * as style from './Songlist.module.less'
+import * as style from './styles/Songlist.module.less'
 import { musicState } from '../model/music'
 import { useRecoilValue } from 'recoil'
 import { Music } from '../../types/Music'
-import { useThrottleFn } from 'ahooks'
-const { useRef, useMemo } = React
+import Scroller from './Scroller'
+
+const { useMemo } = React
 
 interface ItemProps {
   curPlaying: Music | null;
@@ -36,57 +37,41 @@ const SongItem = (props: ItemProps) => {
 interface ILibrary {
     onItemClick: (m: Music, n: number) => void;
     onReachEnd: () => void;
+    onScroll: (scrollTop: number) => void;
     list: Music[];
     hasMore?: boolean;
     showLoading?: boolean;
+    initScrollTop?: number;
 }
 const Songlist = (props: ILibrary) => {
     const { 
-      list, hasMore, showLoading,
-      onItemClick, onReachEnd
+      list, hasMore, initScrollTop,
+      onItemClick, onReachEnd, onScroll
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
-    const listRef = useRef<HTMLElement>()
     
     const handleItemClick = (item, i) => {
         onItemClick?.(item, i)
     }
-    const { run: handleScroll, cancel, flush} = useThrottleFn(() => {
-      if (listRef.current) {
-        const { clientHeight, scrollTop, scrollHeight } = listRef.current
-        if (clientHeight + scrollTop >= scrollHeight - 20) {
-          onReachEnd?.()
-        }
-      }
-    }, { wait: 300 })
-
-    const renderEnd = () => {
-      if (showLoading && hasMore) {
-        return <img src={require('../imgs/ic-loading.svg')} className={style.iconEnd} />
-      }
-      if (!hasMore) {
-        return (
-          <div className={style.emptyTips}>
-            <img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} />
-            <span className={style.tipsText}>没有了</span>
-          </div>
-        )
-      }
-      return null
-    }
 
     return (
-        <ul className={style.container} onScroll={handleScroll} ref={listRef}>
-            { list.map((item, i) => (
-                <SongItem 
-                  key={item.id} 
-                  music={item} 
-                  onClick={() => { handleItemClick(item, i) }}
-                  curPlaying={curPlaying}
-                />
-            )) }
-            <li>{ renderEnd() }</li>
-        </ul>
+      <Scroller
+        onReachEnd={onReachEnd}
+        onScroll={onScroll}
+        showLoading={hasMore}
+        hasMore={hasMore}
+        initScrollTop={initScrollTop}
+        className={style.container}
+      >
+        { list.map((item, i) => (
+          <SongItem 
+            key={item.id} 
+            music={item} 
+            onClick={() => { handleItemClick(item, i) }}
+            curPlaying={curPlaying}
+          />
+        )) }
+      </Scroller>
     )
 }
 

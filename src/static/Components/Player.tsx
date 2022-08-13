@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useMatch } from 'react-router-dom'
-import * as style from './Player.module.less'
+import * as style from './styles/Player.module.less'
 import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { libraryState, pageState } from '../model/library'
+import { libraryState } from '../model/library'
 import { musicState } from '../model/music'
 import { playListState } from '../model/music'
 import { TagEditer } from './TagEditer'
@@ -208,7 +208,7 @@ export const Player = (props: IPlayer) => {
 
     return (
         <Fragment>
-            <audio controls src={info.src} ref={audioRef} style={{width: 0, height: 0}} />
+            <audio controls src={info.src} ref={audioRef} className={style.audioRef} />
             { match ? (
                 <div className={style.fullContainer}>
                     <div
