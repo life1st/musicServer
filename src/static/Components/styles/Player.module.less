@@ -1,0 +1,229 @@
+.audioRef {
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: -999px;
+    left: -999px;
+}
+.fullContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+    .fullCover {
+        @s: 180px;
+        width: @s;
+        height: @s;
+        margin-bottom: 62px;
+        border-radius: 12px;
+    }
+    .fullContent {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        .fullTitle {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .fullDesc {
+            font-size: 16px;
+            color: #999;
+        }
+    }
+    .progressContainer {
+        @s: 4px;
+        @dotS: 8px;
+        @pc: rgb(192, 62, 62);
+        position: relative;
+        width: 80%;
+        height: @s;
+        background: #ccc;
+        margin: 12px 0;
+        border-radius: 2px;
+        &::before {
+            @moreS: 12px;
+            content: '';
+            position: absolute;
+            height: @s + @moreS;
+            left: 0;
+            width: 100%;
+            top: -@moreS * 0.5;
+        }
+        &:hover {
+            .progressDot {
+                width: @dotS + 4;
+                height: @dotS + 4;
+                top: -(@dotS - @s + 4) * 0.5;
+                border-radius: (@dotS + 4) * 0.5;
+            }
+        }
+        .progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: @s;
+            border-radius: @s * 0.5;
+            background-color: @pc;
+        }
+        .progressDot {
+            position: absolute;
+            top: -(@dotS - @s) * 0.5;
+            width: @dotS;
+            height: @dotS;
+            border-radius: @dotS * 0.5;
+            transition: all .2s;
+            background-color: @pc;
+        }
+    }
+
+    .controlBtns {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        margin: 18px 0;
+        .btnCommon(@s: 40px;) {
+            width: @s;
+            height: @s;
+            margin: 0 10px;
+        }
+        .btnNext {
+            .btnCommon();
+        }
+        .btnPrev {
+            .btnCommon();
+            transform: rotate(180deg);
+        }
+        .btnPause {
+            .btnCommon();
+        }
+        .btnPlay {
+            .btnCommon(46);
+            margin: 0 7px;
+        }
+    }
+
+    .volumeContainer {
+        width: 60%;
+        @h: 4px;
+        height: @h;
+        background-color: #666;
+        margin: auto 0 12px;
+        border-radius: 2px;
+        position: relative;
+        @vc: rgb(192, 62, 62);
+        &::before {
+            @th: @h + 10;
+            content: '';
+            position: absolute;
+            height: @th;
+            left: 0;
+            width: 100%;
+            top: -@th * 0.5;
+        }
+        .volumeProgress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: @h;
+            background-color: @vc;
+        }
+        @dh: @h + 4;
+        &:hover {
+            .volumeDot {
+                @dhh: @dh + 2;
+                width: @dhh;
+                height: @dhh;
+                top: -(@dhh - @h) * 0.5;
+                border-radius: @dhh * 0.5;
+            }
+        }
+        .volumeDot {
+            position: absolute;
+            top: -(@dh - @h) * 0.5;
+            width: @dh;
+            height: @dh;
+            border-radius: @dh * 0.5;
+            background-color: @vc;
+            transition: all .3s;
+        }
+        .icVolume {
+            @s: 24px;
+            width: @s;
+            height: @s;
+            position: absolute;
+            left: -@s - 12;
+            top: -(@s - @h) * 0.5;
+        }
+    }
+}
+
+.miniContainer {
+    height: 54px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 0 8px;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    .cover {
+        @s: 32px;
+        width: @s;
+        height: @s;
+        margin-right: 16px;
+    }
+    .oprations {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    @ic_ops: 32px;
+    @ic_ml: 12px;
+    .icOperation {
+        width: @ic_ops;
+        height: @ic_ops;
+        align-self: center;
+        margin: 0 @ic_ml;
+    }
+    .icPause {
+        @s: 26px;
+        width: @s;
+        height: @s;
+        margin: 0 (@ic_ops - @s)*0.5+@ic_ml;
+    }
+    .icNext {
+        @s: 26px;
+        width: @s;
+        height: @s;
+        margin: 0 (@ic_ops - @s)*0.5+@ic_ml;
+    }
+    .infoText {
+        flex: 1;
+        margin: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 1.5;
+        font-size: 15px;
+    }
+    .progressContainer {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 1px;
+        width: 100%;
+        background: rgba(204, 204, 204, 0.3);
+    }
+    .progress {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 2px;
+        border-radius: 2px;
+        background-color: rgb(192, 62, 62);
+    }
+}

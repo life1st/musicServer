@@ -2,18 +2,19 @@ import * as React from 'react'
 import * as style from './Search.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { musicState } from '../model/music'
-import { Music } from '../../types/Music'
+import { searchPageState, searchListState } from '../model/search'
 import { searchMusic } from '../API'
 import { SearchInput } from '../Components/SearchInput'
 import Songlist from '../Components/Songlist'
-import { useLibrary } from '../hooks/useLibrary'
-const { useCallback, useState } = React
+import { useLoadmore } from '../hooks/useLoadmore'
+const { useCallback } = React
 
 const Search = (props) => {
-  const [ hasMore, setHasMore ] = useState(true)
-  const [ searchText, setSearchText ] = useState('')
-  const [ searchList, setSearchList ] = useState<Music[]>([])
-  
+  const {
+    scrollTop: memScrollTop,
+    searchText,
+  } = useRecoilValue(searchPageState)
+  const setSearchState = useSetRecoilState(searchPageState)
   const setMusic = useSetRecoilState(musicState)
 
   const fetchData = useCallback((pageNum) => {
@@ -23,7 +24,9 @@ const Search = (props) => {
       return Promise.resolve([])
     }
   }, [searchText])
-  const { list, curPage, setCurPage } = useLibrary({fetchData})
+  const { list, loading, hasMore, loadNextPage } = useLoadmore({
+    fetchData, listState: searchListState
+  })
 
   const handleItemClick = (music, i) => {
     setMusic((_) => ({
@@ -32,28 +35,37 @@ const Search = (props) => {
     }))
   }
   
-  const handleClearSearch = () => {
-    setSearchText('')
-  }
   const handleSearch = async (val) => {
-    setSearchText(val)
+    setSearchState(state => ({
+      ...state,
+      searchText: val
+    }))
+  }
+  const handleClearSearch = () => {
+    handleSearch('')
   }
 
-  const handleLoadMore = (page = curPage) => {
-    if (!hasMore) {
-      return false;
+  const handleLoadMore = () => {
+    if (hasMore && !loading && searchText) {
+      loadNextPage()
     }
-    setCurPage(page + 1)
+  }
+  const handleScroll = (scrollTop) => {
+    setSearchState(state => ({...state, scrollTop}))
   }
 
   return (
-    <div>
+    <div className={style.container}>
       <SearchInput onSearch={handleSearch} onClear={handleClearSearch} />
       <Songlist
+        className={style.searchList}
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
+        onScroll={handleScroll}
         list={list}
-        hasMore={hasMore} 
+        hasMore={hasMore}
+        initScrollTop={memScrollTop}
+        showLoading={Boolean(hasMore && searchText)}
       />
     </div>
   )

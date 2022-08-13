@@ -1,40 +1,41 @@
 import * as React from 'react'
+import * as style from './styles/Player.module.less'
 import { useMatch } from 'react-router-dom'
-import * as style from './Player.module.less'
+import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { libraryState, pageState } from '../model/library'
-import { musicState } from '../model/music'
+import { libraryState } from '../model/library'
+import { musicState, playListState} from '../model/music'
 import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
+import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
 import useProgress from '../hooks/useProgress'
+import { useDocTitle } from '../hooks/useDocTitle'
+import Cover from './Cover'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
-interface IMusic {
-    id: string;
-    title: string;
-    artist: string;
-    album: string;
-}
+
 interface IPlayer {
     onPlayEnd?: (PLAY_MODE) => () => void;
-    onPlayError?: (m: IMusic) => void;
+    onPlayError?: (m: Music) => void;
     onPrevSong?: () => void;
     onNextSong?: () => void;
 }
 export const Player = (props: IPlayer) => {
-    const { curIndex, music } = useRecoilValue(musicState)
+    const { music } = useRecoilValue(musicState)
     const setMusic = useSetRecoilState(musicState)
+    const { curIndex, list: playList } = useRecoilValue(playListState)
 
+    useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - Music Server')
     const match = useMatch('playing')
     const list = useRecoilValue(libraryState)
     
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
-    const fullProgressRef = useRef()
     const [isPlaying, setIsPlaying] = useState(false)
     const [ time, setTime ] = useState(0)
+    const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
     const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
@@ -76,16 +77,25 @@ export const Player = (props: IPlayer) => {
         }
         handlePlayNext()
     }
+    const checkHasMusic = (afterFunc) => {
+        if (music) {
+            afterFunc()
+        }
+    }
     const handlePause = () => {
         setIsPlaying(false)
-        audioRef.current?.pause()
+        checkHasMusic(() => {
+            audioRef.current?.pause()
+        })
     }
     const handlePlay = () => {
         setIsPlaying(true)
-        audioRef.current?.play()
+        checkHasMusic(() => {
+            audioRef.current?.play()
+        })
     }
 
-    const { id, album, artist, title } = music || {};
+    const { album, artist, title } = music || {};
     const [ isEditing, setEditing ] = useState(false)
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
@@ -111,11 +121,7 @@ export const Player = (props: IPlayer) => {
     }, [onPlayError, audioRef])
     useEffect(() => {
         const handlePlayStatusChange = () => {
-            if (audioRef.current?.paused) {
-                setIsPlaying(false)
-            } else {
-                setIsPlaying(true)
-            }
+            setIsPlaying(!audioRef.current?.paused)
         }
         audioRef.current?.addEventListener('pause', handlePlayStatusChange)
         audioRef.current?.addEventListener('play', handlePlayStatusChange)
@@ -150,18 +156,28 @@ export const Player = (props: IPlayer) => {
             setTime(currentTime)
         }
     }
-    const handleProgressSet = (progress: number) => {
+
+    const fullProgressRef = useRef<HTMLElement>()
+    const handleProgressSet = useCallback((progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
             audioRef.current.currentTime = progress / 100 * curDuration.current
         }
+    }, [])
+    const handleProgressMove = (p) => {
+        // TODO: change ui first, change audio progress at last call
+        // handleProgressSet(p)
     }
-    const {
-        handleProgressDown,
-        handleProgressMove,
-        handleProgressUp
-    } = useProgress({ref: fullProgressRef, onProgressSet: handleProgressSet})
-
+    useProgress({el: fullProgressRef.current, onProgressSet: handleProgressSet, onMove: handleProgressMove})
     const progressPercent = Number((time / curDuration.current * 100).toFixed(2))
+
+    const volumeRef = useRef()
+    const handleVolumeSet = (progress: number) => {
+        setVolume(progress / 100)
+        if (audioRef.current) {
+            audioRef.current.volume = progress / 100
+        }
+    }
+    useProgress({el: volumeRef.current, onProgressSet: handleVolumeSet })
 
     const playModeText = useMemo(() => {
         const transTable = {
@@ -181,52 +197,91 @@ export const Player = (props: IPlayer) => {
         }
         return {
             title: `${music.title} - ${music.artist}`,
-            src: `${origin}/api/music/${music.id}`,
-            cover: ''
+            src: `${origin}/file/music/${music.id}`,
+            cover: `${origin}/file/album_cover/${music.albumId}`,
         }
     }, [music])
+    const desc = useMemo(() => {
+        if (!music) {
+            return ''
+        }
+        const { album, artist } = music
+        if (album) {
+            return `${artist} - ${album}`
+        }
+        return artist
+    } , [music])
 
     return (
         <Fragment>
-            <audio controls src={info.src} ref={audioRef} style={{width: 0, height: 0}} />
+            <audio controls src={info.src} ref={audioRef} className={style.audioRef} />
             { match ? (
                 <div className={style.fullContainer}>
+                    <Cover src={info.cover} className={style.fullCover} />
+                    <div className={style.fullContent}>
+                        { music ? (
+                            <Fragment>
+                                <p className={style.fullTitle}>{music.title}</p>
+                                <p className={style.fullDesc}>{desc}</p>
+                            </Fragment>
+                        ) : <p>{info.title}</p> }
+                    </div>
                     <div
                         className={style.progressContainer}
                         ref={fullProgressRef}
-                        onMouseDown={handleProgressDown}
-                        onMouseMove={handleProgressMove}
-                        onMouseUp={handleProgressUp}
                     >
                         <div className={style.progress} style={{width: `${progressPercent}%`}} />
                         <div className={style.progressDot} style={{left: `${progressPercent}%`}} />
                     </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
-                    <button onClick={handlePlayPrev}>Prev</button>
+                    <div className={style.controlBtns}>
+                        <img src={require('../imgs/ic-next.svg')} className={style.btnPrev} onClick={handlePlayPrev} />
+                        {
+                            isPlaying ? (
+                                <img src={require('../imgs/ic-pause.svg')} className={style.btnPause} onClick={handlePause} />
+                            ) : (
+                                <img src={require('../imgs/ic-play.svg')} className={style.btnPlay} onClick={handlePlay} />
+                            )
+                        }
+                        <img src={require('../imgs/ic-next.svg')} className={style.btnNext} onClick={handlePlayNext} />
+                    </div>
                     <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
                     { isEditing ? (
                         <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
                     ) : null}
+                    <div 
+                        className={style.volumeContainer}
+                        ref={volumeRef}
+                    >
+                        <img src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
+                        <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
+                        <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
+                    </div>
                 </div>
             ) : (
                 <div className={style.miniContainer}>
-                    <div className={style.progressContainer}>
-                        <div className={style.progress} style={{width: `${progressPercent}%`}} />
-                    </div>
-                    <img src={info.cover || require('../imgs/ic-album-default.svg')} className={style.cover} />
+                    <Cover src={info.cover} className={style.cover} />
                     <p className={style.infoText} title={info.title}>{info.title}</p>
-                    <div>
+                    <div className={style.oprations}>
                         <img
                             onClick={isPlaying ? handlePause : handlePlay}
                             src={isPlaying ? require('../imgs/ic-pause.svg') : require('../imgs/ic-play.svg') } 
-                            className={style.icOperation}
+                            className={cls(
+                                style.icOperation,
+                                isPlaying ? style.icPause : ''
+                            )}
                         />
                         <img
                             onClick={handlePlayNext}
                             src={require('../imgs/ic-next.svg')}
-                            className={style.icOperation}
+                            className={cls(
+                                style.icOperation,
+                                style.icNext
+                            )}
                         />
-                        
+                    </div>
+                    <div className={style.progressContainer}>
+                        <div className={style.progress} style={{width: `${progressPercent}%`}} />
                     </div>
                 </div>
             ) }

@@ -7,9 +7,9 @@ RUN yarn build && yarn build-fe
 
 FROM alpine
 WORKDIR /usr/app
-RUN apk add --no-cache --update nodejs
+RUN apk add --no-cache --update nodejs yarn
 COPY --from=builder /usr/app/dist ./dist
 COPY package.json ./
 EXPOSE 3000
 
-CMD [ "npm", "run", "prod" ]
+CMD [ "yarn", "prod" ]

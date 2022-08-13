@@ -5,17 +5,29 @@ import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
 import { genAlbumInfo } from '../utils/album'
 import { genCoverInfo } from '../utils/cover'
+
+const album2Cover = new Map()
 class Album {
     async getCover(albumId: string) {
-        const album = await albumModel.getAlbum(albumId)
-        if (album?.coverUrl) {
-            return createReadStream(album.coverUrl)
+        let coverUrl = album2Cover.get(albumId)
+        if (!coverUrl) {
+            const album = await albumModel.getAlbum(albumId)
+            if (album) {
+                album2Cover.set(albumId, album?.coverUrl)
+                coverUrl = album?.coverUrl
+            }
+        }
+        if (album2Cover.size > 300) {
+            album2Cover.clear()
+        }
+        if (coverUrl) {
+            return createReadStream(coverUrl)
         }
         return null
     }
 
-    async getAlbum(id: string) {
-        return albumModel.getAlbum(id)
+    async getAlbum(albumId: string, config: { needSongs?: boolean } = {}) {
+        return albumModel.getAlbum(albumId, config)
     }
 
     async getAlbumList({pageNum, artist, needSongs}: {
@@ -38,15 +50,29 @@ class Album {
     }
     
     async updateAlbum(music: Music) {
-        const albumInfo = genAlbumInfo(music)
+        let albumInfo = genAlbumInfo(music)
+        const { albumId, name } = albumInfo
+        if (!name) {
+            return null
+        }
+        const existAlbum = await albumModel.getAlbum(albumId)
+        if (existAlbum) {
+            albumInfo = existAlbum
+        }
+        if (!existAlbum || !existAlbum.coverId) {
+            const { coverId, coverUrl } = await genCoverInfo({ music })
+            albumInfo.coverId = coverId
+            albumInfo.coverUrl = coverUrl
+        }
 
-        return albumModel.updateAlbum({
+        const hasUpdate = await albumModel.updateAlbum({
             musicId: music.id,
             albumInfo
         })
+        return hasUpdate ? albumInfo : null
     }
 
-    async createAlbumFromLibrary () {
+    async createAlbumFromLibrary() {
         const LIMIT = 100
         let hasMore = true
         let page = 0
@@ -57,12 +83,13 @@ class Album {
                 break
             }
             for (const music of list) {
-                const { coverUrl, coverId, coverBuf } = await genCoverInfo({ music })
-                console.log(coverUrl, coverId, music.album)
-                await this.updateAlbum({
-                    ...music,
-                    coverUrl, coverId
-                })
+                const albumInfo = await this.updateAlbum(music)
+                if (albumInfo) {
+                    await libraryModel.updateMusic({
+                        ...music,
+                        albumId: albumInfo.albumId,
+                    })
+                }
             }
         }
     }

@@ -46,10 +46,13 @@ class Library {
             process.on('message', async (music: Music) => {
                 console.log('message from music process: ', music?.path)
                 musicCount++
-                await Promise.all([
-                    album.updateAlbum(music),
-                    libraryModel.updateMusic(music)
-                ])
+                
+                const albumInfo = await album.updateAlbum(music)
+                if (albumInfo) {
+                    music.albumId = albumInfo.albumId
+                }
+                await libraryModel.updateMusic(music)
+
                 const i = musicMetaTasks.findIndex(t => t === music.path)
                 if (scanMusicCache.length > 0 && i >= 0) {
                     musicMetaTasks[i] = scanMusicCache.pop() as string
@@ -152,15 +155,18 @@ class Library {
     
     async getMusic(id) {
         const music = await libraryModel.getMusic(id)
-        const stream = createReadStream(music?.path)
-        const close = () => { stream.close() }
-        stream.on('error', close)
-        stream.on('en', close)
-        return {
-            music,
-            stream, 
-            size: music?.size
+        if (music) {
+            const stream = createReadStream(music.path)
+            const close = () => { stream.close() }
+            stream.on('error', close)
+            stream.on('en', close)
+            return {
+                music,
+                stream,
+                size: music?.size
+            }
         }
+        return null
     }
 
     async updateMeta(id, info) {
@@ -173,7 +179,7 @@ class Library {
         const music = await libraryModel.getMusic(id)
 
         let isSuccess = false
-        if (music.path) {
+        if (music?.path) {
             isSuccess = await updateMusicID3(music.path, tags)
             if (isSuccess) {
                 const musicMeta = await getMusicData(music.path)

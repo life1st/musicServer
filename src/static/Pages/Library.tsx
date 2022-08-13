@@ -1,69 +1,51 @@
 import * as React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSetRecoilState, useRecoilValue } from 'recoil'
-import { libraryState, pageState } from '../model/library'
+import { libraryState, libraryScrollState } from '../model/library'
 import { musicState } from '../model/music'
-import { Music } from '../../types/Music'
-import { PLAY_MODE } from '../consts'
-import { getLibrary  } from '../API'
+import { useLoadmore } from '../hooks/useLoadmore'
+import { getLibrary, scanLibrary } from '../API'
 import Songlist from '../Components/Songlist'
-import { Pagenation } from '../Components/Pagenation'
-const { useState, useEffect, useRef, useCallback } = React
 
+const { Fragment } = React
 const Library = (props) => {
-  const list = useRecoilValue(libraryState)
-  const setList = useSetRecoilState(libraryState)
-
-  const curPage = useRecoilValue(pageState)
-  const setCurPage = useSetRecoilState(pageState)
-
-  const { curIndex } = useRecoilValue(musicState)
   const setMusic = useSetRecoilState(musicState)
+  const memScrollTop = useRecoilValue(libraryScrollState)
+  const setLibraryScroll = useSetRecoilState(libraryScrollState)
 
-  const [ hasMore, setHasMore ] = useState(true)
+  const navi = useNavigate()
 
-  const loadedPages = useRef<number[]>([])
+  const { list, loadNextPage, hasMore, loading } = useLoadmore({
+    fetchData: getLibrary,
+    listState: libraryState,
+  })
 
-  const loadNextPage = (page = curPage) => {
-    if (!hasMore) {
-      return false;
-    }
-    return getLibrary(page).then(resp => {
-        const { status, data } = resp
-        if (status === 200 && !loadedPages.current.includes(page)) {
-          if (data.length > 0) {
-            loadedPages.current.push(page)
-            setList(list.concat(data))
-            return true
-          } else {
-            setHasMore(false)
-          }
-        }
-        return false
-    })
-  }
   const handleItemClick = (item, i) => {
       setMusic((_) => ({
         curIndex: i,
         music: item
       }))
+      navi('/playing')
   }
   const handleLoadMore = () => {
-    const nextPage = curPage + 1
-    setCurPage(nextPage)
-    loadNextPage(nextPage)
+    if (hasMore && !loading) {
+      loadNextPage()
+    }
   }
 
-  useEffect(() => {
-    loadNextPage()
-  }, [])
-
   return (
-    <Songlist
+    <Fragment>
+      <button onClick={scanLibrary}>Scan</button>
+      <Songlist
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
+        onScroll={setLibraryScroll}
         list={list}
         hasMore={hasMore}
-    />
+        initScrollTop={memScrollTop}
+        showLoading={hasMore}
+      />
+    </Fragment>
   )
 }
 

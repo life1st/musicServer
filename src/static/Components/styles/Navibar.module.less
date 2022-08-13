@@ -1,0 +1,28 @@
+.icBack {
+  transform: rotate(90deg);
+  @s: 38px;
+  width: @s;
+  height: @s;
+}
+.backBtn {
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  cursor: default;
+  font-size: 15px;
+  transition: all .5s;
+  &:hover {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      height: 1px;
+      @w: 55%;
+      width: @w;
+      left: 102% - @w;
+      background-color: #ccc;
+      transition: all .5s;
+    }
+  }
+}

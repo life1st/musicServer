@@ -5,7 +5,9 @@ export interface Music {
     artist: string;
     album: string;
     genre: string;
+    year?: string;
     size: string | number;
+    albumId?: string;
     coverId?: string;
     coverUrl?: string;
     keyword?: string;

@@ -9,12 +9,13 @@
     "prod": "NODE_ENV=production yarn start",
     "watch": "ts-node ./build/server.ts --watch",
     "build": "ts-node ./build/server.ts --build",
-    "fe": "parcel ./src/static/index.html",
-    "build-fe": "parcel build ./src/static/index.html"
+    "fe": "parcel ./src/static/index.html --dist-dir=dist/static",
+    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static"
   },
   "dependencies": {
     "ahooks": "^3.7.0",
     "axios": "^0.27.2",
+    "classnames": "^2.3.1",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^12.0.0",

@@ -1,24 +1,33 @@
 import * as React from 'react'
-import * as style from './Songlist.module.less'
+import * as style from './styles/Songlist.module.less'
 import { musicState } from '../model/music'
 import { useRecoilValue } from 'recoil'
+import cls from 'classnames'
 import { Music } from '../../types/Music'
-import { useThrottleFn } from 'ahooks'
-const { useRef } = React
+import Scroller from './Scroller'
+
+const { useMemo } = React
 
 interface ItemProps {
+  curPlaying: Music | null;
   music: Music;
   onClick: () => void;
 }
 const SongItem = (props: ItemProps) => {
-  const { music: curPlaying } = useRecoilValue(musicState)
-  const { music, onClick = () => {} } = props
+  const { music, curPlaying, onClick = () => {} } = props
   const isPlaying = curPlaying?.id === music.id
+  const desc = useMemo(() => {
+    const { artist, album } = music
+    if (artist && album) {
+      return `${artist} - ${album}`
+    }
+    return artist || '未知歌手'
+  }, [music])
   return (
     <li onClick={onClick} className={style.songItem}>
       <div className={style.content}>
-        <p className={style.name}>{music.title}</p>
-        <p className={style.artist}>{music.artist || '未知歌手'}</p>
+        <p className={style.name} title={music.title}>{music.title}</p>
+        <p className={style.desc}>{desc}</p>
       </div>
       { isPlaying ? (
         <img src={require('../imgs/ic-cd.svg')} className={style.icPlaying} />
@@ -26,40 +35,46 @@ const SongItem = (props: ItemProps) => {
     </li>
   )
 }
-interface ILibrary {
+interface ISonglist {
     onItemClick: (m: Music, n: number) => void;
-    onReachEnd: () => void;
+    onReachEnd?: () => void;
+    onScroll?: (scrollTop: number) => void;
     list: Music[];
     hasMore?: boolean;
+    showLoading?: boolean;
+    initScrollTop?: number;
+    className?: string;
 }
-const Songlist = (props: ILibrary) => {
+const Songlist = (props: ISonglist) => {
     const { 
-      list, hasMore,
-      onItemClick, onReachEnd
+      list, hasMore, initScrollTop, showLoading, className,
+      onItemClick, onReachEnd, onScroll
     } = props
-    const listRef = useRef<HTMLElement>()
+    const { music: curPlaying } = useRecoilValue(musicState)
     
     const handleItemClick = (item, i) => {
         onItemClick?.(item, i)
     }
-    const { run: handleScroll, cancel, flush} = useThrottleFn(() => {
-      if (listRef.current) {
-        const { clientHeight, scrollTop, scrollHeight } = listRef.current
-        if (clientHeight + scrollTop >= scrollHeight) {
-          onReachEnd?.()
-        }
-      }
-    }, { wait: 300 })
 
     return (
-        <ul className={style.container} onScroll={handleScroll} ref={listRef}>
-            { list.map((item, i) => (
-                <SongItem key={item.id} music={item} onClick={() => { handleItemClick(item, i) }} />
-            )) }
-            { hasMore 
-              ? <img src={require('../imgs/ic-loading.svg')} className={style.iconEnd} /> 
-              : (<div className={style.emptyTips}><img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} /><span className={style.tipsText}>没有了</span></div>)  }
-        </ul>
+      <Scroller
+        onScroll={onScroll}
+        onReachEnd={onReachEnd}
+        hasMore={hasMore}
+        showLoading={showLoading}
+        initScrollTop={initScrollTop}
+        className={cls(style.container, className)}
+      >
+        { list.map((item, i) => (
+          <SongItem 
+            key={item.id} 
+            music={item} 
+            onClick={() => { handleItemClick(item, i) }}
+            curPlaying={curPlaying}
+          />
+        )) }
+        <li style={{height: 40}} />
+      </Scroller>
     )
 }
 
