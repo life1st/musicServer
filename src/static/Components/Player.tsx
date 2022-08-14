@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './styles/Player.module.less'
-import { useMatch } from 'react-router-dom'
+import { useMatch, useNavigate } from 'react-router-dom'
 import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { libraryState } from '../model/library'
@@ -31,6 +31,7 @@ export const Player = (props: IPlayer) => {
 
     useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - Music Server')
     const match = useMatch('playing')
+    const naviTo = useNavigate()
     const list = useRecoilValue(libraryState)
     
     const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
@@ -38,6 +39,7 @@ export const Player = (props: IPlayer) => {
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
+    const naviToFullplayer = () => naviTo('/playing')
     const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
         if (type === PLAY_MODE.prev) {
@@ -120,6 +122,14 @@ export const Player = (props: IPlayer) => {
             audioRef.current?.removeEventListener('error', handlePlayError)
         }
     }, [onPlayError, audioRef])
+
+    const handlePlayTimeupdate = (e) => {
+        const { duration, currentTime } = audioRef.current || {}
+        if (duration && currentTime) {
+            curDuration.current = duration
+            setTime(currentTime)
+        }
+    }
     useEffect(() => {
         const handlePlayStatusChange = () => {
             setIsPlaying(!audioRef.current?.paused)
@@ -147,14 +157,6 @@ export const Player = (props: IPlayer) => {
         }
         if (playMode === PLAY_MODE.random) {
             setPlayMode(PLAY_MODE.next)
-        }
-    }
-
-    const handlePlayTimeupdate = (e) => {
-        const { duration, currentTime } = audioRef.current || {}
-        if (duration && currentTime) {
-            curDuration.current = duration
-            setTime(currentTime)
         }
     }
 
@@ -315,8 +317,8 @@ export const Player = (props: IPlayer) => {
                 </div>
             ) : (
                 <div className={style.miniContainer}>
-                    <Cover src={info.cover} className={style.cover} />
-                    <p className={style.infoText} title={info.title}>{info.title}</p>
+                    <Cover src={info.cover} className={style.cover} onClick={naviToFullplayer} />
+                    <p className={style.infoText} title={info.title} onClick={naviToFullplayer}>{info.title}</p>
                     <div className={style.oprations}>
                         <img
                             onClick={isPlaying ? handlePause : handlePlay}
