@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './FullEditor.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getMusicMeta } from '../API'
+import { getMusicMeta, updateMeta } from '../API'
 import { Music } from '../../types/Music'
 import Navibar from '../Components/Navibar'
 
@@ -31,8 +31,12 @@ const FullEditor = (props) => {
     setMeta({ ...meta, [key]: val })
   }
 
-  const handleUpdate = () => {
-    console.log('update', meta)
+  const handleUpdate = async () => {
+    const {status, data} = await updateMeta(meta.id, meta)
+    console.log(data)
+    if (status === 200) {
+      naviTo(-1)
+    }
   }
   const renderMetaVal = (key: string) => {
     const hideKeys = ['id']
