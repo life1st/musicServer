@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { RecoilState, RecoilValue, useRecoilValue, useSetRecoilState } from 'recoil'
+import { RecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 export interface listState<T> {
   list: T[];
@@ -55,6 +55,10 @@ export const useLoadmore = <T>({
     return Boolean(data?.length)
   }
   useEffect(() => {
+    setListState(_state => ({
+      ..._state,
+      loadedPages: []
+    }))
     loadNextPage(0)
   } , [fetchData])
   return {

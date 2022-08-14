@@ -6,7 +6,7 @@ interface Params {
     onProgressSet: (progress: number) => void;
     onMove?: (progress: number) => void;
 }
-const useProgress = (params: Params) => {
+export const useProgress = (params: Params) => {
     const { el, onProgressSet = () => {}, onMove = () => {} } = params || {}
     const [isKeyDown, setIsKeyDown] = useState(false)
 
@@ -22,7 +22,6 @@ const useProgress = (params: Params) => {
         el?.addEventListener('mousedown', mouseDown)
         el?.addEventListener('mouseup', mouseUp)
         return () => {
-            console.log('unmounted', el)
             el.removeEventListener('mousedown', mouseDown)
             el.removeEventListener('mouseup', mouseUp)
             document.body.removeEventListener('mousemove', mouseMove)
@@ -50,5 +49,3 @@ const useProgress = (params: Params) => {
         onProgressSet(percent)
     }
 }
-
-export default useProgress

@@ -9,7 +9,7 @@ export const useCalColumn = ({
   if (!containerRef.current) {
     return baseWidth
   }
-  const containerWidth = containerRef.current?.clientWidth
+  const containerWidth = containerRef.current.clientWidth
   const columns = Math.floor(containerWidth / baseWidth)
   return Math.floor(containerWidth / columns)
 }
