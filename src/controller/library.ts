@@ -111,49 +111,7 @@ class Library {
     async scan(config: {
         skipExist?: boolean,
     }): Promise<[scanning: typeof this.scanningQueue, finishCount: number]> {
-        const scanLibrary = async () => {
-            const startTime = Date.now()
-            console.log('scan start:', startTime)
-            this.finishQueue = []
-            this.isScanning = true
-            let folderStack = [MUSIC_DIR]
-            while(folderStack.length > 0) {
-                const tmpFolders: string[] = []
-                console.log(folderStack)
-                for (const folder of folderStack) {
-                    const names = await fs.readdir(folder)
-                    console.log(names)
-                    for (const name of names) {
-                        const fullPath = path.join(folder, name)
-                        const [isMusic, stat] = await Promise.all([
-                            isMusicFile(fullPath),
-                            fs.stat(fullPath)
-                        ])
-                        if (isMusic){
-                            this.scanningQueue.push(fullPath)
-                            getMusicData(fullPath)
-                            .then(music => libraryModel.updateMusic(music).then(() => music))
-                            .then(music => {
-                                this.scanningQueue = this.scanningQueue.filter(p => p !== music.path)
-                                this.finishQueue.push(music)
-                                if (this.scanningQueue.length === 0) {
-                                    this.isScanning = false
-                                    console.log('scan finished.', (Date.now() - startTime) / 1000 + 's', this.scanningQueue, this.finishQueue)
-                                }
-                            }).catch(e => {
-                                console.log('scan music error', fullPath, e)
-                            })
-                        } else if (stat.isDirectory()) {
-                            tmpFolders.push(fullPath)
-                        }
-                    }
-                }
-                folderStack = tmpFolders
-            }
-            console.log('scan done.', Date.now(), this.scanningQueue, this.finishQueue)
-        }
         if (!this.isScanning) {
-            // scanLibrary()
             this.scanMulticore(config)
         }
         return [this.scanningQueue, this.finishQueue.length]
