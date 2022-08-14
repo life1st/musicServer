@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Album } from '../../types/Album'
 import { Music } from '../../types/Music'
 
 const buildKvStr = (obj) => Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&')
@@ -43,4 +44,10 @@ export const getAlbumDetail = (id: string, needSongs = true) => {
     const url = '/api/album/' + id
 
     return axios.get(url, { params: { needSongs } })
+}
+
+export const searchAlbum = (q: string, pageNum: number = 0) => {
+    const url = '/api/search_album'
+
+    return axios.get<Album[]>(url, { params: { q, pageNum } })
 }

@@ -7,14 +7,15 @@ const { useState, useMemo, useRef } = React
 interface Props {
   onSearch: (val: string) => void;
   onClear: () => void;
+  autoFocus?: boolean;
 }
 
 export const SearchInput = (props: Props) => {
-  const { onSearch, onClear } = props
+  const { onSearch, onClear, autoFocus = true } = props
   const [ searchText, setSearchText ] = useState<string>('')
 
   const searchInputRef = useRef<HTMLInputElement>()
-  useFocus(searchInputRef)
+  useFocus(autoFocus ? searchInputRef : undefined)
   
   const handleChange = (e) => {
     const val = e.target.value

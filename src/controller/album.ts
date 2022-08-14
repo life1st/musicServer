@@ -30,13 +30,21 @@ class Album {
         return albumModel.getAlbum(albumId, config)
     }
 
-    async getAlbumList({pageNum, artist, needSongs}: {
+    async getAlbumList({pageNum, artist, name, needSongs}: {
         pageNum: number,
+        name?: string,
         artist?: string,
         needSongs?: boolean
     }) {
         const limit = DEFAULT_LIMIT
-        const albums = await albumModel.getAlbumListBy({artist}, { pageNum, limit })
+        const condition: any = {}
+        if (artist) {
+            condition.artist = { $regex: new RegExp(artist) }
+        }
+        if (name) {
+            condition.name = { $regex: new RegExp(name) }
+        }
+        const albums = await albumModel.getAlbumListBy(condition, { pageNum, limit })
         if (needSongs) {
             const albumList = await Promise.all(albums.map(async album => (
                 { 

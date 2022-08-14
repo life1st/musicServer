@@ -16,6 +16,15 @@ export const albumState = atom<{
   },
 })
 
+export const albumPageState = atom<{
+  searchText: string;
+}>({
+  key: 'albumPageState',
+  default: {
+    searchText: '',
+  }
+})
+
 export const albumScrollState = atom<number>({
   key: 'albumScrollState',
   default: 0
