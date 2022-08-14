@@ -2,7 +2,6 @@ import fs from 'fs/promises'
 import { getMusicData } from '../utils/music'
 
 process.on('message', async (musicPath: string) => {
-    console.log('music process receive: ', musicPath)
     if (!musicPath) {
         return
     }

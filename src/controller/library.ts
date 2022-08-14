@@ -1,29 +1,15 @@
 import fs from 'fs/promises'
 import { createReadStream } from 'fs'
-import path from 'path'
 import child_process from 'child_process'
 import os from 'os'
 import { MUSIC_DIR } from '../utils/path'
-import { isMusicFile, updateMusicID3 } from '../utils/file'
+import { updateMusicID3 } from '../utils/file'
 import { getMusicData } from '../utils/music'
 import { libraryModel } from '../model/libraryModel'
 import { album } from './album'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
-
-const excludeProps = <T>(obj: T, excludes: string[]): T => Object.keys(obj).reduce((acc, k) => {
-    if (!excludes.includes(k)) {
-        acc[k] = obj[k]
-    }
-    return acc;
-}, {} as T)
-
-const filterExistProps = <T>(obj: T): T => Object.keys(obj).reduce((acc, k) => {
-    if (obj[k]) {
-        acc[k] = obj[k]
-    }
-    return acc
-}, {} as T)
+import { excludeProps, filterExistProps } from '../utils/obj'
 
 class Library {
     isScanning = false
@@ -49,7 +35,6 @@ class Library {
             process.on('message', async (music: Music) => {
                 console.log('message from music process: ', music?.path)
                 musicCount++
-                
                 const albumInfo = await album.updateAlbum(music)
                 if (albumInfo) {
                     music.albumId = albumInfo.albumId
@@ -75,24 +60,30 @@ class Library {
                 }
             })
         })
-        scanProcess.on('message', ([dirs, musicFiles]: [string[], string[]]) => {
+        scanProcess.on('message', async ([dirs, musicFiles]: [string[], string[]]) => {
             console.log('message from scan process: ', dirs, musicFiles)
             if (dirs.length > 0) {
                 scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb'].some(k => dir.includes(k))))
             }
             if (musicFiles.length > 0) {
+                let _musicFiles: string[] = []
                 if (skipExist) {
-                    musicFiles = musicFiles.filter(async path => {
-                        const musics = await libraryModel.getMusicBy({ path })
-                        return musics.length === 0
-                    })
+                    for (const musicPath of musicFiles) {
+                        const musics = await libraryModel.getMusicBy({ path: musicPath })
+                        const isSkip = musics.length > 0
+                        console.log('skipFile:', isSkip, musicPath, musics.length)
+                        if (!isSkip) {
+                            _musicFiles.push(musicPath)
+                        }
+                    }
+                } else {
+                    _musicFiles = musicFiles
                 }
-                scanMusicCache = scanMusicCache.concat(musicFiles)
+                scanMusicCache = scanMusicCache.concat(_musicFiles)
             }
             musicMetaTasks.map((task, i) => {
                 if (!task && scanMusicCache.length > 0) {
                     const curTask = scanMusicCache.pop() as string
-                    console.log('curTask', curTask, i)
                     musicMetaTasks[i] = curTask
                     musicMetaProcesses[i].send(curTask)
                 }
@@ -114,7 +105,7 @@ class Library {
         if (!this.isScanning) {
             this.scanMulticore(config)
         }
-        return [this.scanningQueue, this.finishQueue.length]
+        return [this.scanningQueue.slice(0, 10), this.finishQueue.length]
     }
 
     async getMusicList(pageNum): Promise<Music[]> {
