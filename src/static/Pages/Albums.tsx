@@ -2,15 +2,16 @@ import * as React from 'react'
 import * as style from './Albums.module.less'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { albumState, albumScrollState } from '../model/album'
-import { getAlbums } from '../API'
+import { albumState, albumScrollState, albumPageState } from '../model/album'
+import { getAlbums, searchAlbum } from '../API'
 import { Album } from '../../types/Album'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { useCalColumn } from '../hooks/useCalColumn'
 import Scroller from '../Components/Scroller'
 import Cover from '../Components/Cover'
+import { SearchInput } from '../Components/SearchInput'
 
-const { useRef, useMemo, useEffect } = React
+const { useRef, useMemo, useEffect, useCallback, Fragment} = React
 
 const { origin } = window.location
 const Album = (props: Album & {
@@ -47,37 +48,62 @@ const Album = (props: Album & {
 }
 
 const Albums = () => {
-  const { list, loadNextPage, hasMore, loading } = useLoadmore({fetchData: getAlbums, listState: albumState})
   const memScrollTop = useRecoilValue(albumScrollState)
   const setAlbumScroll = useSetRecoilState(albumScrollState)
+  const { searchText } = useRecoilValue(albumPageState)
+  const setAlbumPageState = useSetRecoilState(albumPageState)
+
+  console.log('searchText', searchText)
+  const fetchData = useCallback((pageNum: number) => {
+    if (searchText) {
+      return searchAlbum(searchText, pageNum)
+    } else {
+      return getAlbums(pageNum)
+    }
+  }, [searchText])
+  const { list, loadNextPage, hasMore, loading } = useLoadmore({fetchData, listState: albumState})
 
   const containerRef = useRef<HTMLElement>()
   const BASE_WIDTH = 116
   const itemWidth = useRef(BASE_WIDTH)
-  useEffect(() => {
-    // TODO: bug here, change route will cause x roll pos change
-    // itemWidth.current = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
-  }, [])
-  
+
+  const handleSearch = async (val: string) => {
+    setAlbumPageState(state => ({
+      ...state,
+      searchText: val
+    }))
+  }
+  const handleClearSearch = async () => {
+    handleSearch('')
+  }
   const handleReachEnd = () => {
     if (!loading && hasMore) {
       loadNextPage()
     }
   }
+  useEffect(() => {
+    // TODO: bug here, change route will cause x roll pos change
+    // itemWidth.current = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
+  }, [])
+  
+
   return (
-    <Scroller
-      onScroll={setAlbumScroll}
-      onReachEnd={handleReachEnd}
-      initScrollTop={memScrollTop}
-      className={style.albumsContainer}
-      hasMore={hasMore}
-      showLoading={hasMore}
-      ref={containerRef}
-    >
-      { list.map(album => (
-        <li key={album.albumId}><Album  {...album} width={itemWidth.current} /></li>
-      )) }
-    </Scroller>
+    <Fragment>
+      <SearchInput autoFocus={false} onSearch={handleSearch} onClear={handleClearSearch} />
+      <Scroller
+        onScroll={setAlbumScroll}
+        onReachEnd={handleReachEnd}
+        initScrollTop={memScrollTop}
+        className={style.albumsContainer}
+        hasMore={hasMore}
+        showLoading={hasMore}
+        ref={containerRef}
+      >
+        { list.map(album => (
+          <li key={album.albumId} className={style.albumItem}><Album  {...album} width={itemWidth.current} /></li>
+        )) }
+      </Scroller>
+    </Fragment>
   )
 }
 

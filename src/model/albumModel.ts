@@ -4,6 +4,7 @@ import { DB_DIR } from '../utils/path'
 import { getDir } from '../utils/file'
 import { libraryModel } from './libraryModel'
 import { Album } from '../types/Album'
+import { DEFAULT_LIMIT } from '../shareCommon/consts'
 
 class AlbumModel {
     private dbFile = path.resolve(DB_DIR, 'albumModel')
@@ -26,18 +27,16 @@ class AlbumModel {
     }
 
     async getAlbumListBy(
-        param: { artist?: string; },
+        condition: { 
+            artist?: string | { $regex: RegExp };
+            name?: string | { $regex: RegExp }
+        },
         config: {
             pageNum: number;
             limit: number;
         }
     ) {
-        const { artist } = param
-        const { pageNum = 0, limit = 20 } = config
-        let condition = {}
-        if (artist) {
-            condition = { artist }
-        }
+        const { pageNum = 0, limit = DEFAULT_LIMIT } = config
         return await this.db.find<Album>(condition).skip(pageNum * limit).limit(limit).exec()
     }
 

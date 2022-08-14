@@ -4,8 +4,7 @@ import { album } from '../controller/album'
 
 const fileRoute = new Router()
 
-fileRoute
-.get('/music/:id', async ctx => {
+const musicFileHandler = async ctx => {
     const { id } = ctx.params
     const { music, stream, size} = await library.getMusic(id) || {}
     if (music) {
@@ -17,11 +16,16 @@ fileRoute
     } else {
         ctx.throw(404, 'music not found')
     }
-})
-.get('/album_cover/:albumId', async ctx => {
+}
+
+const albumCoverFileHandler = async ctx => {
     const { albumId } = ctx.params
     ctx.set('content-type', 'image/jpeg')
     ctx.body = await album.getCover(albumId)
-})
+}
 
-export { fileRoute }
+fileRoute
+.get('/music/:id', musicFileHandler)
+.get('/album_cover/:albumId', albumCoverFileHandler)
+
+export { fileRoute, musicFileHandler, albumCoverFileHandler }

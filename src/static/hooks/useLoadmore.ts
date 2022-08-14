@@ -24,13 +24,17 @@ export const useLoadmore = <T>({
   const { list, curPage, loadedPages, hasMore } = useRecoilValue(listState)
   const setListState = useSetRecoilState(listState)
   const [ loading, setLoading ] = useState(false)
-  const loadNextPage = async (page = typeof curPage === 'number' ? curPage + 1 : 0) => {
-    if (loading) {
-      return true
+  const loadNextPage = async (page = typeof curPage === 'number' ? curPage + 1 : 0, config?: any) => {
+    const { isForceFetch } = config || {}
+    if (!isForceFetch) {
+      if (loading) {
+        return true
+      }
+      if (loadedPages.includes(page)) {
+        return false
+      }
     }
-    if (loadedPages.includes(page)) {
-      return false
-    }
+
     setLoading(true)
     const resp = await fetchData(page)
     const { status, data } = resp
@@ -55,11 +59,12 @@ export const useLoadmore = <T>({
     return Boolean(data?.length)
   }
   useEffect(() => {
+    console.log('useLoadmore')
     setListState(_state => ({
       ..._state,
       loadedPages: []
     }))
-    loadNextPage(0)
+    loadNextPage(0, { isForceFetch: true })
   } , [fetchData])
   return {
     loadNextPage,
