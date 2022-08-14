@@ -21,7 +21,7 @@ export const Pages = () => {
     }, {
       name: 'Playing',
       path: '/playing',
-      comp: <div>Playing</div>
+      comp: <div />
     }, {
       name: 'Albums',
       path: '/albums',
