@@ -10,8 +10,9 @@ import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
-import useProgress from '../hooks/useProgress'
+import { useProgress } from '../hooks/useProgress'
 import { useDocTitle } from '../hooks/useDocTitle'
+import { useShortcuts } from '../hooks/useShortcuts'
 import Cover from './Cover'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
@@ -179,6 +180,32 @@ export const Player = (props: IPlayer) => {
     }
     useProgress({el: volumeRef.current, onProgressSet: handleVolumeSet })
 
+    useShortcuts({
+        'space': {
+            handler: ({ctrl}) => {
+                if (match || ctrl) {
+                    music ? isPlaying ? handlePause() : handlePlay() : null
+                }
+            }
+        },
+        'arrowdown': {
+            handler: () => {
+                const nextVolume = volume * 100 - 10
+                if (match && nextVolume > 0) {
+                    handleVolumeSet(nextVolume)
+                }
+            }
+        },
+        'arrowup': {
+            handler: () => {
+                const nextVolume = volume * 100 + 10
+                if (match && nextVolume <= 100) {
+                    handleVolumeSet(nextVolume)
+                }
+            }
+        },
+    })
+
     const playModeText = useMemo(() => {
         const transTable = {
             [PLAY_MODE.next]: 'In order',
@@ -211,17 +238,37 @@ export const Player = (props: IPlayer) => {
         }
         return artist
     } , [music])
+    const displayTimes = useMemo(() => {
+        const formatTime = (time: number) => {
+            const minute = Math.floor(time / 60)
+            const second = Math.floor(time % 60)
+            return `${minute}:${second < 10 ? '0' + second : second}`
+        }
+        if (!music) {
+            return {
+                duration: '00:00',
+                time: '00:00'
+            }
+        }
+        return {
+            duration: formatTime(curDuration.current),
+            time: formatTime(time)
+        }
+    }, [time, curDuration.current])
 
     return (
         <Fragment>
             <audio controls src={info.src} ref={audioRef} className={style.audioRef} />
             { match ? (
                 <div className={style.fullContainer}>
-                    <Cover src={info.cover} className={style.fullCover} />
+                    <div className={style.coverContainer}>
+                        <Cover src={info.cover} className={cls(style.fullCover, music ? style.playing : '')} />
+                        {music ? <Cover src={info.cover} className={style.fullCoverBlur} /> : null}
+                    </div>
                     <div className={style.fullContent}>
                         { music ? (
                             <Fragment>
-                                <p className={style.fullTitle}>{music.title}</p>
+                                <p className={style.fullTitle} title={music.title}>{music.title}</p>
                                 <p className={style.fullDesc}>{desc}</p>
                             </Fragment>
                         ) : <p>{info.title}</p> }
@@ -232,6 +279,14 @@ export const Player = (props: IPlayer) => {
                     >
                         <div className={style.progress} style={{width: `${progressPercent}%`}} />
                         <div className={style.progressDot} style={{left: `${progressPercent}%`}} />
+                    </div>
+                    <div className={style.timeContainer}>
+                        { music ? (
+                            <Fragment>
+                                <p>{displayTimes.time}</p>
+                                <p>{displayTimes.duration}</p>
+                            </Fragment>
+                        ) : null }
                     </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
                     <div className={style.controlBtns}>

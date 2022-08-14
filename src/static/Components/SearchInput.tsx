@@ -27,9 +27,7 @@ export const SearchInput = (props: Props) => {
   const handleKeyUp = (e) => {
     if (e.key.toLowerCase() === 'enter') {
       e.preventDefault()
-      if (searchText) {
-        onSearch?.(searchText)
-      }
+      onSearch?.(searchText)
     }
   }
   const handleClear = () => {
