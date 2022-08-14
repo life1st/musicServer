@@ -43,7 +43,7 @@ class LibraryModel {
         const { title, keyword, path, paths } = query
         const limit = DEFAULT_LIMIT
         if (keyword) {
-            let words = keyword.split(' ')
+            let words = keyword.toLowerCase().split(' ')
             if (words.length > 2) {
                 console.log('keywords too mach, only can detect 2.')
                 words = words.slice(0, 2)
