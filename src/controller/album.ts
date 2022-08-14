@@ -91,12 +91,20 @@ class Album {
                 break
             }
             for (const music of list) {
-                const albumInfo = await this.updateAlbum(music)
-                if (albumInfo) {
-                    await libraryModel.updateMusic({
-                        ...music,
-                        albumId: albumInfo.albumId,
+                const { albumId } = music
+                if (albumId) {
+                    await albumModel.updateAlbum({
+                        albumInfo: { albumId },
+                        musicId: music.id
                     })
+                } else {
+                    const albumInfo = await this.updateAlbum(music)
+                    if (albumInfo) {
+                        await libraryModel.updateMusic({
+                            ...music,
+                            albumId: albumInfo.albumId,
+                        })
+                    }
                 }
             }
         }

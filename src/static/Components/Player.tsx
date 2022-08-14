@@ -271,7 +271,7 @@ export const Player = (props: IPlayer) => {
                         { music ? (
                             <Fragment>
                                 <p className={style.fullTitle} title={music.title}>{music.title}</p>
-                                <p className={style.fullDesc}>{desc}</p>
+                                <p className={style.fullDesc} title={desc}>{desc}</p>
                             </Fragment>
                         ) : <p>{info.title}</p> }
                     </div>

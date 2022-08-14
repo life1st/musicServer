@@ -6,6 +6,7 @@ import { MUSIC_DIR } from '../utils/path'
 import { updateMusicID3 } from '../utils/file'
 import { getMusicData } from '../utils/music'
 import { libraryModel } from '../model/libraryModel'
+import { albumModel } from '../model/albumModel'
 import { album } from './album'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
@@ -134,21 +135,38 @@ class Library {
         return null
     }
 
-    async updateMeta(id, info) {
+    async updateMeta(musicId, info) {
         const {
-            title, artist, album, 
+            title, artist, album, year, albumId, keyword
         } = info
         let tags = filterExistProps({
-            title, artist, album
+            title, artist, album, year
         })
-        const music = await libraryModel.getMusic(id)
+        const music = await libraryModel.getMusic(musicId)
 
         let isSuccess = false
         if (music?.path) {
-            isSuccess = await updateMusicID3(music.path, tags)
+            const neddUpdateId3 = Object.keys(tags).some(k => tags[k] !== music[k])
+            isSuccess = neddUpdateId3 ? await updateMusicID3(music.path, tags) : true
             if (isSuccess) {
-                const musicMeta = await getMusicData(music.path)
-                return libraryModel.updateMusic(musicMeta, { prevId: id })
+                const { albumId: oldAlbumId } = music
+                if (albumId !== oldAlbumId && oldAlbumId) {
+                    const oldAlbum = await albumModel.getAlbum(oldAlbumId)
+                    if (oldAlbum?.musicIds.length === 1) {
+                        await albumModel.deleteAlbum(oldAlbumId)
+                    } else {
+                        await albumModel.removeMusicFromAlbum(oldAlbumId, musicId)
+                    }
+                }
+                await albumModel.updateAlbum({
+                    albumInfo: { albumId },
+                    musicId
+                })
+                const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
+                return libraryModel.updateMusic({
+                    ...musicMeta,
+                    albumId,
+                }, { prevId: musicId })
             }
         }
         return isSuccess

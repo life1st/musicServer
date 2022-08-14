@@ -41,10 +41,10 @@ class AlbumModel {
     }
 
     async updateAlbum({ albumInfo, musicId }: {
-        albumInfo: Album, 
+        albumInfo: Album | { albumId: string },
         musicId: string
     }) {
-        const { albumId, coverUrl, coverId } = albumInfo
+        const { albumId } = albumInfo
         const existAlbum = await this.db.findOne<Album>({albumId})
         let hasUpdate = false
         if (existAlbum) {
@@ -54,6 +54,7 @@ class AlbumModel {
                 musicIds: Array.from(new Set(existAlbum.musicIds.concat(musicId))),
             }
             if (!existCoverId) {
+                const { coverUrl, coverId } = albumInfo as Album
                 if (coverId) {
                     curAlbumInfo.coverId = coverId
                 }
@@ -66,6 +67,20 @@ class AlbumModel {
             hasUpdate = await this.db.insert(albumInfo) !== null
         }
         return hasUpdate
+    }
+
+    async removeMusicFromAlbum(albumId: string, musicId: string) {
+        const album = await this.db.findOne<Album>({albumId})
+        if (album) {
+            const { musicIds } = album
+            const newMusicIds = musicIds.filter(id => id !== musicId)
+            return await this.db.update({ albumId }, { ...album, musicIds: newMusicIds }, {}) > 0
+        }
+        return false
+    }
+    
+    async deleteAlbum(id) {
+        return await this.db.remove({ albumId: id }, {}) > 0
     }
 }
 const albumModel = new AlbumModel()
