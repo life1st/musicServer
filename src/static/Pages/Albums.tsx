@@ -53,7 +53,6 @@ const Albums = () => {
   const { searchText } = useRecoilValue(albumPageState)
   const setAlbumPageState = useSetRecoilState(albumPageState)
 
-  console.log('searchText', searchText)
   const fetchData = useCallback((pageNum: number) => {
     if (searchText) {
       return searchAlbum(searchText, pageNum)

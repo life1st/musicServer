@@ -35,10 +35,12 @@ class LibraryModel {
         query: {
             keyword?: string,
             title?: string,
+            path?: string,
+            paths?: string[],
         }, 
-        pageNum: number
+        pageNum = 0
     ): Promise<Music[]> {
-        const { title, keyword } = query
+        const { title, keyword, path, paths } = query
         const limit = DEFAULT_LIMIT
         if (keyword) {
             let words = keyword.split(' ')
@@ -52,6 +54,8 @@ class LibraryModel {
             return this.db.find<Music>({keyword: {$regex: reg}}).skip(pageNum * limit).limit(limit).exec()
         } else if (title) {
             return this.db.find<Music>({title}).limit(limit).exec()
+        } else if (path) {
+            return this.db.find<Music>({path}).limit(limit).exec()
         } else {
             console.log(`getMusicBy didn't received any varible`)
             return Promise.reject(null)

@@ -73,7 +73,6 @@ const Songlist = (props: ISonglist) => {
             curPlaying={curPlaying}
           />
         )) }
-        <li style={{height: 40}} />
       </Scroller>
     )
 }

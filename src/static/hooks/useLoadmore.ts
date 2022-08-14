@@ -59,7 +59,6 @@ export const useLoadmore = <T>({
     return Boolean(data?.length)
   }
   useEffect(() => {
-    console.log('useLoadmore')
     setListState(_state => ({
       ..._state,
       loadedPages: []
