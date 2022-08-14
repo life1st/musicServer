@@ -113,18 +113,23 @@ class Library {
         return music.map(item => excludeProps(item, ['path', '_id']))
     }
     
-    async getMusic(id) {
+    async getMusic(id, config?: {
+        needStream: boolean;
+    }) {
+        const { needStream = true } = config || {}
         const music = await libraryModel.getMusic(id)
+        const result: any = {}
         if (music) {
-            const stream = createReadStream(music.path)
-            const close = () => { stream.close() }
-            stream.on('error', close)
-            stream.on('en', close)
-            return {
-                music,
-                stream,
-                size: music?.size
+            result.music = excludeProps(music, ['_id'])
+            result.size = music.size
+            if (needStream) {
+                const stream = createReadStream(music.path)
+                const close = () => { stream.close() }
+                stream.on('error', close)
+                stream.on('en', close)
+                result.stream = stream
             }
+            return result
         }
         return null
     }

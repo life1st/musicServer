@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as style from './styles/Songlist.module.less'
+import { useNavigate } from 'react-router-dom'
 import { musicState } from '../model/music'
 import { useRecoilValue } from 'recoil'
 import cls from 'classnames'
@@ -11,14 +12,17 @@ const { useMemo } = React
 interface ItemProps {
   curPlaying: Music | null;
   music: Music;
+  showAlbum?: boolean;
   onClick: () => void;
+  onEdit: (e: React.KeyboardEvent) => void;
 }
 const SongItem = (props: ItemProps) => {
-  const { music, curPlaying, onClick = () => {} } = props
+  const { music, curPlaying, showAlbum = true } = props
+  const { onClick = () => {}, onEdit = () => {} } = props
   const isPlaying = curPlaying?.id === music.id
   const desc = useMemo(() => {
     const { artist, album } = music
-    if (artist && album) {
+    if (artist && album && showAlbum) {
       return `${artist} - ${album}`
     }
     return artist || '未知歌手'
@@ -28,6 +32,9 @@ const SongItem = (props: ItemProps) => {
       <div className={style.content}>
         <p className={style.name} title={music.title}>{music.title}</p>
         <p className={style.desc}>{desc}</p>
+      </div>
+      <div className={style.opreation}>
+        <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={onEdit} />
       </div>
       { isPlaying ? (
         <img src={require('../imgs/ic-cd.svg')} className={style.icPlaying} />
@@ -44,16 +51,22 @@ interface ISonglist {
     showLoading?: boolean;
     initScrollTop?: number;
     className?: string;
+    showAlbum?: boolean;
 }
 const Songlist = (props: ISonglist) => {
     const { 
-      list, hasMore, initScrollTop, showLoading, className,
+      list, hasMore, initScrollTop, showLoading, className, showAlbum,
       onItemClick, onReachEnd, onScroll
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
+    const naviTo = useNavigate()
     
     const handleItemClick = (item, i) => {
         onItemClick?.(item, i)
+    }
+    const handleItemEdit = (e, item, i) => {
+      e.stopPropagation()
+      naviTo(`/music/${item.id}/edit`)
     }
 
     return (
@@ -70,7 +83,9 @@ const Songlist = (props: ISonglist) => {
             key={item.id} 
             music={item} 
             onClick={() => { handleItemClick(item, i) }}
+            onEdit={(e) => { handleItemEdit(e, item, i) }}
             curPlaying={curPlaying}
+            showAlbum={showAlbum}
           />
         )) }
       </Scroller>

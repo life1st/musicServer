@@ -55,6 +55,9 @@
   transition: background-color 0.4s;
   &:hover {
     background-color: #eee;
+    .opreation {
+      opacity: 1;
+    }
   }
   &::after {
     content: '';
@@ -90,6 +93,27 @@
     flex: 0 0 @s;
     margin-right: 8px;
     animation: rotate 3s linear infinite;
+  }
+  .opreation {
+    margin-left: auto;
+    margin-right: 24px;
+    opacity: 0;
+    .icOpCommon(@s: 26px;) {
+      width: @s;
+      height: @s;
+      flex: 0 0 @s;
+      margin-right: 8px;
+      transition: all .3s;
+      padding: 4px;
+      box-sizing: border-box;
+      border-radius: @s * 0.5;
+      &:hover {
+        background-color: #999;
+      }
+    }
+    .icEdit {
+      .icOpCommon();
+    }
   }
 }
 
