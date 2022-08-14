@@ -13,6 +13,10 @@ libraryApiRoute
       ctx.throw(500, { isScan: false, e })
   }
 })
+.get('/music_meta/:id', async ctx => {
+  const { id } = ctx.params
+  ctx.body = await library.getMusic(id, { needStream: false })
+})
 .post('/music_meta/:id', async ctx => {
   const { id } = ctx.params
   const { body } = ctx.request

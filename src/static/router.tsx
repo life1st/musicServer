@@ -8,6 +8,7 @@ import Library from './Pages/Library'
 import Search from './Pages/Search'
 import Albums from './Pages/Albums'
 import AlbumDetail from './Pages/AlbumDetail'
+import FullEditor from './Pages/FullEditor'
 
 export const Pages = () => {
   const pages = [{
@@ -30,6 +31,10 @@ export const Pages = () => {
       name: 'Album Detail',
       path: '/album/:albumId',
       comp: <AlbumDetail />
+    }, {
+      name: 'Full Editor',
+      path: '/music/:id/edit',
+      comp: <FullEditor />
     }
   ]
 

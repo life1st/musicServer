@@ -22,6 +22,15 @@ export const updateMeta = (id, tags) => {
     return axios.post(url, tags)
 }
 
+export const getMusicMeta = (id) => {
+    const url = '/api/music_meta/' + id
+
+    return axios.get<{
+        music: Music,
+        size: string,
+    }>(url)
+}
+
 export const searchMusic = (q: string, pageNum: number = 0) => {
     const url = `/api/search_music`
 
