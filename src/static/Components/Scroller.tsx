@@ -43,7 +43,7 @@ const Scroller = (props: React.PropsWithChildren<Props>, ref) => {
 
   const renderEnd = () => {
     if (showLoading && hasMore) {
-      return <img src={require('../imgs/ic-loading.svg')} className={style.icLoading} />
+      return <div><img src={require('../imgs/ic-loading.svg')} className={style.icLoading} /></div>
     }
     if (!hasMore) {
       return (

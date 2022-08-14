@@ -30,7 +30,10 @@ class Library {
     scanningQueue: string[] = []
     finishQueue: Music[] = []
 
-    async scanMulticore() {
+    async scanMulticore(config: {
+        skipExist?: boolean,
+    }) {
+        const { skipExist = true } = config || {}
         const startTime = Date.now()
         const processCount = os.cpus().length
 
@@ -78,6 +81,12 @@ class Library {
                 scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb'].some(k => dir.includes(k))))
             }
             if (musicFiles.length > 0) {
+                if (skipExist) {
+                    musicFiles = musicFiles.filter(async path => {
+                        const musics = await libraryModel.getMusicBy({ path })
+                        return musics.length === 0
+                    })
+                }
                 scanMusicCache = scanMusicCache.concat(musicFiles)
             }
             musicMetaTasks.map((task, i) => {
@@ -99,7 +108,9 @@ class Library {
         scanProcess.send(scanDirs.pop() as string)
     }
 
-    async scan(): Promise<[scanning: typeof this.scanningQueue, finish: typeof this.finishQueue]> {
+    async scan(config: {
+        skipExist?: boolean,
+    }): Promise<[scanning: typeof this.scanningQueue, finishCount: number]> {
         const scanLibrary = async () => {
             const startTime = Date.now()
             console.log('scan start:', startTime)
@@ -143,9 +154,9 @@ class Library {
         }
         if (!this.isScanning) {
             // scanLibrary()
-            this.scanMulticore()
+            this.scanMulticore(config)
         }
-        return [this.scanningQueue, this.finishQueue]
+        return [this.scanningQueue, this.finishQueue.length]
     }
 
     async getMusicList(pageNum): Promise<Music[]> {

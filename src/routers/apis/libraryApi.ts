@@ -7,8 +7,8 @@ const libraryApiRoute = new Router()
 libraryApiRoute
 .post('/scan', async ctx => {
   try {
-      const [scanning, finish] = await library.scan()
-      ctx.body = { isScan: true, waiting: scanning, finish }
+    const [scanning, finishCount] = await library.scan(ctx.body)
+    ctx.body = { isScan: true, waiting: scanning.slice(0, 10), finishCount }
   } catch (e) {
       ctx.throw(500, { isScan: false, e })
   }
