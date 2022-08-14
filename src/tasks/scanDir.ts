@@ -18,7 +18,6 @@ process.on('message', async (dir: string) => {
             tmpDirs.push(fullPath)
         }
     }
-    console.log('scanDir', tmpDirs, musicFiles)
 
     if (!process.send) {
         throw new Error('No process.send')

@@ -20,7 +20,7 @@ export const getMusicData = async (musicPath: string): Promise<Music> => {
       getFileId(buf),
       getMusicID3(buf)
   ])
-  console.log('id, info: ', id, info, musicPath)
+  console.log('id, info: ', id, musicPath)
 
   const {
       title, artist = '', album = '', genre = '',
