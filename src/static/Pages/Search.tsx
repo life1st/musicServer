@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './Search.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { musicState } from '../model/music'
+import { musicState } from '../model/playing'
 import { searchPageState, searchListState } from '../model/search'
 import { searchMusic } from '../API'
 import { SearchInput } from '../Components/SearchInput'

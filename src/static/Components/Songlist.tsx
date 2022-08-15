@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './styles/Songlist.module.less'
 import { useNavigate } from 'react-router-dom'
-import { musicState } from '../model/music'
+import { musicState } from '../model/playing'
 import { useRecoilValue } from 'recoil'
 import cls from 'classnames'
 import { Music } from '../../types/Music'

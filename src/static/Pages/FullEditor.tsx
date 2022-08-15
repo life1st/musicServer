@@ -45,6 +45,9 @@ const FullEditor = (props) => {
       return null
     }
     let value = meta[key]
+    if (key === 'size') {
+      value = (value / 1024 / 1024).toFixed(2) + ' M'
+    }
     if (readOnlyKeys.includes(key)) {
       return <p className={style.itemValue}>{value}</p>
     }
