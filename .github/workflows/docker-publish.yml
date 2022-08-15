@@ -1,4 +1,4 @@
-name: Docker
+name: ghcr image
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -8,8 +8,6 @@ name: Docker
 on:
   push:
     branches: [ "release" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "release" ]
 
