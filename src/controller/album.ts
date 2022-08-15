@@ -90,6 +90,7 @@ class Album {
         const LIMIT = 100
         let hasMore = true
         let page = 0
+        const start = Date.now()
         while(hasMore) {
             const list = await libraryModel.getMusicList(page++, LIMIT)
             if (list.length === 0) {
@@ -106,6 +107,7 @@ class Album {
                 }
             }
         }
+        console.log('createAlbumFromLibrary finish', (Date.now() - start)/1000 + ' sec.') 
     }
 }
 
