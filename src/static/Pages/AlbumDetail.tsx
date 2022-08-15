@@ -58,6 +58,7 @@ const AlbumDetail = (props) => {
               hasMore={false}
               showLoading={false}
               onItemClick={handleMusicItemClick}
+              showAlbum={false}
             />
           </Fragment>
         ) : (<div>Loading</div>)

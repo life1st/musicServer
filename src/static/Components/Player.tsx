@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './styles/Player.module.less'
 import { useMatch, useNavigate } from 'react-router-dom'
+import { ROUTES } from '../router'
 import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { musicState, playingState } from '../model/playing'
@@ -161,6 +162,8 @@ export const Player = (props: IPlayer) => {
         }
     }
 
+    const handleGoList = () => { naviTo(ROUTES.PLAYING_LIST)}
+
     const fullProgressRef = useRef<HTMLElement>()
     const handleProgressSet = useCallback((progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
@@ -307,13 +310,16 @@ export const Player = (props: IPlayer) => {
                     { isEditing ? (
                         <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
                     ) : null}
-                    <div 
-                        className={style.volumeContainer}
-                        ref={volumeRef}
-                    >
-                        <img src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
-                        <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
-                        <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
+                    <div className={style.endingContainer}>
+                        <div 
+                            className={style.volumeContainer}
+                            ref={volumeRef}
+                        >
+                            <img src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
+                            <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
+                            <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
+                        </div>
+                        <img src={require('../imgs/ic-checklist.svg')} className={style.icPlayinglist} onClick={handleGoList} />
                     </div>
                 </div>
             ) : (

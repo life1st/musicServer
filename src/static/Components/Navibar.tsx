@@ -1,8 +1,15 @@
 import * as React from 'react'
 import * as style from './styles/Navibar.module.less'
+import { useNavigate } from 'react-router-dom'
 
 const Navibar = (props) => {
-  const { onBack = () => {} } = props
+  let { onBack } = props
+  const naviTo = useNavigate()
+  if (!onBack) {
+    onBack = () => {
+      naviTo(-1)
+    }
+  }
   return (
     <div>
       <div className={style.backBtn} onClick={onBack}>
