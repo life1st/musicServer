@@ -9,6 +9,7 @@ import Search from './Pages/Search'
 import Albums from './Pages/Albums'
 import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
+import PlayingList from './Pages/PlayingList'
 
 export const ROUTES = {
   LIBRARY: '/library',
@@ -16,7 +17,8 @@ export const ROUTES = {
   PLAYING: '/playing',
   ALBUMS: '/albums',
   ALBUM_DETAIL: '/album/:albumId',
-  FULL_EDITOR: '/music/:id/edit'
+  FULL_EDITOR: '/music/:id/edit',
+  PLAYING_LIST: '/playing_list',
 }
 export const Pages = () => {
   const pages = [{
@@ -43,6 +45,10 @@ export const Pages = () => {
       name: 'Full Editor',
       path: ROUTES.FULL_EDITOR,
       comp: <FullEditor />
+    }, {
+      name: 'Playing List',
+      path: ROUTES.PLAYING_LIST,
+      comp: <PlayingList />
     }
   ]
 
