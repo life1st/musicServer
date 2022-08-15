@@ -6,7 +6,6 @@ import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { musicState, playingState } from '../model/playing'
 import { useMemoizedFn } from 'ahooks'
-import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { Music } from '../../types/Music'
@@ -99,15 +98,12 @@ export const Player = (props: IPlayer) => {
         })
     }
 
-    const { album, artist, title } = music || {};
-    const [ isEditing, setEditing ] = useState(false)
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
     const audioRef = useRef<HTMLAudioElement>()
     useEffect(() => {
         if (music) {
             audioRef.current?.play()
-            setEditing(false)
         }
         audioRef.current?.addEventListener('ended', handlePlayEnd)
         return () => {
@@ -144,13 +140,6 @@ export const Player = (props: IPlayer) => {
         }
     }, [audioRef])
     
-    const handleEditToggle = () => {
-        setEditing(!isEditing)
-    }
-    const handleUpdated = (isSuccess) => {
-        setEditing(false)
-        console.log(isSuccess)
-    }
     const switchPlayMode =() => {
         if (playMode === PLAY_MODE.next) {
             setPlayMode(PLAY_MODE.random)
@@ -304,10 +293,6 @@ export const Player = (props: IPlayer) => {
                         }
                         <img src={require('../imgs/ic-next.svg')} className={style.btnNext} onClick={handlePlayNext} />
                     </div>
-                    <button onClick={handleEditToggle}>{isEditing ? 'close' : 'edit'}</button>
-                    { isEditing ? (
-                        <TagEditer id={music?.id} {...{album, artist, title}} onFinish={handleUpdated} />
-                    ) : null}
                     <div className={style.endingContainer}>
                         <div 
                             className={style.volumeContainer}
