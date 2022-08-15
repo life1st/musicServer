@@ -14,7 +14,7 @@ interface ItemProps {
   music: Music;
   showAlbum?: boolean;
   onClick: () => void;
-  onEdit: (e: React.KeyboardEvent) => void;
+  onEdit: (e: React.MouseEvent) => void;
 }
 const SongItem = (props: ItemProps) => {
   const { music, curPlaying, showAlbum = true } = props
