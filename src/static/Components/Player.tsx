@@ -39,9 +39,9 @@ export const Player = (props: IPlayer) => {
     const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
     const naviToFullplayer = () => naviTo('/playing')
-    const handleSwitchPlaying = useCallback((type) => () => {
+    const handleSwitchPlaying = useMemoizedFn((type) => () => {
         let nextIndex: number = -1
-        if (curIndex) {
+        if (curIndex !== null) {
             if (type === PLAY_MODE.prev) {
                 nextIndex = curIndex - 1 || 0
             }
@@ -61,7 +61,7 @@ export const Player = (props: IPlayer) => {
                 curIndex: nextIndex,
             }))
         }
-    }, [curIndex, list])
+    })
     const handlePlayPrev = handleSwitchPlaying(PLAY_MODE.prev)
     const handlePlayNext = handleSwitchPlaying(PLAY_MODE.next)
     const handlePlayEnd = handlePlayNext
