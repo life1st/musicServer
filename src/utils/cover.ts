@@ -49,7 +49,8 @@ export const genCoverInfo = async (params: {
     const { overwrite = false } = config
     
     const coverPath = path.join(COVER_DIR, `${coverName}.jpg`)
-    if (overwrite || !(existsSync(coverPath))) {
+    const isExist = existsSync(coverPath)
+    if (overwrite || !isExist) {
       try {
         await fs.writeFile(coverPath, cover)
         return coverPath
@@ -58,6 +59,7 @@ export const genCoverInfo = async (params: {
         return null
       }
     }
+    return coverPath
   }
   
   getDir(COVER_DIR)

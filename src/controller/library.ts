@@ -7,7 +7,7 @@ import { updateMusicID3 } from '../utils/file'
 import { getMusicData } from '../utils/music'
 import { libraryModel } from '../model/libraryModel'
 import { albumModel } from '../model/albumModel'
-import { album } from './album'
+import { album as albumController } from './album'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
 import { excludeProps, filterExistProps } from '../utils/obj'
@@ -36,7 +36,7 @@ class Library {
             process.on('message', async (music: Music) => {
                 console.log(`message from music process __${pcsi}__: `, music?.path)
                 musicCount++
-                const albumInfo = await album.updateAlbum(music)
+                const albumInfo = await albumController.updateAlbum(music)
                 if (albumInfo) {
                     music.albumId = albumInfo.albumId
                 }
@@ -161,7 +161,7 @@ class Library {
                         await albumModel.removeMusicFromAlbum(oldAlbumId, musicId)
                     }
                 }
-                await album.updateAlbum(music)
+                await albumController.updateAlbum(music)
                 const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
                 return libraryModel.updateMusic({
                     ...musicMeta,
