@@ -86,6 +86,10 @@ class Album {
         return hasUpdate ? albumInfo : null
     }
 
+    async deleteAlbum(albumId: string) {
+        return albumModel.deleteAlbum(albumId)
+    }
+
     async createAlbumFromLibrary() {
         const LIMIT = 100
         let page = 0
@@ -114,9 +118,9 @@ class Album {
                 break
             }
             for (const album of albumList) {
-                if (album.musicIds.length === 0) {
+                if (!album.musicIds?.length) {
                     deleteAlbumsCount++
-                    await albumModel.deleteAlbum(album.albumId)
+                    await this.deleteAlbum(album.albumId)
                 }
             }
         }
