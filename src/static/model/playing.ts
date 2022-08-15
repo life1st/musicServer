@@ -18,7 +18,7 @@ export const musicState = selector({
     const {list, curIndex} = get(playingState)
 
     return {
-      music: curIndex ? list[curIndex] : null
+      music: curIndex === null ? null : list[curIndex]
     }
   }
 })
