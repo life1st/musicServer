@@ -109,14 +109,12 @@ export const Player = (props: IPlayer) => {
             audioRef.current?.play()
             setEditing(false)
         }
-    }, [music, audioRef])
-    
-    useEffect(() => {
         audioRef.current?.addEventListener('ended', handlePlayEnd)
         return () => {
             audioRef.current?.removeEventListener('ended', handlePlayEnd)
         }
-    }, [playMode, audioRef])
+    }, [music, audioRef])
+    
     useEffect(() => {
         return () => {
         }
