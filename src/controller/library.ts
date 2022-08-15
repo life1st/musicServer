@@ -1,4 +1,3 @@
-import fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import child_process from 'child_process'
 import os from 'os'
