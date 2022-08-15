@@ -10,30 +10,38 @@ import Albums from './Pages/Albums'
 import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
 
+export const ROUTES = {
+  LIBRARY: '/library',
+  SEARCH: '/search',
+  PLAYING: '/playing',
+  ALBUMS: '/albums',
+  ALBUM_DETAIL: '/album/:albumId',
+  FULL_EDITOR: '/music/:id/edit'
+}
 export const Pages = () => {
   const pages = [{
       name: 'Library',
-      path: '/library',
+      path: ROUTES.LIBRARY,
       comp: <Library />
     }, {
       name: 'Serach',
-      path: '/search',
+      path: ROUTES.SEARCH,
       comp: <Search />
     }, {
       name: 'Playing',
-      path: '/playing',
+      path: ROUTES.PLAYING,
       comp: <div />
     }, {
       name: 'Albums',
-      path: '/albums',
+      path: ROUTES.ALBUMS,
       comp: <Albums />
     }, {
       name: 'Album Detail',
-      path: '/album/:albumId',
+      path: ROUTES.ALBUM_DETAIL,
       comp: <AlbumDetail />
     }, {
       name: 'Full Editor',
-      path: '/music/:id/edit',
+      path: ROUTES.FULL_EDITOR,
       comp: <FullEditor />
     }
   ]

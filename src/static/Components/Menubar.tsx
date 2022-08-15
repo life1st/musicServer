@@ -1,26 +1,43 @@
 import * as React from 'react'
 import * as style from './styles/Menubar.module.less'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useMatch } from 'react-router-dom'
+import { albumDetailState } from '../model/albumDetail'
+import { useRecoilValue } from 'recoil'
+import { ROUTES } from '../router'
+
+const { useMemo } = React
 
 const MenuBar = (props) => {
   const navigator = useNavigate()
+  const albumDetail = useRecoilValue(albumDetailState)
 
+  const matchAlbumDetail = useMatch(ROUTES.ALBUM_DETAIL)
+
+  const params = useMemo(() => {
+    return matchAlbumDetail ? { replace: true } : {}
+  }, [matchAlbumDetail])
   const menus = [{
       title: 'Playing',
       icon: require('../imgs/ic-play.svg'),
-      onClick: () => { navigator('/playing') }
+      onClick: () => { navigator('/playing', params) }
     }, {
       title: 'Albums',
       icon: require('../imgs/ic-album.svg'),
-      onClick: () => { navigator('/albums') }
+      onClick: () => {
+        if (albumDetail?.albumId) {
+          navigator(`/album/${albumDetail.albumId}`, params)
+        } else {
+          navigator('/albums', params)
+        }
+      }
     }, {
       title: 'Library',
       icon: require('../imgs/ic-library.svg'),
-      onClick: () => { navigator('/library') }
+      onClick: () => { navigator('/library', params) }
     }, {
       title: 'Search',
       icon: require('../imgs/ic-search.svg'),
-      onClick: () => { navigator('/search') }
+      onClick: () => { navigator('/search', params) }
     },
   ]
 
