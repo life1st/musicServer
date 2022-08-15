@@ -3,6 +3,7 @@ import { DEFAULT_LIMIT } from '../shareCommon/consts'
 import { albumModel } from '../model/albumModel'
 import { libraryModel } from '../model/libraryModel'
 import { Music } from '../types/Music'
+import { Album as IAlbum } from '../types/Album'
 import { genAlbumInfo } from '../utils/album'
 import { genCoverInfo } from '../utils/cover'
 
@@ -58,16 +59,21 @@ class Album {
     }
     
     async updateAlbum(music: Music) {
-        let albumInfo = genAlbumInfo(music)
-        const { albumId, name } = albumInfo
-        if (!name) {
+        let { albumId } = music
+        let albumInfo = {} as IAlbum
+        if (albumId) {
+            const existAlbum = await albumModel.getAlbum(albumId)
+            if (existAlbum) {
+                albumInfo = existAlbum
+            }
+        }
+        if (!albumId || !albumInfo.albumId) {
+            albumInfo = genAlbumInfo(music)
+        }
+        if (!albumInfo.name) {
             return null
         }
-        const existAlbum = await albumModel.getAlbum(albumId)
-        if (existAlbum) {
-            albumInfo = existAlbum
-        }
-        if (!existAlbum || !existAlbum.coverId) {
+        if (!albumInfo.coverId) {
             const { coverId, coverUrl } = await genCoverInfo({ music })
             albumInfo.coverId = coverId
             albumInfo.coverUrl = coverUrl
@@ -91,20 +97,12 @@ class Album {
                 break
             }
             for (const music of list) {
-                const { albumId } = music
-                if (albumId) {
-                    await albumModel.updateAlbum({
-                        albumInfo: { albumId },
-                        musicId: music.id
+                const albumInfo = await this.updateAlbum(music)
+                if (albumInfo) {
+                    await libraryModel.updateMusic({
+                        ...music,
+                        albumId: albumInfo.albumId,
                     })
-                } else {
-                    const albumInfo = await this.updateAlbum(music)
-                    if (albumInfo) {
-                        await libraryModel.updateMusic({
-                            ...music,
-                            albumId: albumInfo.albumId,
-                        })
-                    }
                 }
             }
         }

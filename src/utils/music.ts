@@ -4,9 +4,31 @@ import { getFileId, getMusicID3 } from './file'
 import { Music } from '../types/Music'
 export const genMusicKeyword = (music: Music) => {
   const {
-    title = '', artist = '', album = '', genre = ''
+    title = '', artist = '', album = '', genre = '',
+    path: musicPath = '',
   } = music
-  return [title, artist, album, genre].filter(Boolean).join(' ')
+
+  const extname = path.extname(musicPath)
+  const [
+    dirs,
+    basename,
+  ] = [
+    path.dirname(musicPath).split(path.sep),
+    path.basename(musicPath, extname),
+  ]
+  const dirKeywords = dirs.length > 2 ? [dirs.pop(), dirs.pop()].join(' ') : dirs.pop()
+
+  const keywords = [title, artist, album, genre, dirKeywords]
+  if (!title.includes(basename)) {
+    keywords.push(basename)
+  }
+  return keywords.filter(Boolean).map(v => {
+    const lowerStr = v?.toLowerCase()
+    if (lowerStr === v) {
+      return v
+    }
+    return `${v.toLowerCase()} ${v}`
+  }).join(' ')
 }
 
 export const getMusicData = async (musicPath: string): Promise<Music> => {
@@ -20,7 +42,6 @@ export const getMusicData = async (musicPath: string): Promise<Music> => {
       getFileId(buf),
       getMusicID3(buf)
   ])
-  console.log('id, info: ', id, musicPath)
 
   const {
       title, artist = '', album = '', genre = '',
