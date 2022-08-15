@@ -161,10 +161,7 @@ class Library {
                         await albumModel.removeMusicFromAlbum(oldAlbumId, musicId)
                     }
                 }
-                await albumModel.updateAlbum({
-                    albumInfo: { albumId },
-                    musicId
-                })
+                await album.updateAlbum(music)
                 const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
                 return libraryModel.updateMusic({
                     ...musicMeta,
