@@ -3,8 +3,6 @@ name: dockerhub_publish
 on:
   push:
     branches: [ "release" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "release" ]
 
