@@ -3,8 +3,8 @@ import * as style from './styles/Player.module.less'
 import { useMatch, useNavigate } from 'react-router-dom'
 import cls from 'classnames'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { libraryState } from '../model/library'
-import { musicState, playListState} from '../model/playing'
+import { musicState, playingState } from '../model/playing'
+import { useMemoizedFn } from 'ahooks'
 import { TagEditer } from './TagEditer'
 import { PLAY_MODE } from '../consts'
 import { RESP_STATE } from '../../shareCommon/consts'
@@ -26,15 +26,13 @@ interface IPlayer {
 }
 export const Player = (props: IPlayer) => {
     const { music } = useRecoilValue(musicState)
-    const setMusic = useSetRecoilState(musicState)
-    const { curIndex, list: playList } = useRecoilValue(playListState)
+    const setPlaying = useSetRecoilState(playingState)
+    const { curIndex, list } = useRecoilValue(playingState)
 
     useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - Music Server')
     const match = useMatch('playing')
     const naviTo = useNavigate()
-    const list = useRecoilValue(libraryState)
     
-    const { onPlayEnd, onPlayError, onPrevSong, onNextSong } = props;
     const [isPlaying, setIsPlaying] = useState(false)
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
@@ -42,11 +40,13 @@ export const Player = (props: IPlayer) => {
     const naviToFullplayer = () => naviTo('/playing')
     const handleSwitchPlaying = useCallback((type) => () => {
         let nextIndex: number = -1
-        if (type === PLAY_MODE.prev) {
-            nextIndex = curIndex - 1 || 0
-        }
-        if (type === PLAY_MODE.next) {
-            nextIndex = curIndex + 1 || 0
+        if (curIndex) {
+            if (type === PLAY_MODE.prev) {
+                nextIndex = curIndex - 1 || 0
+            }
+            if (type === PLAY_MODE.next) {
+                nextIndex = curIndex + 1 || 0
+            }
         }
         if (type === PLAY_MODE.random) {
             nextIndex = Math.floor(Math.random() * list.length)
@@ -55,16 +55,16 @@ export const Player = (props: IPlayer) => {
         //     setCurPage(curPage + 1)
         // }
         if (nextIndex >= 0 && nextIndex < list.length) {
-            setMusic((_) => ({
+            setPlaying(_ => ({
+                ..._,
                 curIndex: nextIndex,
-                music: list[nextIndex]
             }))
         }
     }, [curIndex, list])
     const handlePlayPrev = handleSwitchPlaying(PLAY_MODE.prev)
     const handlePlayNext = handleSwitchPlaying(PLAY_MODE.next)
     const handlePlayEnd = handlePlayNext
-    const handlePlayError = async () => {
+    const handlePlayError = useMemoizedFn(async () => {
         if (!music) return
         const isSure = confirm(`play ${music.title + '-' + music.artist} error, delete it?`)
         if (isSure) {
@@ -79,7 +79,7 @@ export const Player = (props: IPlayer) => {
             }
         }
         handlePlayNext()
-    }
+    })
     const checkHasMusic = (afterFunc) => {
         if (music) {
             afterFunc()
@@ -117,19 +117,17 @@ export const Player = (props: IPlayer) => {
         }
     }, [playMode, audioRef])
     useEffect(() => {
-        audioRef.current?.addEventListener('error', handlePlayError)
         return () => {
-            audioRef.current?.removeEventListener('error', handlePlayError)
         }
-    }, [onPlayError, audioRef])
+    }, [audioRef])
 
-    const handlePlayTimeupdate = (e) => {
+    const handlePlayTimeupdate = useMemoizedFn((e) => {
         const { duration, currentTime } = audioRef.current || {}
         if (duration && currentTime) {
             curDuration.current = duration
             setTime(currentTime)
         }
-    }
+    })
     useEffect(() => {
         const handlePlayStatusChange = () => {
             setIsPlaying(!audioRef.current?.paused)
@@ -137,10 +135,13 @@ export const Player = (props: IPlayer) => {
         audioRef.current?.addEventListener('pause', handlePlayStatusChange)
         audioRef.current?.addEventListener('play', handlePlayStatusChange)
         audioRef.current?.addEventListener('timeupdate', handlePlayTimeupdate)
+        audioRef.current?.addEventListener('error', handlePlayError)
+
         return () => {
             audioRef.current?.removeEventListener('pause', handlePlayStatusChange)
             audioRef.current?.removeEventListener('play', handlePlayStatusChange)
             audioRef.current?.addEventListener('timeupdate', handlePlayTimeupdate)
+            audioRef.current?.removeEventListener('error', handlePlayError)
         }
     }, [audioRef])
     

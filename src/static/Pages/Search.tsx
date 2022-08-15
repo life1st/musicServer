@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './Search.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { musicState } from '../model/playing'
+import { playingState } from '../model/playing'
 import { searchPageState, searchListState } from '../model/search'
 import { searchMusic } from '../API'
 import { SearchInput } from '../Components/SearchInput'
@@ -15,7 +15,7 @@ const Search = (props) => {
     searchText,
   } = useRecoilValue(searchPageState)
   const setSearchState = useSetRecoilState(searchPageState)
-  const setMusic = useSetRecoilState(musicState)
+  const setPlaying = useSetRecoilState(playingState)
 
   const fetchData = useCallback((pageNum) => {
     if (searchText) {
@@ -29,9 +29,9 @@ const Search = (props) => {
   })
 
   const handleItemClick = (music, i) => {
-    setMusic((_) => ({
+    setPlaying(_ => ({
+      list,
       curIndex: i,
-      music
     }))
   }
   

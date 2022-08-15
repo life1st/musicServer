@@ -3,7 +3,7 @@ import * as style from './AlbumDetail.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'
-import { musicState } from '../model/playing'
+import { musicState, playingState } from '../model/playing'
 import { getAlbumDetail } from '../API'
 import Navibar from '../Components/Navibar'
 import Cover from '../Components/Cover'
@@ -15,14 +15,18 @@ const AlbumDetail = (props) => {
   const { albumId } = useParams()
   const albumDetail = useRecoilValue(albumDetailState)
   const setAlbumDetail = useSetRecoilState(albumDetailState)
-  const setMusic = useSetRecoilState(musicState)
+  const setPlaying = useSetRecoilState(playingState)
   const naviTo = useNavigate()
 
   const handleBack = () => {
     naviTo('/albums', { replace: true })
   }
   const handleMusicItemClick = (music, i) => {
-    setMusic(_ => ({ music }))
+    const list = albumDetail?.songs || []
+    setPlaying(_ => ({
+      list,
+      curIndex: i,
+    }))
   }
   const fetchData = async (albumId) => {
     const { status, data } = await getAlbumDetail(albumId)

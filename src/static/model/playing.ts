@@ -1,22 +1,24 @@
-import { atom } from 'recoil'
+import { atom, selector } from 'recoil'
 import { Music } from '../../types/Music'
 
-export const musicState = atom<{
-  music: Music | null,
-}>({
-  key: 'musicState',
-  default: {
-    music: null,
-  }
-})
-
-export const playListState = atom<{
+export const playingState = atom<{
   list: Music[],
   curIndex: number | null,
 }>({
-  key: 'playListState',
+  key: 'playingState',
   default: {
     list: [],
     curIndex: null,
+  }
+})
+
+export const musicState = selector({
+  key: 'musicState',
+  get: ({ get }) => {
+    const {list, curIndex} = get(playingState)
+
+    return {
+      music: curIndex ? list[curIndex] : null
+    }
   }
 })
