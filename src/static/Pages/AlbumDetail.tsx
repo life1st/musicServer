@@ -46,14 +46,16 @@ const AlbumDetail = (props) => {
       {
         albumDetail ? (
           <Fragment>
-            <div className={style.detailContent}>
-              <Cover src={`/file/album_cover/${albumDetail.albumId}`} className={style.coverImg} />
-              <div className={style.detailInfo}>
-                <p className={style.title}>{albumDetail.name}</p>
-                <p className={style.artist}>{albumDetail.artist}</p>
-              </div>
-            </div>
             <Songlist
+              startNode={(
+                <div className={style.detailContent}>
+                  <Cover src={`/file/album_cover/${albumDetail.albumId}`} className={style.coverImg} />
+                  <div className={style.detailInfo}>
+                    <p className={style.title}>{albumDetail.name}</p>
+                    <p className={style.artist}>{albumDetail.artist}</p>
+                  </div>
+                </div>
+              )}
               list={albumDetail.songs || []}
               hasMore={false}
               showLoading={false}
