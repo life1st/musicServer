@@ -54,11 +54,13 @@ interface ISonglist {
     initScrollTop?: number;
     className?: string;
     showAlbum?: boolean;
+    startNode?: React.ReactNode;
 }
 const Songlist = (props: ISonglist) => {
     const { 
       list, hasMore, initScrollTop, showLoading, className, showAlbum,
-      onItemClick, onReachEnd, onScroll
+      onItemClick, onReachEnd, onScroll,
+      startNode
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
     const { list: playingList } = useRecoilValue(playingState)
@@ -91,6 +93,7 @@ const Songlist = (props: ISonglist) => {
         initScrollTop={initScrollTop}
         className={cls(style.container, className)}
       >
+        {props.startNode}
         { list.map((item, i) => (
           <SongItem 
             key={item.id} 
