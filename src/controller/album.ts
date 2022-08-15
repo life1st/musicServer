@@ -88,13 +88,11 @@ class Album {
 
     async createAlbumFromLibrary() {
         const LIMIT = 100
-        let hasMore = true
         let page = 0
         const start = Date.now()
-        while(hasMore) {
+        while(true) {
             const list = await libraryModel.getMusicList(page++, LIMIT)
             if (list.length === 0) {
-                hasMore = false
                 break
             }
             for (const music of list) {
@@ -107,7 +105,22 @@ class Album {
                 }
             }
         }
-        console.log('createAlbumFromLibrary finish', (Date.now() - start)/1000 + ' sec.') 
+        console.log('createAlbumFromLibrary finish', (Date.now() - start)/1000 + ' sec.')
+        let albumPage = 0
+        let deleteAlbumsCount = 0
+        while (true) {
+            const albumList = await this.getAlbumList({pageNum: albumPage++})
+            if (albumList.length === 0) {
+                break
+            }
+            for (const album of albumList) {
+                if (album.musicIds.length === 0) {
+                    deleteAlbumsCount++
+                    await albumModel.deleteAlbum(album.albumId)
+                }
+            }
+        }
+        console.log('delete empty album finish, count:', deleteAlbumsCount, (Date.now() - start)/1000 + ' sec.')
     }
 }
 
