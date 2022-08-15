@@ -82,9 +82,8 @@ const Albums = () => {
   }
   useEffect(() => {
     // TODO: bug here, change route will cause x roll pos change
-    // itemWidth.current = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
+    itemWidth.current = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
   }, [])
-  
 
   return (
     <Fragment>
