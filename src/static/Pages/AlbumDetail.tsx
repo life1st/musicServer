@@ -3,7 +3,8 @@ import * as style from './AlbumDetail.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'
-import { musicState, playingState } from '../model/playing'
+import { playingState } from '../model/playing'
+import { Album } from '../../types/Album'
 import { getAlbumDetail } from '../API'
 import Navibar from '../Components/Navibar'
 import Cover from '../Components/Cover'
@@ -27,6 +28,12 @@ const AlbumDetail = (props) => {
       list,
       curIndex: i,
     }))
+  }
+  const handleDeleted = (music, s) => {
+    setAlbumDetail({
+      ...albumDetail as Album,
+      songs: albumDetail?.songs?.filter(m => m.id !== music.id) || []
+    })
   }
   const fetchData = async (albumId) => {
     const { status, data } = await getAlbumDetail(albumId)
@@ -60,6 +67,7 @@ const AlbumDetail = (props) => {
               hasMore={false}
               showLoading={false}
               onItemClick={handleMusicItemClick}
+              deleteSuccess={handleDeleted}
               showAlbum={false}
             />
           </Fragment>

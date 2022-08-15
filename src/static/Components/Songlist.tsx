@@ -5,6 +5,8 @@ import { musicState, playingState } from '../model/playing'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import cls from 'classnames'
 import { Music } from '../../types/Music'
+import { RESP_STATE } from '../../shareCommon/consts'
+import { deleteMusic } from '../API'
 import Scroller from './Scroller'
 
 const { useMemo } = React
@@ -14,12 +16,13 @@ interface ItemProps {
   music: Music;
   showAlbum?: boolean;
   onClick: () => void;
+  onDelete: (e: React.MouseEvent) => void;
   onEdit: (e: React.MouseEvent) => void;
   onAddList?: (e: React.MouseEvent) => void;
 }
 const SongItem = (props: ItemProps) => {
   const { music, curPlaying, showAlbum = true } = props
-  const { onClick = () => {}, onEdit = () => {}, onAddList = () => {} } = props
+  const { onClick = () => {}, onDelete = () => {}, onEdit = () => {}, onAddList = () => {} } = props
   const isPlaying = curPlaying?.id === music.id
   const desc = useMemo(() => {
     const { artist, album } = music
@@ -35,6 +38,7 @@ const SongItem = (props: ItemProps) => {
         <p className={style.desc}>{desc}</p>
       </div>
       <div className={style.opreation}>
+        <img src={require('../imgs/ic-delete.svg')} className={style.icDelete} onClick={onDelete} />
         <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={onEdit} />
         <img src={require('../imgs/ic-list-add.svg')} className={style.icAddList} onClick={onAddList} />
       </div>
@@ -48,6 +52,7 @@ interface ISonglist {
     onItemClick: (m: Music, n: number) => void;
     onReachEnd?: () => void;
     onScroll?: (scrollTop: number) => void;
+    deleteSuccess?: (m: Music, s: RESP_STATE) => void;
     list: Music[];
     hasMore?: boolean;
     showLoading?: boolean;
@@ -59,8 +64,7 @@ interface ISonglist {
 const Songlist = (props: ISonglist) => {
     const { 
       list, hasMore, initScrollTop, showLoading, className, showAlbum,
-      onItemClick, onReachEnd, onScroll,
-      startNode
+      onItemClick, onReachEnd, onScroll, deleteSuccess
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
     const { list: playingList } = useRecoilValue(playingState)
@@ -69,6 +73,16 @@ const Songlist = (props: ISonglist) => {
     
     const handleItemClick = (item, i) => {
         onItemClick?.(item, i)
+    }
+    const handleItemDelete = async (e, item) => {
+      e.stopPropagation()
+      const ensure = confirm(`确定删除${item.title}吗？`)
+      if (ensure) {
+        const { status, data } = await deleteMusic(item.id)
+        if (status === 200) {
+          deleteSuccess?.(item, data)
+        }
+      }
     }
     const handleItemEdit = (e, item, i) => {
       e.stopPropagation()
@@ -99,6 +113,7 @@ const Songlist = (props: ISonglist) => {
             key={item.id} 
             music={item} 
             onClick={() => { handleItemClick(item, i) }}
+            onDelete={(e) => { handleItemDelete(e, item, i) }}
             onEdit={(e) => { handleItemEdit(e, item, i) }}
             onAddList={(e) => { handleAddItemToList(e, item) }}
             curPlaying={curPlaying}

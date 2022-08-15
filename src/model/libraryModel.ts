@@ -8,7 +8,9 @@ import { DEFAULT_LIMIT } from '../shareCommon/consts'
 
 class LibraryModel {
     private dbFile = path.resolve(DB_DIR, 'libraryModel')
+    private deletedLibrarydbFile = path.resolve(DB_DIR, 'deletedLibraryModel')
     private db = Nedb.create(this.dbFile)
+    private deletedMusicdb = Nedb.create(this.deletedLibrarydbFile)
     constructor() {
         getDir(DB_DIR)
     }
@@ -82,7 +84,13 @@ class LibraryModel {
     }
 
     async deleteMusic(id: string): Promise<number> {
+        const music = await this.db.findOne({id})
+        this.deletedMusicdb.insert(music)
         return this.db.remove({ id }, {})
+    }
+
+    async getDeletedMusic({path}) {
+        return this.deletedMusicdb.findOne({path})
     }
 }
 

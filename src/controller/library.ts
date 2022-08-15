@@ -18,8 +18,9 @@ class Library {
 
     async scanMulticore(config: {
         skipExist?: boolean,
+        skipDeleted?: boolean,
     }) {
-        const { skipExist = true } = config || {}
+        const { skipExist = true, skipDeleted = true } = config || {}
         const startTime = Date.now()
         const processCount = os.cpus().length
 
@@ -69,20 +70,30 @@ class Library {
                 scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb'].some(k => dir.includes(k))))
             }
             if (musicFiles.length > 0) {
-                let _musicFiles: string[] = []
                 if (skipExist) {
+                    let tmpList: string[] = []
                     for (const musicPath of musicFiles) {
                         const musics = await libraryModel.getMusicBy({ path: musicPath })
                         const isSkip = musics.length > 0
                         console.log('skipFile:', isSkip, musicPath, musics.length)
                         if (!isSkip) {
-                            _musicFiles.push(musicPath)
+                            tmpList.push(musicPath)
                         }
                     }
-                } else {
-                    _musicFiles = musicFiles
+                    musicFiles = tmpList
                 }
-                scanMusicCache = scanMusicCache.concat(_musicFiles)
+                if (skipDeleted) {
+                    let tmpList: string[] = []
+                    for (const musicPath of musicFiles) {
+                        const isDeleted = await libraryModel.getDeletedMusic({ path: musicPath })
+                        console.log('skip deleted File:', Boolean(isDeleted), musicPath)
+                        if (!isDeleted) {
+                            tmpList.push(musicPath)
+                        }
+                    }
+                    musicFiles = tmpList
+                }
+                scanMusicCache = scanMusicCache.concat(musicFiles)
             }
             musicMetaTasks.map((task, i) => {
                 if (!task && scanMusicCache.length > 0) {

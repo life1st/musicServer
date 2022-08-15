@@ -15,6 +15,7 @@ const Search = (props) => {
     searchText,
   } = useRecoilValue(searchPageState)
   const setSearchState = useSetRecoilState(searchPageState)
+  const setSearchListState = useSetRecoilState(searchListState)
   const setPlaying = useSetRecoilState(playingState)
 
   const fetchData = useCallback((pageNum) => {
@@ -53,6 +54,12 @@ const Search = (props) => {
   const handleScroll = (scrollTop) => {
     setSearchState(state => ({...state, scrollTop}))
   }
+  const handleDeleted = (music, s) => {
+    setSearchListState(_ => ({
+      ..._,
+      list: _.list.filter(m => m.id !== music.id),
+    }))
+  }
 
   return (
     <div className={style.container}>
@@ -60,6 +67,7 @@ const Search = (props) => {
       <Songlist
         className={style.searchList}
         onItemClick={handleItemClick}
+        deleteSuccess={handleDeleted}
         onReachEnd={handleLoadMore}
         onScroll={handleScroll}
         list={list}

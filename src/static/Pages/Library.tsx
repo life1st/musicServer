@@ -12,6 +12,7 @@ const Library = (props) => {
   const setPlaying = useSetRecoilState(playingState)
   const memScrollTop = useRecoilValue(libraryScrollState)
   const setLibraryScroll = useSetRecoilState(libraryScrollState)
+  const setLibraryState = useSetRecoilState(libraryState)
 
   const navi = useNavigate()
 
@@ -33,10 +34,18 @@ const Library = (props) => {
     }
   }
 
+  const handleDeleted = (music, s) => {
+    setLibraryState(state => ({
+      ...state,
+      list: state.list.filter(m => m.id !== music.id),
+    }))
+  }
+
   return (
     <Fragment>
       <button onClick={scanLibrary}>Scan</button>
       <Songlist
+        deleteSuccess={handleDeleted}
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}
         onScroll={setLibraryScroll}
