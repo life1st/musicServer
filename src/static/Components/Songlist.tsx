@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './styles/Songlist.module.less'
 import { useNavigate } from 'react-router-dom'
-import { musicState } from '../model/playing'
-import { useRecoilValue } from 'recoil'
+import { musicState, playingState } from '../model/playing'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import cls from 'classnames'
 import { Music } from '../../types/Music'
 import Scroller from './Scroller'
@@ -15,10 +15,11 @@ interface ItemProps {
   showAlbum?: boolean;
   onClick: () => void;
   onEdit: (e: React.MouseEvent) => void;
+  onAddList?: (e: React.MouseEvent) => void;
 }
 const SongItem = (props: ItemProps) => {
   const { music, curPlaying, showAlbum = true } = props
-  const { onClick = () => {}, onEdit = () => {} } = props
+  const { onClick = () => {}, onEdit = () => {}, onAddList = () => {} } = props
   const isPlaying = curPlaying?.id === music.id
   const desc = useMemo(() => {
     const { artist, album } = music
@@ -35,6 +36,7 @@ const SongItem = (props: ItemProps) => {
       </div>
       <div className={style.opreation}>
         <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={onEdit} />
+        <img src={require('../imgs/ic-list-add.svg')} className={style.icAddList} onClick={onAddList} />
       </div>
       { isPlaying ? (
         <img src={require('../imgs/ic-cd.svg')} className={style.icPlaying} />
@@ -59,6 +61,8 @@ const Songlist = (props: ISonglist) => {
       onItemClick, onReachEnd, onScroll
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
+    const { list: playingList } = useRecoilValue(playingState)
+    const setPlayingList = useSetRecoilState(playingState)
     const naviTo = useNavigate()
     
     const handleItemClick = (item, i) => {
@@ -67,6 +71,15 @@ const Songlist = (props: ISonglist) => {
     const handleItemEdit = (e, item, i) => {
       e.stopPropagation()
       naviTo(`/music/${item.id}/edit`)
+    }
+    const handleAddItemToList = (e, item) => {
+      e.stopPropagation()
+      if (!playingList.some(music => music.id === item.id)) {
+        setPlayingList(_ => ({
+          ..._,
+          list: playingList.concat(item)
+        }))
+      }
     }
 
     return (
@@ -84,6 +97,7 @@ const Songlist = (props: ISonglist) => {
             music={item} 
             onClick={() => { handleItemClick(item, i) }}
             onEdit={(e) => { handleItemEdit(e, item, i) }}
+            onAddList={(e) => { handleAddItemToList(e, item) }}
             curPlaying={curPlaying}
             showAlbum={showAlbum}
           />
