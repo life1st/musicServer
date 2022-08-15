@@ -32,9 +32,9 @@ class Library {
         let scanProcess = child_process.fork('./dist/scanDir.js')
         let musicMetaProcesses = Array(musicProcessCount).fill(null).map(() => child_process.fork('./dist/getMusicMeta.js'))
         let musicCount = 0
-        musicMetaProcesses.map((process) => {
+        musicMetaProcesses.map((process, pcsi) => {
             process.on('message', async (music: Music) => {
-                console.log('message from music process: ', music?.path)
+                console.log(`message from music process __${pcsi}__: `, music?.path)
                 musicCount++
                 const albumInfo = await album.updateAlbum(music)
                 if (albumInfo) {
@@ -50,6 +50,9 @@ class Library {
                     process.kill('SIGINT')
                     // @ts-ignore
                     musicMetaProcesses[i] = null
+                    if (musicMetaTasks.every(t => !t)) {
+                        console.log(`scan finish, but not all process exit. ProcessCount: ${musicMetaProcesses.length}, MusicCount:`, musicCount, (Date.now() - startTime) / 1000 + 's')
+                    }
                     if (musicMetaProcesses.every(p => p === null)) {
                         console.log('scan finish', musicCount, (Date.now() - startTime) / 1000 + 's')
                         if (scanProcess) {
@@ -195,13 +198,6 @@ class Library {
     }
 
     async deleteMusic(id) {
-        const music = await libraryModel.getMusic(id)
-        try {
-            await fs.access(music.path)
-            await fs.unlink(music.path)
-        } catch (e) {
-            console.log('music file not exist.', e)
-        }
         const deleteNumber = await libraryModel.deleteMusic(id)
         return deleteNumber > 0 ? RESP_STATE.success : RESP_STATE.alreadyDone
     }
