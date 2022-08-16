@@ -120,7 +120,7 @@ class Album {
             for (const album of albumList) {
                 if (!album.musicIds?.length) {
                     deleteAlbumsCount++
-                    await this.deleteAlbum(album.albumId)
+                    await albumModel.deleteAlbum(album.albumId, { _id: album._id })
                 }
             }
         }

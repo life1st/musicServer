@@ -79,8 +79,16 @@ class AlbumModel {
         return false
     }
     
-    async deleteAlbum(id) {
-        return await this.db.remove({ albumId: id }, {}) > 0
+    async deleteAlbum(id, config?: {
+        _id: string;
+    }) {
+        if (id) {
+            return await this.db.remove({ albumId: id }, {}) > 0
+        }
+        const { _id } = config || {}
+        if (_id) {
+            return await this.db.remove({ _id }, {}) > 0
+        }
     }
 }
 const albumModel = new AlbumModel()
