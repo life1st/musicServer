@@ -4,6 +4,20 @@ import { useThrottleFn } from 'ahooks'
 
 const { useRef, useEffect, useImperativeHandle, forwardRef } = React
 
+const EndFix = ({showLoading, hasMore}) => {
+  if (showLoading && hasMore) {
+    return <div><img src={require('../imgs/ic-loading.svg')} className={style.icLoading} /></div>
+  }
+  if (!hasMore) {
+    return (
+      <div className={style.emptyTips}>
+        <img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} />
+        <span className={style.tipsText}>没有了</span>
+      </div>
+    )
+  }
+  return null
+}
 interface Props {
   onReachEnd?: () => void;
   onScroll?: (scrollTop: number) => void;
@@ -12,7 +26,7 @@ interface Props {
   className?: string;
   initScrollTop?: number;
 }
-const Scroller = (props: React.PropsWithChildren<Props>, ref) => {
+const Scroller = forwardRef((props: React.PropsWithChildren<Props>, ref) => {
   const {
     onReachEnd = () => {},
     onScroll = () => {},
@@ -41,26 +55,14 @@ const Scroller = (props: React.PropsWithChildren<Props>, ref) => {
     }
   }, { wait: 300 })
 
-  const renderEnd = () => {
-    if (showLoading && hasMore) {
-      return <div><img src={require('../imgs/ic-loading.svg')} className={style.icLoading} /></div>
-    }
-    if (!hasMore) {
-      return (
-        <div className={style.emptyTips}>
-          <img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} />
-          <span className={style.tipsText}>没有了</span>
-        </div>
-      )
-    }
-    return null
-  }
   return (
     <ul ref={listRef} onScroll={handleScroll} className={className}>
       {props.children}
-      <li className={style.endFix}>{ renderEnd() }</li>
+      <li className={style.endFix}>
+        <EndFix showLoading={showLoading} hasMore={hasMore} />
+      </li>
     </ul>
   )
-}
+})
 
-export default forwardRef(Scroller)
+export { Scroller, EndFix }

@@ -7,7 +7,7 @@ import cls from 'classnames'
 import { Music } from '../../types/Music'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { deleteMusic } from '../API'
-import Scroller from './Scroller'
+import { Scroller } from './Scroller'
 
 const { useMemo } = React
 

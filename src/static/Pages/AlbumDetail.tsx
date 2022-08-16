@@ -9,6 +9,7 @@ import { getAlbumDetail } from '../API'
 import Navibar from '../Components/Navibar'
 import Cover from '../Components/Cover'
 import Songlist from '../Components/Songlist'
+import { EndFix } from '../Components/Scroller'
 
 const { Fragment, useEffect } = React
 
@@ -47,11 +48,13 @@ const AlbumDetail = (props) => {
     }
   }, [albumId])
 
+  const hasCurData = albumDetail && albumDetail.albumId === albumId
+
   return (
     <div className={style.container}>
       <Navibar onBack={handleBack} />
       {
-        albumDetail ? (
+        hasCurData ? (
           <Fragment>
             <Songlist
               startNode={(
@@ -71,7 +74,9 @@ const AlbumDetail = (props) => {
               showAlbum={false}
             />
           </Fragment>
-        ) : (<div>Loading</div>)
+        ) : (
+          <div><EndFix showLoading={true} hasMore={true} /></div>
+        )
       }
     </div>
   )

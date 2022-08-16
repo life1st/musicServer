@@ -7,7 +7,7 @@ import { getAlbums, searchAlbum } from '../API'
 import { Album } from '../../types/Album'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { useCalColumn } from '../hooks/useCalColumn'
-import Scroller from '../Components/Scroller'
+import { Scroller } from '../Components/Scroller'
 import Cover from '../Components/Cover'
 import { SearchInput } from '../Components/SearchInput'
 
