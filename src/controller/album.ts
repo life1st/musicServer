@@ -31,13 +31,13 @@ class Album {
         return albumModel.getAlbum(albumId, config)
     }
 
-    async getAlbumList({pageNum, artist, name, needSongs}: {
-        pageNum: number,
-        name?: string,
-        artist?: string,
-        needSongs?: boolean
+    async getAlbumList({pageNum, artist, name, needSongs, limit = DEFAULT_LIMIT}: {
+        pageNum: number;
+        name?: string;
+        artist?: string;
+        needSongs?: boolean;
+        limit?: number;
     }) {
-        const limit = DEFAULT_LIMIT
         const condition: any = {}
         if (artist) {
             condition.artist = { $regex: new RegExp(artist) }
@@ -59,15 +59,15 @@ class Album {
     }
     
     async updateAlbum(music: Music) {
-        let { albumId } = music
+        let { albumId: existedAlbumId } = music
         let albumInfo = {} as IAlbum
-        if (albumId) {
-            const existAlbum = await albumModel.getAlbum(albumId)
+        if (existedAlbumId) {
+            const existAlbum = await albumModel.getAlbum(existedAlbumId)
             if (existAlbum) {
                 albumInfo = existAlbum
             }
         }
-        if (!albumId || !albumInfo.albumId) {
+        if (!existedAlbumId || !albumInfo.albumId) {
             albumInfo = genAlbumInfo(music)
         }
         if (!albumInfo.name) {
@@ -95,12 +95,13 @@ class Album {
         let page = 0
         const start = Date.now()
         while(true) {
-            const list = await libraryModel.getMusicList(page++, LIMIT)
-            if (list.length === 0) {
+            const musicList = await libraryModel.getMusicList(page++, LIMIT)
+            if (musicList.length === 0) {
                 break
             }
-            for (const music of list) {
-                const albumInfo = await this.updateAlbum(music)
+            for (const music of musicList) {
+                const { albumId } = genAlbumInfo(music)
+                const albumInfo = await this.updateAlbum({...music, albumId})
                 if (albumInfo) {
                     await libraryModel.updateMusic({
                         ...music,

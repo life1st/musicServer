@@ -3,7 +3,7 @@ import fs from 'fs/promises'
 import md5 from 'md5'
 import ID3 from 'node-id3'
 
-export const getDir = async (path: string): Promise<string> => {
+export const getDir = (path: string): string => {
     if (!existsSync(path)){
         mkdirSync(path, { recursive: true });
     }
@@ -17,13 +17,12 @@ export const genFile = async (filePath: string): Promise<string> => {
     return filePath;
 }
 
-
-export const isMusicFile = (filePath): boolean => {
+export const isMusicFile = (filePath: string): boolean => {
     // await fs.read
     return filePath.includes('.mp3')
 }
 
-export const getFileId = async (fileBuf): Promise<string> => {
+export const getFileId = async (fileBuf: Buffer): Promise<string> => {
     try {
         return md5(fileBuf)
     } catch(e) {
@@ -41,6 +40,6 @@ export const getMusicID3 = async (fileBuf: Buffer): Promise<ID3.Tags> => {
     }
 }
 
-export const updateMusicID3 = async (path, tags): Promise<boolean> => {
+export const updateMusicID3 = async (path: string, tags: ID3.Tags): Promise<boolean> => {
     return Boolean(ID3.update(tags, path))
 }
