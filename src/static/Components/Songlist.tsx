@@ -120,6 +120,7 @@ const Songlist = (props: ISonglist) => {
             showAlbum={showAlbum}
           />
         )) }
+        {list.length ? <p className={style.endCount}>Songs: {list.length}</p> : null}
       </Scroller>
     )
 }

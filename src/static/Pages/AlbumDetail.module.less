@@ -21,6 +21,8 @@
 .detailInfo {
   height: @info_s;
   flex: 1;
+  display: flex;
+  flex-direction: column;
   .title {
     font-size: 18px;
     font-weight: bold;
@@ -29,5 +31,22 @@
   .artist {
     font-size: 14px;
     color: #636363;
+  }
+}
+.oprations {
+  margin-top: auto;
+  .icCommon(@s: 24px) {
+    width: @s;
+    height: @s;
+    padding: 4px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    transition: all .2s;
+    &:hover {
+      background-color: #eee;
+    }
+  }
+  .icEdit {
+    .icCommon();
   }
 }

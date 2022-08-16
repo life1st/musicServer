@@ -63,6 +63,9 @@ const AlbumDetail = (props) => {
                   <div className={style.detailInfo}>
                     <p className={style.title}>{albumDetail.name}</p>
                     <p className={style.artist}>{albumDetail.artist}</p>
+                    <div className={style.oprations}>
+                      <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} />
+                    </div>
                   </div>
                 </div>
               )}

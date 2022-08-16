@@ -44,7 +44,10 @@
     .tipsLine();
   }
 }
-
+.endCount {
+  padding: 6px 12px 0;
+  font-size: 11px;
+}
 .songItem {
   @pl: 12px;
   display: flex;
@@ -56,7 +59,7 @@
   &:hover {
     background-color: #eee;
     .opreation {
-      opacity: 1;
+      display: block;
     }
     .icPlaying {
       display: none;
@@ -100,7 +103,7 @@
   .opreation {
     margin-left: auto;
     margin-right: 24px;
-    opacity: 0;
+    display: none;
     .icOpCommon(@s: 26px;) {
       width: @s;
       height: @s;
