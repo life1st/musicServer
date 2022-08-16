@@ -59,12 +59,13 @@ class Album {
     }
     
     async updateAlbum(music: Music) {
-        let { albumId: existedAlbumId } = music
+        let { albumId: existedAlbumId, year } = music
         let albumInfo = {} as IAlbum
         if (existedAlbumId) {
             const existAlbum = await albumModel.getAlbum(existedAlbumId)
             if (existAlbum) {
                 albumInfo = existAlbum
+                year = existAlbum.year || year
             }
         }
         if (!existedAlbumId || !albumInfo.albumId) {
@@ -77,6 +78,9 @@ class Album {
             const { coverId, coverUrl } = await genCoverInfo({ music })
             albumInfo.coverId = coverId
             albumInfo.coverUrl = coverUrl
+        }
+        if (!albumInfo.year) {
+            albumInfo.year = year
         }
 
         const hasUpdate = await albumModel.updateAlbum({
@@ -100,8 +104,8 @@ class Album {
                 break
             }
             for (const music of musicList) {
-                const { albumId } = genAlbumInfo(music)
-                const albumInfo = await this.updateAlbum({...music, albumId})
+                const { albumId, year } = genAlbumInfo(music)
+                const albumInfo = await this.updateAlbum({year, ...music, albumId})
                 if (albumInfo) {
                     await libraryModel.updateMusic({
                         ...music,
