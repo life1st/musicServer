@@ -24,14 +24,14 @@ interface IPlayer {
     onNextSong?: () => void;
 }
 export const Player = (props: IPlayer) => {
-    const { music } = useRecoilValue(musicState)
-    const setPlaying = useSetRecoilState(playingState)
-    const { curIndex, list } = useRecoilValue(playingState)
-
     const match = useMatch('playing')
     const naviTo = useNavigate()
-    
-    const [isPlaying, setIsPlaying] = useState(false)
+
+    const { music } = useRecoilValue(musicState)
+    const { curIndex, list } = useRecoilValue(playingState)
+    const setPlaying = useSetRecoilState(playingState)
+
+    const [ isPlaying, setIsPlaying ] = useState(false)
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
@@ -108,11 +108,6 @@ export const Player = (props: IPlayer) => {
             audioRef.current?.removeEventListener('ended', handlePlayEnd)
         }
     }, [music, audioRef])
-    
-    useEffect(() => {
-        return () => {
-        }
-    }, [audioRef])
 
     const handlePlayTimeupdate = useMemoizedFn((e) => {
         const { duration, currentTime } = audioRef.current || {}

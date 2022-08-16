@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getMusicMeta, updateMeta } from '../API'
 import { Music } from '../../types/Music'
 import Navibar from '../Components/Navibar'
+import { copyText } from '../utils'
 
 const { useEffect, useState } = React
 const FullEditor = (props) => {
@@ -38,6 +39,11 @@ const FullEditor = (props) => {
       naviTo(-1)
     }
   }
+
+  const handleCopy = async (text) => {
+    const res = await copyText(text)
+    console.log(text + res ? 'copy success' : 'copy failed')
+  }
   const renderMetaVal = (key: string) => {
     const hideKeys = ['id']
     const readOnlyKeys = ['path', 'size']
@@ -47,6 +53,11 @@ const FullEditor = (props) => {
     let value = meta[key]
     if (key === 'size') {
       value = (value / 1024 / 1024).toFixed(2) + ' M'
+    }
+    if (key === 'path') {
+      return <p className={style.itemValue}>{value.split('/').map(p => (
+        <span className={style.pathFragment} key={p} onClick={() => {handleCopy(p)}}>{p} /</span>
+      ))}</p>
     }
     if (readOnlyKeys.includes(key)) {
       return <p className={style.itemValue}>{value}</p>
