@@ -11,7 +11,6 @@ import { RESP_STATE } from '../../shareCommon/consts'
 import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
 import { useProgress } from '../hooks/useProgress'
-import { useDocTitle } from '../hooks/useDocTitle'
 import { useShortcuts } from '../hooks/useShortcuts'
 import Cover from './Cover'
 
@@ -29,7 +28,6 @@ export const Player = (props: IPlayer) => {
     const setPlaying = useSetRecoilState(playingState)
     const { curIndex, list } = useRecoilValue(playingState)
 
-    useDocTitle(music ? `${music?.title} - ${music?.artist}` : 'Stop play - Music Server')
     const match = useMatch('playing')
     const naviTo = useNavigate()
     
