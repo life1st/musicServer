@@ -44,25 +44,33 @@ class AlbumModel {
         albumInfo: Album | { albumId: string },
         musicId: string
     }) {
+        const LIMIT = 100 // per album only hold 100 songs
         const { albumId } = albumInfo
         const existAlbum = await this.db.findOne<Album>({albumId})
         let hasUpdate = false
         if (existAlbum) {
-            const { coverId: existCoverId } = existAlbum
-            const curAlbumInfo = {
-                ...existAlbum,
-                musicIds: Array.from(new Set(existAlbum.musicIds.concat(musicId))),
-            }
-            if (!existCoverId) {
-                const { coverUrl, coverId } = albumInfo as Album
-                if (coverId) {
-                    curAlbumInfo.coverId = coverId
+            if (existAlbum.musicIds.length < LIMIT) {
+                const { coverId: existCoverId, name: existName } = existAlbum
+                const curAlbumInfo = {
+                    ...existAlbum,
+                    musicIds: Array.from(new Set(existAlbum.musicIds.concat(musicId))),
                 }
-                if (coverUrl) {
-                    curAlbumInfo.coverUrl = coverUrl
+                if (!existCoverId) {
+                    const { coverUrl, coverId } = albumInfo as Album
+                    if (coverId) {
+                        curAlbumInfo.coverId = coverId
+                    }
+                    if (coverUrl) {
+                        curAlbumInfo.coverUrl = coverUrl
+                    }
                 }
+                if (existName.includes('未知专辑') && albumInfo.name && !albumInfo.name.includes('未知专辑')) {
+                    curAlbumInfo.name = albumInfo.name
+                }
+                hasUpdate = await this.db.update({ albumId }, curAlbumInfo, {}) > 0
+            } else {
+                // do nothing
             }
-            hasUpdate = await this.db.update({ albumId }, curAlbumInfo, {}) > 0
         } else {
             hasUpdate = await this.db.insert(albumInfo) !== null
         }

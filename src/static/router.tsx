@@ -12,7 +12,7 @@ import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
 import PlayingList from './Pages/PlayingList'
 
-const { useLayoutEffect } = React
+const { useEffect } = React
 
 export const ROUTES = {
   LIBRARY: '/library',
@@ -57,7 +57,7 @@ export const Pages = () => {
 
   const matchIndex = useMatch('/')
   const naviTo = useNavigate()
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (matchIndex) {
       naviTo(ROUTES.LIBRARY, { replace: true })
     }
