@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './AlbumDetail.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useInViewport } from 'ahooks'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'
 import { playingState } from '../model/playing'
@@ -11,7 +12,7 @@ import Cover from '../Components/Cover'
 import Songlist from '../Components/Songlist'
 import { EndFix } from '../Components/Scroller'
 
-const { Fragment, useEffect } = React
+const { Fragment, useEffect, useRef } = React
 
 const AlbumDetail = (props) => {
   const { albumId } = useParams()
@@ -48,21 +49,25 @@ const AlbumDetail = (props) => {
     }
   }, [albumId])
 
+  const infoRef = useRef()
+  const [ infoInView ] = useInViewport(infoRef)
+
   const hasCurData = albumDetail && albumDetail.albumId === albumId
 
   return (
     <div className={style.container}>
-      <Navibar onBack={handleBack} />
+      <Navibar onBack={handleBack} title={infoInView ? null : albumDetail?.name} />
       {
         hasCurData ? (
           <Fragment>
             <Songlist
               startNode={(
-                <div className={style.detailContent}>
+                <div className={style.detailContent} ref={infoRef}>
                   <Cover src={`/file/album_cover/${albumDetail.albumId}`} className={style.coverImg} />
                   <div className={style.detailInfo}>
                     <p className={style.title}>{albumDetail.name}</p>
                     <p className={style.artist}>{albumDetail.artist}</p>
+                    { albumDetail.year ? <p className={style.year}>{albumDetail.year}</p> : null}
                     <div className={style.oprations}>
                       <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} />
                     </div>

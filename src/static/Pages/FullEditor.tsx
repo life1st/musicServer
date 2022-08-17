@@ -46,7 +46,7 @@ const FullEditor = (props) => {
   }
   const renderMetaVal = (key: string) => {
     const hideKeys = ['id']
-    const readOnlyKeys = ['path', 'size']
+    const readOnlyKeys = ['path', 'size', 'albumId']
     if (hideKeys.includes(key)) {
       return null
     }
@@ -72,13 +72,15 @@ const FullEditor = (props) => {
   return (
     <div className={style.container}>
         <Navibar onBack={handleBack} />
-        { Object.keys(meta).map(key => (
-          <div key={key} className={style.editItem}>
-            <p className={style.itemType}>{key}</p>
-            {renderMetaVal(key)}
-          </div>
-        )) }
-        <button className={style.btnUpdate} onClick={handleUpdate}>Update</button>
+        <div className={style.contentContainer}>
+          { Object.keys(meta).map(key => (
+            <div key={key} className={style.editItem}>
+              <p className={style.itemType}>{key}</p>
+              {renderMetaVal(key)}
+            </div>
+          )) }
+          <button className={style.btnUpdate} onClick={handleUpdate}>Update</button>
+        </div>
     </div>
   )
 }

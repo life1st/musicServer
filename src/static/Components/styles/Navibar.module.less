@@ -1,3 +1,9 @@
+.navibar{
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 38px;
+}
 .icBack {
   transform: rotate(90deg);
   @s: 38px;
@@ -5,6 +11,7 @@
   height: @s;
 }
 .backBtn {
+  flex: 0 0 72px;
   display: inline-flex;
   justify-content: flex-start;
   align-items: center;
@@ -25,4 +32,16 @@
       transition: all .5s;
     }
   }
+}
+.title {
+  flex: 4 1 auto;
+  line-height: 38px;
+  margin: 0 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all .3s;
+}
+.rightNode {
+  flex: 0 0 72px;
 }
