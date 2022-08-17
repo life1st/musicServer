@@ -15,10 +15,10 @@ export const getAlbumId = (music: Music) => {
 }
 
 export const genAlbumInfo = (music: Music): Album => {
-    const { album, artist } = music
+    const { album, artist, year } = music
     const albumId = getAlbumId(music)
     const info: Album = {
-        albumId, name: album, artist,
+        albumId, name: album, artist, year,
         musicIds: [music.id]
     }
 
