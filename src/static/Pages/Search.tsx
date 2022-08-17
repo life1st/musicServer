@@ -25,9 +25,9 @@ const Search = (props) => {
       return Promise.resolve([])
     }
   }, [searchText])
-  const { list, loading, hasMore, loadNextPage } = useLoadmore({
+  const { list, loading, hasMore, curPage, loadNextPage } = useLoadmore({
     fetchData, listState: searchListState
-  })
+  }, searchText)
 
   const handleItemClick = (music, i) => {
     setPlaying(_ => ({
@@ -48,7 +48,7 @@ const Search = (props) => {
 
   const handleLoadMore = () => {
     if (hasMore && !loading && searchText) {
-      loadNextPage()
+      loadNextPage((curPage || 0) + 1, { deps: [searchText] })
     }
   }
   const handleScroll = (scrollTop) => {

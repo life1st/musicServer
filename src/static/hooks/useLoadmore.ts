@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { RecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 
 export interface listState<T> {
@@ -14,8 +14,8 @@ export const useLoadmore = <T>({
 }: {
   fetchData: (page: number, limit?: number) => Promise<any>;
   listState: RecoilState<listState<T>>;
-}): {
-  loadNextPage: (n?: number) => Promise<boolean>;
+}, dep: string): {
+  loadNextPage: (n?: number, config?: {}) => Promise<boolean>;
   curPage: number | null;
   list: T[];
   hasMore: boolean;
@@ -24,16 +24,23 @@ export const useLoadmore = <T>({
   const { list, curPage, loadedPages, hasMore } = useRecoilValue(listState)
   const setListState = useSetRecoilState(listState)
   const [ loading, setLoading ] = useState(false)
-  const loadNextPage = async (page = typeof curPage === 'number' ? curPage + 1 : 0, config?: any) => {
-    const { isForceFetch } = config || {}
-    if (!isForceFetch) {
+  const loadDeps = useRef<string[]>([''])
+  const loadNextPage = useCallback(async (page = typeof curPage === 'number' ? curPage + 1 : 0, config?: {
+    deps?: string[];
+  }) => {
+    const { deps = [] } = config || {}
+    const isDepsChange = deps.length !== loadDeps.current.length || deps.some(s => !loadDeps.current.includes(s))
+    if (!isDepsChange) {
       if (loading) {
         return true
       }
       if (loadedPages.includes(page)) {
         return false
       }
+    } else {
+      loadDeps.current = deps
     }
+    console.log(deps, deps.length, loadDeps.current.length, deps.some(s => !loadDeps.current.includes(s)), isDepsChange)
 
     setLoading(true)
     const resp = await fetchData(page)
@@ -57,14 +64,10 @@ export const useLoadmore = <T>({
     }
     setLoading(false)
     return Boolean(data?.length)
-  }
+  }, [loading, loadedPages, fetchData])
   useEffect(() => {
-    setListState(_state => ({
-      ..._state,
-      loadedPages: []
-    }))
-    loadNextPage(0, { isForceFetch: true })
-  } , [fetchData])
+    loadNextPage(0, { deps: [dep] })
+  } , [fetchData, dep])
   return {
     loadNextPage,
     curPage,

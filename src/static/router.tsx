@@ -2,7 +2,8 @@ import * as React from 'react'
 import {
   Routes,
   Route,
-  Link
+  useNavigate,
+  useMatch
 } from 'react-router-dom'
 import Library from './Pages/Library'
 import Search from './Pages/Search'
@@ -10,6 +11,8 @@ import Albums from './Pages/Albums'
 import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
 import PlayingList from './Pages/PlayingList'
+
+const { useLayoutEffect } = React
 
 export const ROUTES = {
   LIBRARY: '/library',
@@ -51,6 +54,14 @@ export const Pages = () => {
       comp: <PlayingList />
     }
   ]
+
+  const matchIndex = useMatch('/')
+  const naviTo = useNavigate()
+  useLayoutEffect(() => {
+    if (matchIndex) {
+      naviTo(ROUTES.LIBRARY, { replace: true })
+    }
+  }, [])
 
   return (
     <Routes>

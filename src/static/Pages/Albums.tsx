@@ -60,7 +60,8 @@ const Albums = () => {
       return getAlbums(pageNum)
     }
   }, [searchText])
-  const { list, loadNextPage, hasMore, loading } = useLoadmore({fetchData, listState: albumState})
+
+  const { list, loadNextPage, hasMore, loading, curPage } = useLoadmore({fetchData, listState: albumState}, searchText)
 
   const containerRef = useRef<HTMLElement>()
   const BASE_WIDTH = 116
@@ -77,17 +78,23 @@ const Albums = () => {
   }
   const handleReachEnd = () => {
     if (!loading && hasMore) {
-      loadNextPage()
+      loadNextPage((curPage || 0) + 1, { deps: [searchText] })
     }
   }
   useEffect(() => {
-    // TODO: bug here, change route will cause x roll pos change
     itemWidth.current = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
   }, [])
 
+  const sameAlbumCheck = (album, idx) => !list.some((a, i) => a.albumId === album.albumId && i !== idx)
+
   return (
     <Fragment>
-      <SearchInput autoFocus={false} onSearch={handleSearch} onClear={handleClearSearch} />
+      <SearchInput
+        initText={searchText}
+        autoFocus={false}
+        onSearch={handleSearch}
+        onClear={handleClearSearch}
+      />
       <Scroller
         onScroll={setAlbumScroll}
         onReachEnd={handleReachEnd}
@@ -97,7 +104,7 @@ const Albums = () => {
         showLoading={hasMore}
         ref={containerRef}
       >
-        { list.map(album => (
+        { list.filter(sameAlbumCheck).map(album => (
           <li key={album.albumId} className={style.albumItem}><Album  {...album} width={itemWidth.current} /></li>
         )) }
       </Scroller>

@@ -8,11 +8,12 @@ interface Props {
   onSearch: (val: string) => void;
   onClear: () => void;
   autoFocus?: boolean;
+  initText?: string;
 }
 
 export const SearchInput = (props: Props) => {
-  const { onSearch, onClear, autoFocus = true } = props
-  const [ searchText, setSearchText ] = useState<string>('')
+  const { onSearch, onClear, autoFocus = true, initText = '' } = props
+  const [ searchText, setSearchText ] = useState<string>(initText)
 
   const searchInputRef = useRef<HTMLInputElement>()
   useFocus(autoFocus ? searchInputRef : undefined)

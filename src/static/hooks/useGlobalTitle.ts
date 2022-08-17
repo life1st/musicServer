@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTitle } from 'ahooks'
 import { useRecoilValue } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'
@@ -9,6 +9,7 @@ import { useMatch as TuseMatch } from 'react-router-dom'
 const defaultFavicon = require('../imgs/favicon.png')
 
 export const useFavicon = (href) =>  {
+  const els = useRef<Element[]>([])
   useEffect(() => {
     if (!href) return
     /* 
@@ -16,18 +17,22 @@ export const useFavicon = (href) =>  {
       <link rel="shortcut icon" href="./imgs/favicon.png" />
       <link rel="icon" href="./imgs/favicon.png"> 
     */
-    let elRels = ['icon', 'shortcut icon', 'apple-touch-icon-precomposed']
-    let els = elRels.map(r => document.querySelector(`link[rel="${r}"]`))
-    els.map((el, i) => {
+  let elRels = ['icon', 'shortcut icon', 'apple-touch-icon-precomposed']
+  if (!els.current?.length) {
+    const eles = elRels.map(r => document.querySelector(`link[rel="${r}"]`)).map((el, i) => {
       if (!el) {
         const _el = document.createElement('link')
         _el.setAttribute('rel', elRels[i])
+        document.head.appendChild(_el)
         return _el
       }
       return el
-    }).map(el => {
-      el.setAttribute('href', href)
     })
+    els.current = eles
+  }
+  els.current.map(el => {
+    el.setAttribute('href', href)
+  })
   }, [href])
 }
 
@@ -60,7 +65,6 @@ export const useGlobalTitle = (params: {
     }
     return [_title, _coverUrl]
   }, [isMatchAlbumDetail, albumDetail, music])
-  console.log(title, coverUrl)
   
   useFavicon(coverUrl)
   useTitle(title)
