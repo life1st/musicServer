@@ -94,10 +94,12 @@ class Album {
                 const { albumId, year } = genAlbumInfo(music)
                 const albumInfo = await this.updateAlbum({year, ...music, albumId})
                 if (albumInfo) {
-                    await libraryModel.updateMusic({
-                        ...music,
-                        albumId: albumInfo.albumId,
-                    })
+                    if (music.albumId !== albumInfo.albumId) {
+                        await libraryModel.updateMusic({
+                            ...music,
+                            albumId: albumInfo.albumId,
+                        })
+                    }
                 } else if (music.albumId) {
                     const { albumId, ...restMusic} = music
                     await libraryModel.updateMusic(restMusic)
