@@ -11,6 +11,7 @@ import Albums from './Pages/Albums'
 import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
 import PlayingList from './Pages/PlayingList'
+import Playlists from './Pages/Playlists'
 
 const { useEffect } = React
 
@@ -22,6 +23,7 @@ export const ROUTES = {
   ALBUM_DETAIL: '/album/:albumId',
   FULL_EDITOR: '/music/:id/edit',
   PLAYING_LIST: '/playing_list',
+  PLAYLISTS: '/playlists',
 }
 export const Pages = () => {
   const pages = [{
@@ -52,6 +54,10 @@ export const Pages = () => {
       name: 'Playing List',
       path: ROUTES.PLAYING_LIST,
       comp: <PlayingList />
+    }, {
+      name: 'Playlists',
+      path: ROUTES.PLAYLISTS,
+      comp: <Playlists />
     }
   ]
 
@@ -59,7 +65,7 @@ export const Pages = () => {
   const naviTo = useNavigate()
   useEffect(() => {
     if (matchIndex) {
-      naviTo(ROUTES.LIBRARY, { replace: true })
+      naviTo(ROUTES.PLAYLISTS, { replace: true })
     }
   }, [])
 

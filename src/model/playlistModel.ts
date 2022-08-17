@@ -1,5 +1,6 @@
 import path from 'path'
 import Nedb from 'nedb-promises'
+import md5 from 'md5'
 import { DB_DIR } from '../utils/path'
 import { getDir } from '../utils/file'
 import { Playlist } from '../types/Playlist'
@@ -16,7 +17,7 @@ class PlaylistModel {
   }
 
   async getPlaylists({page, limit = DEFAULT_LIMIT}) {
-    return this.db.find<Playlist>({}).skip(page * limit).limit(limit).exex()
+    return this.db.find<Playlist>({}).skip(page * limit).limit(limit).exec()
   }
 
   async getPlaylist(id, config?: {
@@ -36,10 +37,15 @@ class PlaylistModel {
   }
 
   async createPlaylist(playlist: Playlist) {
+    const createTime = new Date().toISOString()
+    const updateTime = createTime
+    const id = md5(playlist.title + createTime)
     return this.db.insert<Playlist>({
       ...playlist,
-      createTime: new Date().toISOString(),
-      updateTime: new Date().toISOString(),
+      id,
+      createTime,
+      updateTime,
+      musicIds: []
     })
   }
 
