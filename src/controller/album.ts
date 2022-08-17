@@ -71,7 +71,7 @@ class Album {
         if (!existedAlbumId || !albumInfo.albumId) {
             albumInfo = genAlbumInfo(music)
         }
-        if (!albumInfo.name) {
+        if (!albumInfo.albumId) {
             return null
         }
         if (!albumInfo.coverId) {
@@ -98,11 +98,14 @@ class Album {
         const LIMIT = 100
         let page = 0
         const start = Date.now()
+        console.log('start create album from library', start)
+        let count = 0
         while(true) {
             const musicList = await libraryModel.getMusicList(page++, LIMIT)
             if (musicList.length === 0) {
                 break
             }
+            count += musicList.length
             for (const music of musicList) {
                 const { albumId, year } = genAlbumInfo(music)
                 const albumInfo = await this.updateAlbum({year, ...music, albumId})
@@ -114,7 +117,7 @@ class Album {
                 }
             }
         }
-        console.log('createAlbumFromLibrary finish', (Date.now() - start)/1000 + ' sec.')
+        console.log('createAlbumFromLibrary finish', (Date.now() - start)/1000 + ' sec.', count, 'songs')
         let albumPage = 0
         let deleteAlbumsCount = 0
         while (true) {

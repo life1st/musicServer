@@ -150,10 +150,10 @@ class Library {
 
     async updateMeta(musicId, info) {
         const {
-            title, artist, album, year, albumId, keyword
+            title, artist, album, year, genre,
         } = info
         let tags = filterExistProps({
-            title, artist, album, year
+            title, artist, album, year, genre,
         })
         const music = await libraryModel.getMusic(musicId)
 
@@ -162,21 +162,9 @@ class Library {
             const neddUpdateId3 = Object.keys(tags).some(k => tags[k] !== music[k])
             isSuccess = neddUpdateId3 ? await updateMusicID3(music.path, tags) : true
             if (isSuccess) {
-                const { albumId: oldAlbumId } = music
-                if (albumId !== oldAlbumId && oldAlbumId) {
-                    const oldAlbum = await albumModel.getAlbum(oldAlbumId)
-                    if (oldAlbum?.musicIds.length === 1) {
-                        await albumModel.deleteAlbum(oldAlbumId)
-                    } else {
-                        await albumModel.removeMusicFromAlbum(oldAlbumId, musicId)
-                    }
-                }
                 await albumController.updateAlbum(music)
                 const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
-                return libraryModel.updateMusic({
-                    ...musicMeta,
-                    albumId,
-                }, { prevId: musicId })
+                return libraryModel.updateMusic(musicMeta, { prevId: musicId })
             }
         }
         return isSuccess
