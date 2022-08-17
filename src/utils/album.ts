@@ -7,7 +7,7 @@ const getPathList = (p: string) => {
     const dirs = path.dirname(p).split(path.sep)
     const startAt = dirs.indexOf('music')
 
-    return dirs.slice(startAt)
+    return dirs.slice(startAt + 1)
 }
 
 export const getAlbumId = (music: Music) => {

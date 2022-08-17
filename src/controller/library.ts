@@ -162,8 +162,8 @@ class Library {
             const neddUpdateId3 = Object.keys(tags).some(k => tags[k] !== music[k])
             isSuccess = neddUpdateId3 ? await updateMusicID3(music.path, tags) : true
             if (isSuccess) {
-                await albumController.updateAlbum(music)
                 const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
+                await albumController.updateAlbum(musicMeta)
                 return libraryModel.updateMusic(musicMeta, { prevId: musicId })
             }
         }
