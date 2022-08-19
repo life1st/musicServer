@@ -1,5 +1,6 @@
 import Router from 'koa-router'
 import { album } from '../../controller/album'
+import { excludeProps } from '../../utils/obj'
 
 const albumApiRoute = new Router()
 
@@ -22,14 +23,15 @@ albumApiRoute
 .get('/album_list/:pageNum', async ctx => {
   const { pageNum } = ctx.params
   const { artist } = ctx.request.query
-  ctx.body = await album.getAlbumList({pageNum, artist})
+  const albumlist = await album.getAlbumList({pageNum, artist})
+  ctx.body = albumlist.map(album => excludeProps(album, ['_id', 'musicIds']))
 })
 .get('/search_album', async ctx => {
   const { query } = ctx.request
   const { q, pageNum = 0 } = query as { q: string, pageNum: number }
   const albumsByName = await album.getAlbumList({name: q, pageNum})
   const albumsByArtist =  await album.getAlbumList({artist: q, pageNum})
-  ctx.body = [...albumsByName, ...albumsByArtist]
+  ctx.body = [...albumsByName, ...albumsByArtist].map(album => excludeProps(album, ['_id', 'musicIds']))
 })
 
 export { albumApiRoute }

@@ -12,6 +12,7 @@ import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
 import PlayingList from './Pages/PlayingList'
 import Playlists from './Pages/Playlists'
+import Playlist from './Pages/Playlist'
 
 const { useEffect } = React
 
@@ -24,6 +25,7 @@ export const ROUTES = {
   FULL_EDITOR: '/music/:id/edit',
   PLAYING_LIST: '/playing_list',
   PLAYLISTS: '/playlists',
+  PLAYLIST: '/playlist/:id',
 }
 export const Pages = () => {
   const pages = [{
@@ -58,6 +60,10 @@ export const Pages = () => {
       name: 'Playlists',
       path: ROUTES.PLAYLISTS,
       comp: <Playlists />
+    } , {
+      name: 'Playlist',
+      path: ROUTES.PLAYLIST,
+      comp: <Playlist />
     }
   ]
 

@@ -4,8 +4,8 @@ class Playlist {
   getPlaylists({page, limit}) {
     return playlistModel.getPlaylists({page, limit})
   }
-  getPlaylist(id) {
-    return playlistModel.getPlaylist(id)
+  getPlaylist(id, config) {
+    return playlistModel.getPlaylist(id, config)
   }
   createPlaylist(playlist: IPlaylist) {
     return playlistModel.createPlaylist(playlist)
@@ -15,7 +15,7 @@ class Playlist {
   }
   deletePlaylist(id) {
     return playlistModel.deletePlaylist(id)
-  } 
+  }
 }
 
 const playlist = new Playlist()

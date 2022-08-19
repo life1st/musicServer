@@ -14,7 +14,7 @@ export const useLoadmore = <T>({
 }: {
   fetchData: (page: number, limit?: number) => Promise<any>;
   listState: RecoilState<listState<T>>;
-}, dep: string): {
+}, dep?: string): {
   loadNextPage: (n?: number, config?: {}) => Promise<boolean>;
   curPage: number | null;
   list: T[];

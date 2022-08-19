@@ -1,5 +1,6 @@
 import Router from 'koa-router'
 import { playlist } from '../../controller/playlist'
+import { excludeProps } from '../../utils/obj'
 
 const playlistRoute = new Router()
 
@@ -10,8 +11,9 @@ playlistRoute
 })
 .get('/playlist/:id', async ctx => {
     const { id } = ctx.params
-    const list = await playlist.getPlaylist(id)
-    ctx.body = list
+    const { needSongs } = ctx.query
+    const data = await playlist.getPlaylist(id, { needSongs })
+    ctx.body = excludeProps(data || {}, ['musicIds', '_id'])
 })
 .post('/playlist', async ctx => {
     const { body } = ctx.request

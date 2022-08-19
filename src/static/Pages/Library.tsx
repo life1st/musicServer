@@ -6,6 +6,7 @@ import { playingState } from '../model/playing'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { getLibrary, scanLibrary } from '../API'
 import Songlist from '../Components/Songlist'
+import PlaylistEntry from '../Components/PlaylistEntry'
 
 const { Fragment } = React
 const Library = (props) => {
@@ -45,6 +46,7 @@ const Library = (props) => {
     <Fragment>
       <button onClick={scanLibrary}>Scan</button>
       <Songlist
+        startNode={ <PlaylistEntry /> }
         deleteSuccess={handleDeleted}
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}

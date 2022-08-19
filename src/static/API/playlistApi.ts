@@ -6,6 +6,12 @@ export const getPlaylists = (pageNum: number) => {
     return axios.get(url, { params: {pageNum} })
 }
 
+export const getPlaylist = (id) => {
+    const url = '/api/playlist/' + id
+
+    return axios.get(url, { params: {needSongs: true} })
+}
+
 export const createPlaylist = (playlist: Playlist) => {
     const url = '/api/playlist'
 
