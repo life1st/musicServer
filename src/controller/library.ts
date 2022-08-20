@@ -49,8 +49,6 @@ class Library {
                 } else {
                     process.kill('SIGINT')
                     // @ts-ignore
-                    musicMetaProcesses[i] = null
-                    // @ts-ignore
                     musicMetaTasks[i] = null
                     console.log('scan music cached 0', musicMetaTasks, musicMetaProcesses)
                     if (musicMetaTasks.every(t => !t) && scanMusicCache.length === 0) {
@@ -63,7 +61,7 @@ class Library {
         scanProcess.on('message', async ([dirs, musicFiles]: [string[], string[]]) => {
             console.log('message from scan process: ', dirs, musicFiles)
             if (dirs.length > 0) {
-                scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb'].some(k => dir.includes(k))))
+                scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb', '陈一发'].some(k => dir.includes(k))))
             }
             if (musicFiles.length > 0) {
                 if (skipExist) {
