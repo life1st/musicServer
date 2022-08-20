@@ -129,7 +129,10 @@ class Album {
                         await libraryModel.updateMusic(restMusic)
                     }
                 } else {
-                    libraryModel.deleteMusic(music.id, { saveToDel: false })
+                    await Promise.all([
+                        music.albumId ? albumModel.removeMusicFromAlbum(music.albumId, music.id) : true,
+                        libraryModel.deleteMusic(music.id, { saveToDel: false })
+                    ])
                 }
             }
         }
@@ -142,6 +145,7 @@ class Album {
                 break
             }
             for (const album of albumList) {
+                
                 if (!album.musicIds?.length) {
                     deleteAlbumsCount++
                     await albumModel.deleteAlbum(album.albumId, { _id: album._id })
