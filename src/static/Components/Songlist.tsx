@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './styles/Songlist.module.less'
 import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../router'
 import { musicState, playingState } from '../model/playing'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import cls from 'classnames'
@@ -86,7 +87,7 @@ const Songlist = (props: ISonglist) => {
     }
     const handleItemEdit = (e, item, i) => {
       e.stopPropagation()
-      naviTo(`/music/${item.id}/edit`)
+      naviTo(ROUTES.MUSIC_EDITOR.replace(':id', item.id))
     }
     const handleAddItemToList = (e, item) => {
       e.stopPropagation()

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './AlbumDetail.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
+import { ROUTES } from '../router'
 import { useInViewport } from 'ahooks'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'
@@ -37,6 +38,9 @@ const AlbumDetail = (props) => {
       songs: albumDetail?.songs?.filter(m => m.id !== music.id) || []
     })
   }
+  const handleEdit = () => {
+    naviTo(ROUTES.ALBUM_EDITOR.replace(':id', albumDetail?.albumId))
+  }
   const fetchData = async (albumId) => {
     const { status, data } = await getAlbumDetail(albumId)
     if (status === 200 && typeof data !== 'string') {
@@ -49,27 +53,29 @@ const AlbumDetail = (props) => {
     }
   }, [albumId])
 
-  const infoRef = useRef()
-  const [ infoInView ] = useInViewport(infoRef)
+  const titleRef = useRef()
+  const [ titleInView ] = useInViewport(titleRef)
 
   const hasCurData = albumDetail && albumDetail.albumId === albumId
 
   return (
     <div className={style.container}>
-      <Navibar onBack={handleBack} title={infoInView ? null : albumDetail?.name} />
+      <Navibar onBack={handleBack} title={titleInView || !hasCurData ? null : albumDetail?.name} />
       {
         hasCurData ? (
           <Fragment>
             <Songlist
               startNode={(
-                <div className={style.detailContent} ref={infoRef}>
+                <div className={style.detailContent}>
                   <Cover src={`/file/album_cover/${albumDetail.albumId}`} className={style.coverImg} />
                   <div className={style.detailInfo}>
-                    <p className={style.title}>{albumDetail.name}</p>
+                    <p className={style.title} ref={titleRef}>{albumDetail.name}</p>
                     <p className={style.artist}>{albumDetail.artist}</p>
-                    { albumDetail.year ? <p className={style.year}>{albumDetail.year}</p> : null}
+                    { albumDetail.year ? 
+                        <p className={style.year}>{albumDetail.year}</p> 
+                    : null }
                     <div className={style.oprations}>
-                      <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} />
+                      <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={handleEdit} />
                     </div>
                   </div>
                 </div>

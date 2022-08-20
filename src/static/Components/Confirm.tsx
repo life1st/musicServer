@@ -18,7 +18,6 @@ const Confirm = ({
   reject: typeof Promise.reject;
   dispose: () => void;
 }) => {
-  console.log(title, options, props)
   const close = (result) => {
     resolve(result)
     dispose()

@@ -1,64 +1,62 @@
 import * as React from 'react'
-import * as style from './FullEditor.module.less'
+import * as style from './styles/EditorCommon.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getMusicMeta, updateMeta } from '../API'
-import { Music } from '../../types/Music'
+import { useSetRecoilState, useRecoilValue } from 'recoil'
+import { albumDetailState } from '../model/albumDetail'
+import { getAlbumDetail, updateAlbumDetail } from '../API'
 import Navibar from '../Components/Navibar'
-import { copyText } from '../utils/'
+import { Album } from '../../types/Album'
 
 const { useEffect, useState } = React
-const FullEditor = (props) => {
+const AlbumEditor = (props) => {
   const { id } = useParams()
-  const [ meta, setMeta ] = useState<Music>({} as Music)
   const naviTo = useNavigate()
 
-  const fetchMeta = async (id) => {
-    const { status, data } = await getMusicMeta(id)
+  const albumMeta = useRecoilValue(albumDetailState)
+  const setAlbumMeta = useSetRecoilState(albumDetailState)
+  const [ meta, setMeta ] = useState<Album | null>(albumMeta)
+  
+  const fetchMeta = async id => {
+    const { status, data } = await getAlbumDetail(id)
     if (status === 200) {
-      setMeta(data.music)
+      setAlbumMeta(data)
+      setMeta(data)
     }
   }
-  const handleBack = () => { naviTo(-1)}
+
+  const handleBack = () => { naviTo(-1) }
   useEffect(() => {
-    fetchMeta(id)
+    if (!albumMeta || albumMeta.albumId !== id) {
+      fetchMeta(id)
+    }
   }, [id])
 
   const handleChange = (key: string) => e => {
     const val = e.target.value
-    console.log(key, val)
-    if (typeof meta[key]) {
-
-    }
+    console.log(key, val, meta?.[key])
     setMeta({ ...meta, [key]: val })
   }
 
   const handleUpdate = async () => {
-    const {status, data} = await updateMeta(meta.id, meta)
-    console.log(data)
+    if (!meta) return
+    const {status, data} = await updateAlbumDetail(meta.albumId, meta)
+    console.log(data, meta)
     if (status === 200) {
+      setAlbumMeta(_ => ({
+        ..._,
+        ...meta
+      }))
       naviTo(-1)
     }
   }
 
-  const handleCopy = async (text) => {
-    const res = await copyText(text)
-    console.log(text + res ? 'copy success' : 'copy failed')
-  }
   const renderMetaVal = (key: string) => {
-    const hideKeys = ['id']
-    const readOnlyKeys = ['path', 'size', 'albumId']
+    const hideKeys = ['musicIds', '_id', 'songs']
+    const readOnlyKeys = ['path', 'size', 'albumId', 'coverId', 'coverUrl']
     if (hideKeys.includes(key)) {
       return null
     }
     let value = meta[key]
-    if (key === 'size') {
-      value = (value / 1024 / 1024).toFixed(2) + ' M'
-    }
-    if (key === 'path') {
-      return <p className={style.itemValue}>{value.split('/').map(p => (
-        <span className={style.pathFragment} key={p} onClick={() => {handleCopy(p)}}>{p} /</span>
-      ))}</p>
-    }
     if (readOnlyKeys.includes(key)) {
       return <p className={style.itemValue}>{value}</p>
     }
@@ -73,16 +71,16 @@ const FullEditor = (props) => {
     <div className={style.container}>
         <Navibar onBack={handleBack} />
         <div className={style.contentContainer}>
-          { Object.keys(meta).map(key => (
+          {meta ? Object.keys(meta).map(key => (
             <div key={key} className={style.editItem}>
               <p className={style.itemType}>{key}</p>
               {renderMetaVal(key)}
             </div>
-          )) }
+          )) : null }
           <button className={style.btnUpdate} onClick={handleUpdate}>Update</button>
         </div>
     </div>
   )
 }
 
-export default FullEditor
+export default AlbumEditor

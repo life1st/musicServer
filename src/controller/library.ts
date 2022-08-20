@@ -36,7 +36,7 @@ class Library {
             process.on('message', async (music: Music) => {
                 console.log(`message from music process __${pcsi}__: `, music?.path)
                 musicCount++
-                const albumInfo = await albumController.updateAlbum(music)
+                const albumInfo = await albumController.updateAlbumBy({music})
                 if (albumInfo) {
                     music.albumId = albumInfo.albumId
                 }
@@ -159,7 +159,7 @@ class Library {
             isSuccess = neddUpdateId3 ? await updateMusicID3(music.path, tags) : true
             if (isSuccess) {
                 const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
-                await albumController.updateAlbum(musicMeta)
+                await albumController.updateAlbumBy({ music: musicMeta })
                 return libraryModel.updateMusic(musicMeta, { prevId: musicId })
             }
         }

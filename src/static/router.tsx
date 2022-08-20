@@ -8,13 +8,16 @@ import {
 import Library from './Pages/Library'
 import Search from './Pages/Search'
 import Albums from './Pages/Albums'
-import AlbumDetail from './Pages/AlbumDetail'
-import FullEditor from './Pages/FullEditor'
 import PlayingList from './Pages/PlayingList'
-import Playlists from './Pages/Playlists'
-import PlaylistDetail from './Pages/PlaylistDetail'
+import { EndFix } from './Components/Scroller'
 
-const { useEffect } = React
+const { useEffect, lazy, Suspense } = React
+
+const AlbumDetail = lazy(() => import('./Pages/AlbumDetail'))
+const MusicEditor = lazy(() => import('./Pages/MusicEditor'))
+const AlbumEditor = lazy(() => import('./Pages/AlbumEditor'))
+const PlaylistDetail = lazy(() => import('./Pages/PlaylistDetail'))
+const Playlists = lazy(() => import('./Pages/Playlists'))
 
 export const ROUTES = {
   LIBRARY: '/library',
@@ -22,7 +25,8 @@ export const ROUTES = {
   PLAYING: '/playing',
   ALBUMS: '/albums',
   ALBUM_DETAIL: '/album/:albumId',
-  FULL_EDITOR: '/music/:id/edit',
+  MUSIC_EDITOR: '/music/:id/edit',
+  ALBUM_EDITOR: '/album/:id/edit',
   PLAYING_LIST: '/playing_list',
   PLAYLISTS: '/playlists',
   PLAYLIST: '/playlist/:id',
@@ -49,9 +53,13 @@ export const Pages = () => {
       path: ROUTES.ALBUM_DETAIL,
       comp: <AlbumDetail />
     }, {
-      name: 'Full Editor',
-      path: ROUTES.FULL_EDITOR,
-      comp: <FullEditor />
+      name: 'Music Editor',
+      path: ROUTES.MUSIC_EDITOR,
+      comp: <MusicEditor />
+    }, {
+      name: 'Album Editor',
+      path: ROUTES.ALBUM_EDITOR,
+      comp: <AlbumEditor />
     }, {
       name: 'Playing List',
       path: ROUTES.PLAYING_LIST,
@@ -71,17 +79,19 @@ export const Pages = () => {
   const naviTo = useNavigate()
   useEffect(() => {
     if (matchIndex) {
-      naviTo(ROUTES.PLAYLISTS, { replace: true })
+      naviTo(ROUTES.LIBRARY, { replace: true })
     }
   }, [])
 
   return (
-    <Routes>
-      {
-        pages.map(page => (
-          <Route key={page.path} path={page.path} element={page.comp} />
-        ))
-      }
-    </Routes>
+    <Suspense fallback={<EndFix hasMore={true} showLoading={true} />}>
+      <Routes>
+        {
+          pages.map(page => (
+            <Route key={page.name} path={page.path} element={page.comp} />
+          ))
+        }
+      </Routes>
+    </Suspense>
   )
 }

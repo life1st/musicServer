@@ -55,6 +55,11 @@ export const getAlbumDetail = (id: string, needSongs = true) => {
     return axios.get(url, { params: { needSongs } })
 }
 
+export const updateAlbumDetail = (id: string, albumDetail: Album) => {
+    const url = '/api/album/' + id
+    return axios.post(url, albumDetail)
+}
+
 export const searchAlbum = (q: string, pageNum: number = 0) => {
     const url = '/api/search_album'
 

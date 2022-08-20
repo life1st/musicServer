@@ -59,18 +59,35 @@ class Album {
         return albums
     }
     
-    async updateAlbum(music: Music) {
-        let albumInfo = genAlbumInfo(music)
-        if (!albumInfo.coverId) {
-            const { coverId, coverUrl } = await genCoverInfo({ music })
-            albumInfo.coverId = coverId
-            albumInfo.coverUrl = coverUrl
+    async updateAlbumBy({ music, album }: {
+        music?: Music;
+        album?: IAlbum
+    }) {
+        let hasUpdate = false
+        let albumInfo: IAlbum | null = null
+        let condition: {
+            albumInfo?: IAlbum;
+            musicId?: string;
+        } = {}
+        if (music) {
+            albumInfo = genAlbumInfo(music)
+            if (!albumInfo.coverId) {
+                const { coverId, coverUrl } = await genCoverInfo({ music })
+                albumInfo.coverId = coverId
+                albumInfo.coverUrl = coverUrl
+            }
+            condition = {
+                musicId: music.id,
+                albumInfo
+            }
+        } else if (album) {
+            condition.albumInfo = album
+            albumInfo = album
+        }
+        if (condition?.albumInfo) {
+            hasUpdate = await albumModel.updateAlbum(condition)
         }
 
-        const hasUpdate = await albumModel.updateAlbum({
-            musicId: music.id,
-            albumInfo
-        })
         return hasUpdate ? albumInfo : null
     }
 
@@ -99,7 +116,7 @@ class Album {
                     console.log(`${music.path} not exist anymore.`)
                 }
                 if (musicExist) {
-                    const albumInfo = await this.updateAlbum(music)
+                    const albumInfo = await this.updateAlbumBy({music})
                     if (albumInfo) {
                         if (music.albumId !== albumInfo.albumId) {
                             await libraryModel.updateMusic({

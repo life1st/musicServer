@@ -20,6 +20,15 @@ albumApiRoute
 
   ctx.body = await album.getAlbum(id, { needSongs })
 })
+.post('/album/:id', async ctx => {
+  const { id } = ctx.params
+  const { body } = ctx.request
+  if (id !== body.albumId) {
+    ctx.throw(403, 'albumId not match')
+  } else {
+    ctx.body = await album.updateAlbumBy({ album: excludeProps(body, ['songs']) })
+  }
+})
 .get('/album_list/:pageNum', async ctx => {
   const { pageNum } = ctx.params
   const { artist } = ctx.request.query
