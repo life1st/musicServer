@@ -7,6 +7,8 @@ import { searchMusic } from '../API'
 import { SearchInput } from '../Components/SearchInput'
 import Songlist from '../Components/Songlist'
 import { useLoadmore } from '../hooks/useLoadmore'
+import { confirm } from '../Components/Confirm'
+
 const { useCallback } = React
 
 const Search = (props) => {
@@ -60,10 +62,37 @@ const Search = (props) => {
       list: _.list.filter(m => m.id !== music.id),
     }))
   }
+  const handleOpenMenu = async () => {
+    confirm({
+      unmountDelay: 1,
+      options: [{
+        text: '设置',
+        action: () => {
+          console.log('toSetting')
+        }
+      }, {
+        text: 'scan',
+        action: () => {
+          console.log('scan')
+        }
+      }]
+    })
+  }
 
   return (
     <div className={style.container}>
-      <SearchInput onSearch={handleSearch} onClear={handleClearSearch} />
+      <div className={style.inputContainer}>
+        <SearchInput
+          className={style.searchInput}
+          onSearch={handleSearch} 
+          onClear={handleClearSearch}
+        />
+        <img
+          src={require('../imgs/ic-menu.svg')}
+          className={style.icMenu}
+          onClick={handleOpenMenu}
+        />
+      </div>
       <Songlist
         className={style.searchList}
         onItemClick={handleItemClick}

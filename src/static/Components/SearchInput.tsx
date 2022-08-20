@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as style from './SearchInput.module.less'
+import cls from 'classnames'
 import { useFocus } from '../hooks/useFocus'
 
 const { useState, useMemo, useRef } = React
@@ -9,10 +10,11 @@ interface Props {
   onClear: () => void;
   autoFocus?: boolean;
   initText?: string;
+  className?: string;
 }
 
 export const SearchInput = (props: Props) => {
-  const { onSearch, onClear, autoFocus = true, initText = '' } = props
+  const { onSearch, onClear, autoFocus = true, initText = '', className } = props
   const [ searchText, setSearchText ] = useState<string>(initText)
 
   const searchInputRef = useRef<HTMLInputElement>()
@@ -39,7 +41,7 @@ export const SearchInput = (props: Props) => {
 
   const showClear = useMemo(() => searchText.length, [searchText])
   return (
-    <div className={style.container}>
+    <div className={cls(style.container, className)}>
         <img src={require('../imgs/ic-search.svg')} className={style.searchIcon} />
         <input
           className={style.input}
