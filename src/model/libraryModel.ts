@@ -83,9 +83,14 @@ class LibraryModel {
         return hasUpdate
     }
 
-    async deleteMusic(id: string): Promise<number> {
-        const music = await this.db.findOne({id})
-        this.deletedMusicdb.insert(music)
+    async deleteMusic(id: string, config?: {
+        saveToDel: boolean
+    }): Promise<number> {
+        const { saveToDel = true } = config || {}
+        if (saveToDel) {
+            const music = await this.db.findOne({id})
+            this.deletedMusicdb.insert(music)
+        }
         return this.db.remove({ id }, {})
     }
 

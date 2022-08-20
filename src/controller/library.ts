@@ -50,16 +50,12 @@ class Library {
                     process.kill('SIGINT')
                     // @ts-ignore
                     musicMetaProcesses[i] = null
-                    if (musicMetaTasks.every(t => !t)) {
-                        console.log(`scan finish, but not all process exit. ProcessCount: ${musicMetaProcesses.length}, MusicCount:`, musicCount, (Date.now() - startTime) / 1000 + 's')
-                    }
-                    if (musicMetaProcesses.every(p => p === null)) {
-                        console.log('scan finish', musicCount, (Date.now() - startTime) / 1000 + 's')
-                        if (scanProcess) {
-                            scanProcess.kill('SIGINT')
-                            // @ts-ignore
-                            scanProcess = null
-                        }
+                    // @ts-ignore
+                    musicMetaTasks[i] = null
+                    console.log('scan music cached 0', musicMetaTasks, musicMetaProcesses)
+                    if (musicMetaTasks.every(t => !t) && scanMusicCache.length === 0) {
+                        console.log(`scan finish. ProcessCount: ${musicMetaProcesses.length}, MusicCount:`, musicCount, (Date.now() - startTime) / 1000 + 's')
+                        musicMetaProcesses = []
                     }
                 }
             })

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 
 export const useCalColumn = ({
   baseWidth,
@@ -6,10 +7,13 @@ export const useCalColumn = ({
   baseWidth: number;
   containerRef: React.RefObject<HTMLElement | undefined>;
 }) => {
-  if (!containerRef.current) {
-    return baseWidth
-  }
-  const containerWidth = containerRef.current.clientWidth
-  const columns = Math.floor(containerWidth / baseWidth)
-  return Math.floor(containerWidth / columns)
+  let width = useRef(baseWidth)
+  useEffect(() => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth
+      const columns = Math.floor(containerWidth / baseWidth)
+      width.current = Math.floor(containerWidth / columns)
+    }
+  }, [])
+  return width.current
 }

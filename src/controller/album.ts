@@ -1,4 +1,5 @@
 import { createReadStream } from 'fs'
+import fs from 'fs/promises'
 import { DEFAULT_LIMIT } from '../shareCommon/consts'
 import { albumModel } from '../model/albumModel'
 import { libraryModel } from '../model/libraryModel'
@@ -91,18 +92,27 @@ class Album {
             console.log(`create album from library page ${page}`)
             count += musicList.length
             for (const music of musicList) {
-                const { albumId, year } = genAlbumInfo(music)
-                const albumInfo = await this.updateAlbum({year, ...music, albumId})
-                if (albumInfo) {
-                    if (music.albumId !== albumInfo.albumId) {
-                        await libraryModel.updateMusic({
-                            ...music,
-                            albumId: albumInfo.albumId,
-                        })
+                let musicExist = false
+                try {
+                    musicExist = !!await fs.stat(music.path)
+                } catch {
+                    console.log(`${music.path} not exist anymore.`)
+                }
+                if (musicExist) {
+                    const albumInfo = await this.updateAlbum(music)
+                    if (albumInfo) {
+                        if (music.albumId !== albumInfo.albumId) {
+                            await libraryModel.updateMusic({
+                                ...music,
+                                albumId: albumInfo.albumId,
+                            })
+                        }
+                    } else if (music.albumId) {
+                        const { albumId, ...restMusic} = music
+                        await libraryModel.updateMusic(restMusic)
                     }
-                } else if (music.albumId) {
-                    const { albumId, ...restMusic} = music
-                    await libraryModel.updateMusic(restMusic)
+                } else {
+                    libraryModel.deleteMusic(music.id, { saveToDel: false })
                 }
             }
         }

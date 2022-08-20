@@ -64,8 +64,7 @@ const Albums = () => {
   const { list, loadNextPage, hasMore, loading, curPage } = useLoadmore({fetchData, listState: albumState}, searchText)
 
   const containerRef = useRef<HTMLElement>()
-  const BASE_WIDTH = 116
-  const itemWidth = useRef(BASE_WIDTH)
+  
 
   const handleSearch = async (val: string) => {
     setAlbumPageState(state => ({
@@ -81,9 +80,8 @@ const Albums = () => {
       loadNextPage((curPage || 0) + 1, { deps: [searchText] })
     }
   }
-  useEffect(() => {
-    itemWidth.current = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
-  }, [])
+  const BASE_WIDTH = 116
+  const itemWidth = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
 
   const sameAlbumCheck = (album, idx) => !list.some((a, i) => a.albumId === album.albumId && i !== idx)
 
