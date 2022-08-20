@@ -12,7 +12,9 @@ export const getPlaylist = (id) => {
     return axios.get(url, { params: {needSongs: true} })
 }
 
-export const createPlaylist = (playlist: Playlist) => {
+export const createPlaylist = (playlist: Omit<
+    Playlist, 'updateTime' | 'createTime' | 'id' | 'musicIds'
+>) => {
     const url = '/api/playlist'
 
     return axios.post(url, playlist)
@@ -22,4 +24,10 @@ export const updatePlaylist = (id, playlist: Playlist) => {
     const url = '/api/playlist/' + id
 
     return axios.post(url, playlist)
+}
+
+export const deletePlaylist = (id) => {
+    const url = `/api/playlist/` + id
+
+    return axios.delete(url)
 }

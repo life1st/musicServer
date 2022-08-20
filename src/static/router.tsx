@@ -12,7 +12,7 @@ import AlbumDetail from './Pages/AlbumDetail'
 import FullEditor from './Pages/FullEditor'
 import PlayingList from './Pages/PlayingList'
 import Playlists from './Pages/Playlists'
-import Playlist from './Pages/Playlist'
+import PlaylistDetail from './Pages/PlaylistDetail'
 
 const { useEffect } = React
 
@@ -63,7 +63,7 @@ export const Pages = () => {
     } , {
       name: 'Playlist',
       path: ROUTES.PLAYLIST,
-      comp: <Playlist />
+      comp: <PlaylistDetail />
     }
   ]
 

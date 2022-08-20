@@ -8,6 +8,10 @@ import Menubar from './Components/Menubar'
 import { useGlobalTitle } from './hooks/useGlobalTitle'
 import './global.less'
 import 'reset-css'
+import dayJs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayJs.extend(relativeTime)
 
 const { useMemo, Fragment} = React
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { createPlaylist, getPlaylists } from '../API/playlistApi'
+import { getPlaylists } from '../API/playlistApi'
 import { Playlist as IPlaylist } from '../../types/Playlist'
+import { handleCreate } from '../utils/playlistHelper'
 
 const { useEffect, useState } = React
 
@@ -17,15 +18,6 @@ const Playlists = (props) => {
         fetchData()
     }, [])
 
-    const handleCreate = async () => {
-        const name = prompt('input playlist name')
-        if (name) {
-            const result = createPlaylist({
-                title: name,
-            })
-            console.log(result)
-        }
-    }
 
     return (
         <div>

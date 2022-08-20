@@ -40,7 +40,6 @@ export const useLoadmore = <T>({
     } else {
       loadDeps.current = deps
     }
-    console.log(deps, deps.length, loadDeps.current.length, deps.some(s => !loadDeps.current.includes(s)), isDepsChange)
 
     setLoading(true)
     const resp = await fetchData(page)

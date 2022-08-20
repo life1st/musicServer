@@ -12,12 +12,14 @@ const icCoverDefault = require('../imgs/ic-album-default.svg')
 const Cover = (props: Props) => {
   const { src, defaultSrc = icCoverDefault, className, style } = props
   const { onClick = () => {} } = props
-  const [url, setUrl] = React.useState(src)
+  const [ url, setUrl ] = React.useState(src || defaultSrc)
   const handleLoadError = () => {
     setUrl(defaultSrc)
   }
   useEffect(() => {
-    setUrl(src)
+    if (src) {
+      setUrl(src)
+    }
   }, [src])
 
   return (

@@ -1,12 +1,45 @@
 @itemH: 48px;
 .container {
     height: @itemH;
-    overflow: hidden;
     flex: 1 0 auto;
-    .item {
-        height: @itemH;
-    }
+    padding: 0 0 0 12px;
+    display: flex;
 }
 .createNew {
     height: 32px;
+    line-height: 32px;
+    align-self: center;
+}
+
+.playlistItem {
+  height: @itemH;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  .cover {
+    @s: 30px;
+    width: @s;
+    height: @s;
+    margin-right: 8px;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .time {
+    font-size: 12px;
+    line-height: 1.2;
+    color: #666;
+  }
+  .content {
+    flex: 1;
+    margin-right: 24px;
+    line-height: 1.5;
+  }
+  .icEntry {
+    @s: 20px;
+    width: @s;
+    height: @s;
+    transform: rotate(-90deg);
+  }
 }

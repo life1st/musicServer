@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as style from './Library.module.less'
 import { useNavigate } from 'react-router-dom'
 import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { libraryState, libraryScrollState } from '../model/library'
@@ -6,7 +7,7 @@ import { playingState } from '../model/playing'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { getLibrary, scanLibrary } from '../API'
 import Songlist from '../Components/Songlist'
-import PlaylistEntry from '../Components/PlaylistEntry'
+import { PlaylistEntry } from '../Components/PlaylistEntry'
 
 const { Fragment } = React
 const Library = (props) => {
@@ -46,7 +47,12 @@ const Library = (props) => {
     <Fragment>
       <button onClick={scanLibrary}>Scan</button>
       <Songlist
-        startNode={ <PlaylistEntry /> }
+        startNode={(
+          <Fragment>
+            <PlaylistEntry />
+            <li className={style.startNodeEndfix} />
+          </Fragment>
+        )}
         deleteSuccess={handleDeleted}
         onItemClick={handleItemClick}
         onReachEnd={handleLoadMore}

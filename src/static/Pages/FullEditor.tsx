@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getMusicMeta, updateMeta } from '../API'
 import { Music } from '../../types/Music'
 import Navibar from '../Components/Navibar'
-import { copyText } from '../utils'
+import { copyText } from '../utils/'
 
 const { useEffect, useState } = React
 const FullEditor = (props) => {
