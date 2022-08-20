@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './styles/PlaylistEntry.module.less'
 import dayJs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '../router'
+import { ROUTES } from '../utils/routesPath'
 import { getPlaylists } from '../API/playlistApi'
 import { handleCreate } from '../utils/playlistHelper'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
@@ -53,7 +53,6 @@ const PlaylistEntry = (props) => {
     const handleItemClick = (pl) => {
         naviTo(ROUTES.PLAYLIST.replace(':id', pl.id))
     }
-
     return (
         <div className={style.container}>
             { playlists.length > 0 ? playlists.slice(0, 3).map(playlist => 

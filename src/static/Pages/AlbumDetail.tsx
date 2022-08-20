@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './AlbumDetail.module.less'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ROUTES } from '../router'
+import { ROUTES } from '../utils/routesPath'
 import { useInViewport } from 'ahooks'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'

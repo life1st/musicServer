@@ -10,6 +10,7 @@ import Search from './Pages/Search'
 import Albums from './Pages/Albums'
 import PlayingList from './Pages/PlayingList'
 import { EndFix } from './Components/Scroller'
+import { ROUTES } from './utils/routesPath'
 
 const { useEffect, lazy, Suspense } = React
 
@@ -19,18 +20,6 @@ const AlbumEditor = lazy(() => import('./Pages/AlbumEditor'))
 const PlaylistDetail = lazy(() => import('./Pages/PlaylistDetail'))
 const Playlists = lazy(() => import('./Pages/Playlists'))
 
-export const ROUTES = {
-  LIBRARY: '/library',
-  SEARCH: '/search',
-  PLAYING: '/playing',
-  ALBUMS: '/albums',
-  ALBUM_DETAIL: '/album/:albumId',
-  MUSIC_EDITOR: '/music/:id/edit',
-  ALBUM_EDITOR: '/album/:id/edit',
-  PLAYING_LIST: '/playing_list',
-  PLAYLISTS: '/playlists',
-  PLAYLIST: '/playlist/:id',
-}
 export const Pages = () => {
   const pages = [{
       name: 'Library',

@@ -3,7 +3,7 @@ import * as style from './styles/Menubar.module.less'
 import { useNavigate, useMatch } from 'react-router-dom'
 import { albumDetailState } from '../model/albumDetail'
 import { useRecoilValue } from 'recoil'
-import { ROUTES } from '../router'
+import { ROUTES } from '../utils/routesPath'
 
 const { useMemo } = React
 

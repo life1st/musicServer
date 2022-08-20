@@ -3,7 +3,7 @@ import { useTitle } from 'ahooks'
 import { useRecoilValue } from 'recoil'
 import { albumDetailState } from '../model/albumDetail'
 import { musicState } from '../model/playing'
-import { ROUTES } from '../router'
+import { ROUTES } from '../utils/routesPath'
 import { useMatch as TuseMatch } from 'react-router-dom'
 
 const defaultFavicon = require('../imgs/favicon.png')
