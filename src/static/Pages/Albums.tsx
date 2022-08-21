@@ -83,7 +83,7 @@ const Albums = () => {
   const BASE_WIDTH = 116
   const itemWidth = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
 
-  const sameAlbumCheck = (album, idx) => !list.some((a, i) => a.albumId === album.albumId && i !== idx)
+  const sameAlbumCheck = (acc, a) => acc.some(al => al.albumId === a.id) ? acc : acc.concat(a)
 
   return (
     <Fragment>
@@ -102,7 +102,7 @@ const Albums = () => {
         showLoading={hasMore}
         ref={containerRef}
       >
-        { list.filter(sameAlbumCheck).map(album => (
+        { list.reduce(sameAlbumCheck, []).map(album => (
           <li key={album.albumId} className={style.albumItem}><Album  {...album} width={itemWidth.current} /></li>
         )) }
       </Scroller>

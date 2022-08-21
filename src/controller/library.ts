@@ -47,7 +47,6 @@ class Library {
                     musicMetaTasks[i] = scanMusicCache.pop() as string
                     process.send(musicMetaTasks[i])
                 } else {
-                    process.kill('SIGINT')
                     // @ts-ignore
                     musicMetaTasks[i] = null
                     console.log('scan music cached 0', musicMetaTasks, musicMetaProcesses)
