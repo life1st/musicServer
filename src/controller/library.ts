@@ -30,9 +30,10 @@ class Library {
         let scanMusicCache: string[] = []
 
         let scanProcess = child_process.fork('./dist/scanDir.js')
-        let musicMetaProcesses = Array(musicProcessCount).fill(null).map(() => child_process.fork('./dist/getMusicMeta.js'))
+        const createMusicMetaProcess = () => child_process.fork('./dist/getMusicMeta.js')
+        let musicMetaProcesses = Array(musicProcessCount).fill(null).map(createMusicMetaProcess)
         let musicCount = 0
-        musicMetaProcesses.map((process, pcsi) => {
+        const musicMetaTask = (process, pcsi) => {
             process.on('message', async (music: Music) => {
                 console.log(`message from music process __${pcsi}__: `, music?.path)
                 musicCount++
@@ -49,44 +50,36 @@ class Library {
                 } else {
                     // @ts-ignore
                     musicMetaTasks[i] = null
-                    console.log('scan music cached 0', musicMetaTasks, musicMetaProcesses)
-                    if (musicMetaTasks.every(t => !t) && scanMusicCache.length === 0) {
+                    console.log('scan music cached 0', musicMetaTasks)
+                    if (musicMetaTasks.every(t => !t) && scanMusicCache.length === 0 && !scanProcess) {
                         console.log(`scan finish. ProcessCount: ${musicMetaProcesses.length}, MusicCount:`, musicCount, (Date.now() - startTime) / 1000 + 's')
                         musicMetaProcesses = []
                     }
                 }
             })
-        })
+        }
+        musicMetaProcesses.map(musicMetaTask)
         scanProcess.on('message', async ([dirs, musicFiles]: [string[], string[]]) => {
             console.log('message from scan process: ', dirs, musicFiles)
             if (dirs.length > 0) {
-                scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb', '陈一发'].some(k => dir.includes(k))))
+                scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb', '陈一发', 'Recycle'].some(k => dir.includes(k))))
             }
             if (musicFiles.length > 0) {
-                if (skipExist) {
-                    let tmpList: string[] = []
-                    for (const musicPath of musicFiles) {
-                        const musics = await libraryModel.getMusicBy({ path: musicPath })
-                        const isSkip = musics.length > 0
-                        console.log('skipFile:', isSkip, musicPath, musics.length)
-                        if (!isSkip) {
-                            tmpList.push(musicPath)
-                        }
+                let tmpList: string[] = []
+                for (const musicPath of musicFiles) {
+                    const [
+                        isExist,
+                        isDeled,
+                    ] = await Promise.all([
+                        skipExist ? (await libraryModel.getMusicBy({ path: musicPath }))?.length : false,
+                        skipDeleted ? libraryModel.getDeletedMusic({ path: musicPath }) : false
+                    ])
+                    console.log(isExist, isDeled, musicPath)
+                    if (!isExist && !isDeled) {
+                        tmpList.push(musicPath)
                     }
-                    musicFiles = tmpList
                 }
-                if (skipDeleted) {
-                    let tmpList: string[] = []
-                    for (const musicPath of musicFiles) {
-                        const isDeleted = await libraryModel.getDeletedMusic({ path: musicPath })
-                        console.log('skip deleted File:', Boolean(isDeleted), musicPath)
-                        if (!isDeleted) {
-                            tmpList.push(musicPath)
-                        }
-                    }
-                    musicFiles = tmpList
-                }
-                scanMusicCache = scanMusicCache.concat(musicFiles)
+                scanMusicCache = scanMusicCache.concat(tmpList)
             }
             musicMetaTasks.map((task, i) => {
                 if (!task && scanMusicCache.length > 0) {
@@ -101,6 +94,16 @@ class Library {
                 scanProcess.kill('SIGINT')
                 // @ts-ignore
                 scanProcess = null
+                if (scanMusicCache.length > 0) {
+                    const curTask = scanMusicCache.pop() as string
+                    musicMetaProcesses.push(createMusicMetaProcess())
+                    musicMetaTasks.push(curTask)
+
+                    const i = musicMetaTasks.length - 1
+                    const process = musicMetaProcesses[i]
+                    musicMetaTask(process, i)
+                    process.send(curTask)
+                }
             }
         })
         scanProcess.send(scanDirs.pop() as string)
