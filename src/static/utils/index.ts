@@ -1,8 +1,13 @@
 let hasPermission = false
+let hasCheck = false
 
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-const checkPermission = () => {
-    return !hasPermission ? navigator.permissions.query({name: 'clipboard-write'}).then((r) => r.state === 'granted') : true
+const checkPermission = async () => {
+    if (!hasPermission && !hasCheck) {
+        hasCheck = true
+        hasPermission = await navigator.permissions.query({name: 'clipboard-write'}).then((r) => r.state === 'granted')
+    }
+    return hasPermission
 }
 
 export const copyText = async (text) => {
