@@ -24,7 +24,7 @@ class Library {
         const startTime = Date.now()
         const processCount = os.cpus().length
 
-        const musicProcessCount = processCount - 1 || 1
+        const musicProcessCount = Math.max(processCount - 1, 1)
         const musicMetaTasks: string[] = Array(musicProcessCount).fill(null)
         let scanDirs = [MUSIC_DIR]
         let scanMusicCache: string[] = []
@@ -52,7 +52,7 @@ class Library {
                     musicMetaTasks[i] = null
                     console.log('scan music cached 0', musicMetaTasks)
                     if (musicMetaTasks.every(t => !t) && scanMusicCache.length === 0 && !scanProcess) {
-                        console.log(`scan finish. ProcessCount: ${musicMetaProcesses.length}, MusicCount:`, musicCount, (Date.now() - startTime) / 1000 + 's')
+                        console.log(`scan finish. ${musicMetaProcesses.length} Process, ${musicCount} MusicCount, Time:`, (Date.now() - startTime) / 1000 + 's')
                         musicMetaProcesses = []
                     }
                 }
@@ -60,7 +60,7 @@ class Library {
         }
         musicMetaProcesses.map(musicMetaTask)
         scanProcess.on('message', async ([dirs, musicFiles]: [string[], string[]]) => {
-            console.log('message from scan process: ', dirs, musicFiles)
+            console.log('message from scan process: ', dirs, musicFiles.length)
             if (dirs.length > 0) {
                 scanDirs = scanDirs.concat(dirs.filter(dir => !['._', 'streams', 'thumb', '陈一发', 'Recycle'].some(k => dir.includes(k))))
             }

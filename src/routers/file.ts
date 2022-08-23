@@ -21,6 +21,7 @@ const musicFileHandler = async ctx => {
 const albumCoverFileHandler = async ctx => {
     const { albumId } = ctx.params
     ctx.set('content-type', 'image/jpeg')
+    ctx.set('Cache-Control', `max-age=${1 * 60 * 60}`) // sec
     ctx.body = await album.getCover(albumId)
 }
 
