@@ -100,8 +100,11 @@ export const Player = (props: IPlayer) => {
 
     const audioRef = useRef<HTMLAudioElement>()
     useEffect(() => {
-        if (music) {
-            audioRef.current?.play()
+        if (music && audioRef.current) {
+            audioRef.current.currentTime = 0
+            setTimeout(() => {
+                audioRef.current?.play()
+            }, 0)
         }
         audioRef.current?.addEventListener('ended', handlePlayEnd)
         return () => {
@@ -204,26 +207,24 @@ export const Player = (props: IPlayer) => {
         if (!music) {
             return {
                 title: 'No Playing',
+                desc: '',
                 src: '',
                 cover: ''
             }
         }
+        const { album, artist } = music
+        let desc = artist
+        if (album) {
+            desc = `${artist} - ${album}`
+        }
         return {
             title: `${music.title} - ${music.artist}`,
+            desc,
             src: `${origin}/file/music/${music.id}`,
             cover: `${origin}/file/album_cover/${music.albumId}`,
         }
     }, [music])
-    const desc = useMemo(() => {
-        if (!music) {
-            return ''
-        }
-        const { album, artist } = music
-        if (album) {
-            return `${artist} - ${album}`
-        }
-        return artist
-    } , [music])
+
     const displayTimes = useMemo(() => {
         const formatTime = (time: number) => {
             const minute = Math.floor(time / 60)
@@ -255,7 +256,7 @@ export const Player = (props: IPlayer) => {
                         { music ? (
                             <Fragment>
                                 <p className={style.fullTitle} title={music.title}>{music.title}</p>
-                                <p className={style.fullDesc} title={desc}>{desc}</p>
+                                <p className={style.fullDesc} title={info.desc}>{info.desc}</p>
                             </Fragment>
                         ) : <p>{info.title}</p> }
                     </div>
