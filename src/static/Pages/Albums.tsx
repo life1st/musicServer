@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './Albums.module.less'
+import * as style from './styles/Albums.module.less'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumState, albumScrollState, albumPageState } from '../model/album'

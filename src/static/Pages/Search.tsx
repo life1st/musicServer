@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './Search.module.less'
+import * as style from './styles/Search.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { playingState } from '../model/playing'
 import { searchPageState, searchListState } from '../model/search'
@@ -7,7 +7,7 @@ import { searchMusic } from '../API'
 import { SearchInput } from '../Components/SearchInput'
 import Songlist from '../Components/Songlist'
 import { useLoadmore } from '../hooks/useLoadmore'
-import { confirm } from '../Components/Confirm'
+import { confirm } from '../Components/ModalBox/Confirm'
 
 const { useCallback } = React
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './styles/Confirm.module.less'
+import * as style from './Confirm.module.less'
 import { createConfirmation } from 'react-confirm'
 
 interface Option {

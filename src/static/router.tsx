@@ -10,7 +10,7 @@ import Search from './Pages/Search'
 import Albums from './Pages/Albums'
 import PlayingList from './Pages/PlayingList'
 import { EndFix } from './Components/Scroller'
-import { ROUTES } from './utils/routesPath'
+import { ROUTES } from './consts'
 
 const { useEffect, lazy, Suspense } = React
 

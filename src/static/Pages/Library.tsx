@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './Library.module.less'
+import * as style from './styles/Library.module.less'
 import { useNavigate } from 'react-router-dom'
 import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { libraryState, libraryScrollState } from '../model/library'

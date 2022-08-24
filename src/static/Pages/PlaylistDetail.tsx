@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './PlaylistDetail.module.less'
+import * as style from './styles/PlaylistDetail.module.less'
 import dayJs from 'dayjs'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getPlaylist, deletePlaylist } from '../API/playlistApi'
