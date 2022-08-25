@@ -5,6 +5,7 @@ export enum PLAY_MODE {
 }
 
 export const ROUTES = {
+  AUTH: '/auth',
   LIBRARY: '/library',
   SEARCH: '/search',
   PLAYING: '/playing',

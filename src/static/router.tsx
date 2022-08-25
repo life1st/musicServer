@@ -61,6 +61,10 @@ export const Pages = () => {
       name: 'Playlist',
       path: ROUTES.PLAYLIST,
       comp: <PlaylistDetail />
+    }, {
+      name: 'Auth',
+      path: ROUTES.AUTH,
+      comp: <div />
     }
   ]
 

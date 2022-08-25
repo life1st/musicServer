@@ -5,6 +5,7 @@ import { RecoilRoot } from 'recoil'
 import { Player } from './Components/Player'
 import { Pages } from './router'
 import Menubar from './Components/Menubar'
+import AuthWrapper from './Components/AuthWrapper'
 import { useGlobalTitle } from './hooks/useGlobalTitle'
 import './global.less'
 import 'reset-css'
@@ -25,13 +26,13 @@ const App = () => {
     }, [matchPlayer])
     useGlobalTitle({ useMatch })
     return (
-        <Fragment>
+        <AuthWrapper>
             <div className='pages-content-container' style={pageStyles}>
                 <Pages />
             </div>
             <Player />
             <Menubar />
-        </Fragment>
+        </AuthWrapper>
     )
 }
 

@@ -2,6 +2,7 @@ import Koa from 'koa'
 import staticHost from 'koa-static'
 import bodyParser from 'koa-bodyparser'
 import compress from 'koa-compress'
+import cookie from 'koa-cookie'
 import { route } from './src/routers'
 import { STATIC_DIR } from './src/utils/path'
 import { staticHandler } from './src/routers/static'
@@ -10,6 +11,7 @@ const flush = require('zlib').constants.Z_SYNC_FLUSH
 const app = new Koa()
 
 app
+.use(cookie())
 .use(compress({
     filter: mime => /text|javascript|json/i.test(mime),
     threshold: 1000,
