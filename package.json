@@ -10,7 +10,7 @@
     "watch": "ts-node ./build/server.ts --watch",
     "build": "ts-node ./build/server.ts --build",
     "fe": "parcel ./src/static/index.html --dist-dir=dist/static",
-    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static"
+    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --reporter @parcel/reporter-bundle-analyzer"
   },
   "dependencies": {
     "ahooks": "^3.7.0",
@@ -19,6 +19,7 @@
     "dayjs": "^1.11.5",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
+    "koa-compress": "^5.1.0",
     "koa-router": "^12.0.0",
     "koa-static": "^5.0.0",
     "md5": "^2.3.0",
@@ -30,10 +31,12 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "recoil": "^0.7.4",
-    "reset-css": "^5.0.1"
+    "reset-css": "^5.0.1",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
-    "@parcel/transformer-less": "2.6.2",
+    "@parcel/reporter-bundle-analyzer": "^2.7.0",
+    "@parcel/transformer-less": "^2.7.0",
     "@types/node": "^18.6.1",
     "@types/react": "^18.0.15",
     "assert": "^2.0.0",
@@ -43,7 +46,7 @@
     "esbuild": "^0.14.49",
     "events": "^3.3.0",
     "nodemon": "^2.0.19",
-    "parcel": "^2.6.2",
+    "parcel": "^2.7.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
