@@ -1,46 +1,36 @@
 import * as React from 'react'
-import { useNavigate, useMatch } from 'react-router-dom'
-import { ROUTES } from '../consts'
+import { useRequest } from 'ahooks'
 import { sendAuth, getAuthStatus } from '../API'
 import { EndFix } from './Scroller'
+import { MAX_AGE } from '../../utils/auth'
 const { useState, useEffect } = React
 
+
 const Auth = (props) => {
-    const [ loading, setLoading ] = useState(true)
-    const [ isAuthed, setIsAuthed ] = useState(false)
     const [ val, setVal ] = useState('')
     const handleChange = (e) => {
         const val = e.target.value
         setVal(val)
     }
     const handleSubmit = async () => {
-        setLoading(true)
         const { status, data } = await sendAuth(val)
-        setLoading(false)
         if (status === 200 && data) {
-            setIsAuthed(true)
+            refresh()
         } else {
             // toast
             console.log('invalid pass')
             setVal('')
         }
     }
-
-    useEffect(() => {
-        getAuthStatus().then(resp => {
-            setLoading(false)
-            const { status, data } = resp
-            console.log(data)
-            if (status === 200) {
-                setIsAuthed(true)
-            }
-        })
-    }, [])
+    const { data: isAuthed, loading, error, refresh} = useRequest(getAuthStatus, {
+        refreshOnWindowFocus: true,
+        focusTimespan: MAX_AGE
+    })
 
     if (loading) {
         return <EndFix hasMore={true} showLoading={true} />
     }
-    if (isAuthed) {
+    if (isAuthed && !error) {
         return props.children
     }
     return (
