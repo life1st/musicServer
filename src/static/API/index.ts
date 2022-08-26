@@ -4,17 +4,6 @@ import { Music } from '../../types/Music'
 
 const buildKvStr = (obj) => Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&')
 
-axios.interceptors.response.use(response => response, err => {
-    const { response, request } = err
-    const isForbidden = response.status === 403
-    const isAuth = request.responseURL?.includes('/api/auth')
-    if (isForbidden && !isAuth) {
-        console.log('403 common handler')
-        window.location.replace('/auth')
-    }
-    return err
-})
-
 export const getLibrary = (pageNum: number) => {
     const url = '/api/music_list/' + pageNum
 
@@ -81,4 +70,10 @@ export const sendAuth = (pw: string) => {
     const url = '/api/auth'
 
     return axios.post(url, {pw})
+}
+
+export const getAuthStatus = () => {
+    const url = '/api/authed'
+
+    return axios.get(url)
 }
