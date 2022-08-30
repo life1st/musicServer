@@ -16,19 +16,22 @@ export const genMusicKeyword = (music: Music) => {
     path.dirname(musicPath).split(path.sep),
     path.basename(musicPath, extname),
   ]
-  const dirKeywords = dirs.length > 2 ? [dirs.pop(), dirs.pop()].join(' ') : dirs.pop()
+  const dirKeywords = dirs.length > 2 ? [dirs.pop(), dirs.pop()] : [dirs.pop()]
 
-  const keywords = [title, artist, album, genre, dirKeywords]
+  const keywords = [title, artist, album, genre, ...dirKeywords].filter(Boolean) as string[]
   if (!title.includes(basename)) {
     keywords.push(basename)
   }
-  return keywords.filter(Boolean).map(v => {
-    const lowerStr = v?.toLowerCase()
-    if (lowerStr === v) {
-      return v
+  return keywords.reduce((acc, v) => {
+    if (acc.some(w => w.includes(v))) {
+      return acc
     }
-    return `${v.toLowerCase()} ${v}`
-  }).join(' ')
+    const lowerStr = v.toLowerCase()
+    if (lowerStr === v) {
+      return acc.concat([v]) 
+    }
+    return acc.concat([lowerStr, v])
+  }, [] as string[]).join(' ')
 }
 
 export const getMusicData = async (musicPath: string): Promise<Music> => {
