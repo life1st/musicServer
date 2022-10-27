@@ -46,6 +46,9 @@ const buildTasks = async () => {
         const _args = `${taskPath} --bundle --platform=node --target=node18 --outfile=${OUT_DIR}/${basename}.js`.split(' ')
         if (isWatch) {
             _args.push('--watch')
+        }   
+        if (isBuild) {
+            _args.push('--minify')
         }
         const build = child_process.spawn(`esbuild`, _args, { shell: true })
         build.stdout.on('data', data => {

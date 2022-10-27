@@ -1,4 +1,3 @@
-import fs from 'fs/promises'
 import { getMusicData } from '../utils/music'
 
 process.on('message', async (musicPath: string) => {
