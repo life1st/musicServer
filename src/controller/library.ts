@@ -6,6 +6,7 @@ import { updateMusicID3 } from '../utils/file'
 import { getMusicData } from '../utils/music'
 import { libraryModel } from '../model/libraryModel'
 import { albumModel } from '../model/albumModel'
+import { youtubeMusicModel } from '../model/youtubeMusicModel'
 import { album as albumController } from './album'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
@@ -170,11 +171,22 @@ class Library {
         keyword: string,
         conf: {
             pageNum: number,
-        }) {
+    }) {
         const { pageNum } = conf
+        console.log(keyword)
         let musicList: Music[] = []
         try {
-            musicList = await libraryModel.getMusicBy({keyword}, pageNum)
+            const [
+                localMusicList,
+                youtubeMusicList,
+            ] = await Promise.all([
+                libraryModel.getMusicBy({keyword}, pageNum),
+                youtubeMusicModel.search(keyword)
+            ])
+            console.log(youtubeMusicList)
+            musicList = [
+                ...localMusicList,
+            ]
         } catch (e) {
             musicList = []
         }
