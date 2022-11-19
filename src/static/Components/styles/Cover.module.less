@@ -1,0 +1,67 @@
+.normalCover {
+  transition: opacity .1s;
+  opacity: 1;
+}
+.hideCover {
+  opacity: 0;
+}
+.coverPreviewBox {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+.coverPreviewBoxShow {
+  opacity: 1;
+  background-color: rgba(0,0,0,.6);
+  transition: background-color .3s, opacity .1s;
+}
+.coverPreviewBoxHide {
+  overflow: hidden;
+  opacity: 0;
+  background-color: transparent;
+  transition: opacity .1s;
+  pointer-events: none;
+}
+.coverPreview {
+  margin: 8px;
+  width: 100%;
+  max-width: 600px;
+  object-fit: contain;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  box-shadow: 1px 1px 4px #666;
+  background-color: #fff;
+  transition: opacity .3s;
+}
+.coverPreviewShow {
+  opacity: 1;
+  animation: .2s ease-out preview;
+}
+.coverPreviewHide {
+  opacity: 0;
+  animation: .2s linear hidePreview;
+}
+@keyframes preview {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes hidePreview {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
