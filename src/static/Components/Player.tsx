@@ -12,6 +12,7 @@ import { Music } from '../../types/Music'
 import { deleteMusic } from '../API'
 import { useProgress } from '../hooks/useProgress'
 import { useShortcuts } from '../hooks/useShortcuts'
+import { Svg } from './Svg'
 import Cover from './Cover'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
@@ -277,26 +278,26 @@ export const Player = (props: IPlayer) => {
                     </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
                     <div className={style.controlBtns}>
-                        <img src={require('../imgs/ic-next.svg')} className={style.btnPrev} onClick={handlePlayPrev} />
+                        <Svg src={require('../imgs/ic-next.svg')} className={style.btnPrev} onClick={handlePlayPrev} />
                         {
                             isPlaying ? (
-                                <img src={require('../imgs/ic-pause.svg')} className={style.btnPause} onClick={handlePause} />
+                                <Svg src={require('../imgs/ic-pause.svg')} className={style.btnPause} onClick={handlePause} />
                             ) : (
-                                <img src={require('../imgs/ic-play.svg')} className={style.btnPlay} onClick={handlePlay} />
+                                <Svg src={require('../imgs/ic-play.svg')} className={style.btnPlay} onClick={handlePlay} />
                             )
                         }
-                        <img src={require('../imgs/ic-next.svg')} className={style.btnNext} onClick={handlePlayNext} />
+                        <Svg src={require('../imgs/ic-next.svg')} className={style.btnNext} onClick={handlePlayNext} />
                     </div>
                     <div className={style.endingContainer}>
                         <div 
                             className={style.volumeContainer}
                             ref={volumeRef}
                         >
-                            <img src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
+                            <Svg src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
                             <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
                             <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
                         </div>
-                        <img src={require('../imgs/ic-checklist.svg')} className={style.icPlayinglist} onClick={handleGoList} />
+                        <Svg src={require('../imgs/ic-checklist.svg')} className={style.icPlayinglist} onClick={handleGoList} />
                     </div>
                 </div>
             ) : (
@@ -304,7 +305,7 @@ export const Player = (props: IPlayer) => {
                     <Cover src={info.cover} className={style.cover} onClick={naviToFullplayer} />
                     <p className={style.infoText} title={info.title} onClick={naviToFullplayer}>{info.title}</p>
                     <div className={style.oprations}>
-                        <img
+                        <Svg
                             onClick={isPlaying ? handlePause : handlePlay}
                             src={isPlaying ? require('../imgs/ic-pause.svg') : require('../imgs/ic-play.svg') } 
                             className={cls(
@@ -312,7 +313,7 @@ export const Player = (props: IPlayer) => {
                                 isPlaying ? style.icPause : ''
                             )}
                         />
-                        <img
+                        <Svg
                             onClick={handlePlayNext}
                             src={require('../imgs/ic-next.svg')}
                             className={cls(

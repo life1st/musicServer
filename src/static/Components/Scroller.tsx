@@ -1,17 +1,18 @@
 import * as React from 'react'
 import * as style from './styles/Scroller.module.less'
 import { useThrottleFn } from 'ahooks'
+import { Svg } from './Svg'
 
 const { useRef, useEffect, useImperativeHandle, forwardRef } = React
 
 const EndFix = ({showLoading, hasMore}) => {
   if (showLoading && hasMore) {
-    return <div><img src={require('../imgs/ic-loading.svg')} className={style.icLoading} /></div>
+    return <div><Svg src={require('../imgs/ic-loading.svg')} className={style.icLoading} /></div>
   }
   if (!hasMore) {
     return (
       <div className={style.emptyTips}>
-        <img src={require('../imgs/ic-empty.svg')} className={style.icEmpty} />
+        <Svg src={require('../imgs/ic-empty.svg')} className={style.icEmpty} />
         <span className={style.tipsText}>没有了</span>
       </div>
     )

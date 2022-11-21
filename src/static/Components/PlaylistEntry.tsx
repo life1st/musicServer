@@ -8,6 +8,7 @@ import { handleCreate } from '../utils/playlistHelper'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { playlistState } from '../model/playlist'
 import { Playlist as IPlaylist } from '../../types/Playlist'
+import { Svg } from './Svg'
 import Cover from './Cover'
 
 const { useEffect } = React
@@ -24,7 +25,7 @@ const PlaylistItem = (props: IPlaylist & {
                 <p className={style.title}>{title}</p>
                 <p className={style.time}>{dayJs(updateTime).fromNow()}</p>
             </div>
-            <img src={require('../imgs/arrow-down.svg')} className={style.icEntry} />
+            <Svg src={require('../imgs/arrow-down.svg')} className={style.icEntry} />
         </div>
     )
 }

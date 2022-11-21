@@ -9,6 +9,7 @@ import { Music } from '../../types/Music'
 import { RESP_STATE } from '../../shareCommon/consts'
 import { deleteMusic } from '../API'
 import { Scroller } from './Scroller'
+import { Svg } from './Svg'
 
 const { useMemo } = React
 
@@ -39,12 +40,12 @@ const SongItem = (props: ItemProps) => {
         <p className={style.desc}>{desc}</p>
       </div>
       <div className={style.opreation}>
-        <img src={require('../imgs/ic-delete.svg')} className={style.icDelete} onClick={onDelete} />
-        <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={onEdit} />
-        <img src={require('../imgs/ic-list-add.svg')} className={style.icAddList} onClick={onAddList} />
+        <Svg src={require('../imgs/ic-delete.svg')} className={style.icDelete} onClick={onDelete} />
+        <Svg src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={onEdit} />
+        <Svg src={require('../imgs/ic-list-add.svg')} className={style.icAddList} onClick={onAddList} />
       </div>
       { isPlaying ? (
-        <img src={require('../imgs/ic-cd.svg')} className={style.icPlaying} />
+        <Svg src={require('../imgs/ic-cd.svg')} className={style.icPlaying} />
       ) : null }
     </li>
   )

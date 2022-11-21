@@ -8,8 +8,16 @@ import { SearchInput } from '../Components/SearchInput'
 import Songlist from '../Components/Songlist'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { confirm } from '../Components/ModalBox/Confirm'
+import { Svg } from '../Components/Svg'
+import {
+  enable as enableDarkMode,
+  disable as disableDarkMode,
+  isEnabled as isEnabledDarkMode,
+} from 'darkreader'
+import { darkModeConfig, autoDarkModeUtils } from '../utils/darkmodeHelper'
 
-const { useCallback } = React
+const { useCallback, useState, useEffect } = React
+const darkEnableStatus = isEnabledDarkMode()
 
 const Search = (props) => {
   const {
@@ -19,6 +27,7 @@ const Search = (props) => {
   const setSearchState = useSetRecoilState(searchPageState)
   const setSearchListState = useSetRecoilState(searchListState)
   const setPlaying = useSetRecoilState(playingState)
+  const [ isEnableDark, setDark ] = useState(darkEnableStatus)
 
   const fetchData = useCallback((pageNum) => {
     if (searchText) {
@@ -75,9 +84,24 @@ const Search = (props) => {
         action: () => {
           console.log('scan')
         }
+      }, {
+        text: isEnableDark ? 'disable DarkMode' : 'enable DarkMode',
+        action: () => {
+          isEnableDark ? disableDarkMode() : enableDarkMode(darkModeConfig)
+          setDark(!isEnableDark)
+        }
+      }, {
+        text: autoDarkModeUtils.getEnabled() ? 'disable auto darkmode' : 'enable auto darkmode',
+        action: () => {
+          autoDarkModeUtils.setEnable(!autoDarkModeUtils.getEnabled())
+        }
       }]
     })
   }
+
+  useEffect(() => {
+    setDark(isEnabledDarkMode())
+  }, [])
 
   return (
     <div className={style.container}>
@@ -87,7 +111,7 @@ const Search = (props) => {
           onSearch={handleSearch} 
           onClear={handleClearSearch}
         />
-        <img
+        <Svg
           src={require('../imgs/ic-menu.svg')}
           className={style.icMenu}
           onClick={handleOpenMenu}

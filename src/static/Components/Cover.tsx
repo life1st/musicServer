@@ -1,6 +1,7 @@
 import * as React from 'react'
 import cls from 'classnames'
 import styl from './styles/Cover.module.less'
+import { Svg } from './Svg'
 
 const { useEffect, useState, Fragment } = React
 interface Props {
@@ -51,28 +52,50 @@ const Cover = (props: Props) => {
         [styl.coverPreviewBoxShow]: showPreview,
         [styl.coverPreviewBoxHide]: !showPreview
       })} onClick={handleClickPreview}>
+        {url ? (
+          <img
+            onError={handleLoadError}
+            className={cls({
+              [styl.coverPreview]: true,
+              [styl.coverPreviewShow]: showPreview,
+              [styl.coverPreviewHide]: !showPreview,
+            })}
+            src={url}
+            style={style}
+          />
+        ) : (
+          <Svg 
+            src={defaultSrc}
+            className={cls({
+              [styl.coverPreview]: true,
+              [styl.coverPreviewShow]: showPreview,
+              [styl.coverPreviewHide]: !showPreview,
+            })}
+          />
+        )}
+      </div>
+      { url ? (
         <img
+          onClick={handleClick}
           onError={handleLoadError}
           className={cls({
-            [styl.coverPreview]: true,
-            [styl.coverPreviewShow]: showPreview,
-            [styl.coverPreviewHide]: !showPreview,
+            [className]: true,
+            [styl.normalCover]: true,
+            [styl.hideCover]: showPreview,
           })}
-          src={url || defaultSrc}
+          src={url}
           style={style}
         />
-      </div>
-      <img
-        onClick={handleClick}
-        onError={handleLoadError}
-        className={cls({
-          [className]: true,
-          [styl.normalCover]: true,
-          [styl.hideCover]: showPreview,
-        })}
-        src={url || defaultSrc}
-        style={style}
-      />
+      ) : (
+        <Svg
+          src={defaultSrc}
+          className={cls({
+            [className]: true,
+            [styl.normalCover]: true,
+            [styl.hideCover]: showPreview,
+          })}
+        />
+      )}
     </Fragment>
   )
 }

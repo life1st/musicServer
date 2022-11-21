@@ -12,6 +12,7 @@ import Navibar from '../Components/Navibar'
 import Cover from '../Components/Cover'
 import Songlist from '../Components/Songlist'
 import { EndFix } from '../Components/Scroller'
+import { Svg } from '../Components/Svg'
 
 const { Fragment, useEffect, useRef } = React
 
@@ -75,7 +76,7 @@ const AlbumDetail = (props) => {
                         <p className={style.year}>{albumDetail.year}</p> 
                     : null }
                     <div className={style.oprations}>
-                      <img src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={handleEdit} />
+                      <Svg src={require('../imgs/ic-edit.svg')} className={style.icEdit} onClick={handleEdit} />
                     </div>
                   </div>
                 </div>

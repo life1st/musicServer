@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as style from './styles/Menubar.module.less'
+import { Svg } from './Svg'
 import { useNavigate, useMatch } from 'react-router-dom'
 import { albumDetailState } from '../model/albumDetail'
 import { useRecoilValue } from 'recoil'
@@ -45,7 +46,7 @@ const MenuBar = (props) => {
     <div className={style.container}>
       {menus.map(menu => (
         <div key={menu.title} className={style.menuItem} onClick={menu.onClick}>
-          <img src={menu.icon} className={style.menuIcon} />
+          <Svg src={menu.icon} className={style.menuIcon} />
           <span className={style.menuText}>{menu.title}</span>
         </div>
       ))}

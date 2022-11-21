@@ -10,8 +10,15 @@ import './global.less'
 import 'reset-css'
 import dayJs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { 
+    auto as followSystemColorScheme,
+} from 'darkreader'
+import { darkModeConfig, autoDarkModeUtils } from './utils/darkmodeHelper'
 
 dayJs.extend(relativeTime)
+if (autoDarkModeUtils.getEnabled()) {
+    followSystemColorScheme(darkModeConfig) // enable auto darkmode
+}
 
 const { useMemo, Fragment} = React
 

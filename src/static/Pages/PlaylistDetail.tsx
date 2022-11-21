@@ -8,6 +8,7 @@ import { EndFix } from '../Components/Scroller'
 import Songlist from '../Components/Songlist'
 import Navibar  from '../Components/Navibar'
 import Cover from '../Components/Cover'
+import { Svg } from '../Components/Svg'
 const { useEffect, useState } = React
 
 const Playlist = (props) => {
@@ -50,7 +51,7 @@ const Playlist = (props) => {
                                 <div className={style.title}>{playlist.title}</div>
                                 <div className={style.time}>{dayJs(playlist.updateTime).fromNow()}</div>
                                 <div className={style.oprations}>
-                                    <img
+                                    <Svg
                                         src={require('../imgs/ic-delete.svg')}
                                         className={style.delete}
                                         onClick={handleDel}

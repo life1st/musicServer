@@ -1,6 +1,7 @@
 import * as React from 'react'
-import * as style from './SearchInput.module.less'
+import * as style from './styles/SearchInput.module.less'
 import cls from 'classnames'
+import { Svg } from './Svg'
 import { useFocus } from '../hooks/useFocus'
 
 const { useState, useMemo, useRef } = React
@@ -42,7 +43,7 @@ export const SearchInput = (props: Props) => {
   const showClear = useMemo(() => searchText.length, [searchText])
   return (
     <div className={cls(style.container, className)}>
-        <img src={require('../imgs/ic-search.svg')} className={style.searchIcon} />
+        <Svg src={require('../imgs/ic-search.svg')} className={style.searchIcon} />
         <input
           className={style.input}
           type="text" 
@@ -53,7 +54,7 @@ export const SearchInput = (props: Props) => {
           ref={searchInputRef}
         />
         { showClear ? (
-          <img src={require('../imgs/ic-cross.svg')} onClick={handleClear} className={style.icClose} />
+          <Svg src={require('../imgs/ic-cross.svg')} onClick={handleClear} className={style.icClose} />
         ) : null }
     </div>
   )
