@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumState, albumScrollState, albumPageState } from '../model/album'
 import { getAlbums, searchAlbum } from '../API'
-import { Album } from '../../types/Album'
+import { Album as IAlbum } from '../../types/Album'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { useCalColumn } from '../hooks/useCalColumn'
 import { Scroller } from '../Components/Scroller'
@@ -15,10 +15,10 @@ import { ROUTES } from '../consts'
 const { useRef, useMemo, useEffect, useCallback, Fragment} = React
 
 const { origin } = window.location
-type IlocState = {
+type ILocState = {
   q: string
 } | null
-const Album = (props: Album & {
+const Album = (props: IAlbum & {
   width?: number
 }) => {
   const { name, albumId, width } = props
@@ -67,10 +67,10 @@ const Albums = () => {
 
   const { list, loadNextPage, hasMore, loading, curPage } = useLoadmore({fetchData, listState: albumState}, searchText)
 
-  const containerRef = useRef<HTMLElement>()
+  const containerRef = useRef<HTMLElement>(null)
   const location = useLocation()
   useEffect(() => {
-    const state = location.state as IlocState
+    const state = location.state as ILocState
     const notRefresh = list.length > 0
     if (state?.q && notRefresh) {
       handleSearch(state.q)
@@ -92,9 +92,9 @@ const Albums = () => {
     }
   }
   const BASE_WIDTH = 116
-  const itemWidth = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
+  const { columnWidth, isDomReady } = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
 
-  const sameAlbumCheck = (acc, a) => acc.some(al => al.albumId === a.id) ? acc : acc.concat(a)
+  const sameAlbumCheck = (acc, a) => acc.some(al => al.albumId === a.albumId) ? acc : acc.concat(a)
 
   return (
     <Fragment>
@@ -113,9 +113,11 @@ const Albums = () => {
         showLoading={hasMore}
         ref={containerRef}
       >
-        { list.reduce(sameAlbumCheck, []).map(album => (
-          <li key={album.albumId} className={style.albumItem}><Album  {...album} width={itemWidth.current} /></li>
-        )) }
+        { isDomReady ? list.reduce(sameAlbumCheck, []).map(album => (
+          <li key={album.albumId} className={style.albumItem}>
+            <Album  {...album} width={columnWidth} />
+          </li>
+        )) : null }
       </Scroller>
     </Fragment>
   )

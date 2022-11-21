@@ -38,11 +38,18 @@ const Scroller = forwardRef((props: React.PropsWithChildren<Props>, ref) => {
   } = props
 
   const listRef = useRef<HTMLElement>()
+  const scrollToMemoPosition = () => {
+    setTimeout(() => {
+      if (initScrollTop && listRef.current) {
+        listRef.current.scrollTop = initScrollTop
+      }
+    }, 0)
+  }
   useEffect(() => {
-    if (initScrollTop && listRef.current) {
-      listRef.current.scrollTop = initScrollTop
+    if (listRef.current) {
+      scrollToMemoPosition()
     }
-  }, [])
+  }, [listRef])
   useImperativeHandle(ref, () => ({
     clientWidth: listRef.current?.clientWidth,
   }))
