@@ -4,7 +4,7 @@ import cls from 'classnames'
 import { Svg } from './Svg'
 import { useFocus } from '../hooks/useFocus'
 
-const { useState, useMemo, useRef } = React
+const { useState, useMemo, useRef, useEffect } = React
 
 interface Props {
   onSearch: (val: string) => void;
@@ -20,6 +20,10 @@ export const SearchInput = (props: Props) => {
 
   const searchInputRef = useRef<HTMLInputElement>()
   useFocus(autoFocus ? searchInputRef : undefined)
+
+  useEffect(() => {
+    setSearchText(initText)
+  }, [initText])
   
   const handleChange = (e) => {
     const val = e.target.value

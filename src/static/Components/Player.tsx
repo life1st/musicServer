@@ -18,6 +18,41 @@ import Cover from './Cover'
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
 
+const PlayerInfo  = (props: Music | null) => {
+    const naviTo = useNavigate()
+
+    if (!props) {
+        return (
+            <p className={style.fullTitle}>No Playing</p>
+        )
+    }
+
+    const { artist, album, albumId } = props
+    const desc = artist && album ? `${artist} - ${artist}` : artist || album || ''
+    const jumpToArtist = () => {
+        naviTo(ROUTES.ALBUMS, {
+            state: { q: artist }
+        })
+    }
+    const jumpToAlbum = () => {
+        if (!albumId) {
+            return
+        }
+        naviTo(ROUTES.ALBUM_DETAIL.replace(':albumId', albumId))
+    }
+    return (
+        <div title={desc} className={style.fullDesc}>
+            { artist ? (
+                <a onClick={jumpToArtist} className={style.partDesc}>{artist}</a>
+            ) : null }
+            { artist && album ? ('-') : null }
+            { album ? (
+                <a onClick={jumpToAlbum} className={style.partDesc}>{album}</a>
+            ) : null }
+        </div>
+    )
+}
+
 interface IPlayer {
     onPlayEnd?: (PLAY_MODE) => () => void;
     onPlayError?: (m: Music) => void;
@@ -99,7 +134,7 @@ export const Player = (props: IPlayer) => {
 
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
-    const audioRef = useRef<HTMLAudioElement>()
+    const audioRef = useRef<HTMLAudioElement>(null)
     useEffect(() => {
         if (music && audioRef.current) {
             audioRef.current.currentTime = 0
@@ -148,7 +183,7 @@ export const Player = (props: IPlayer) => {
 
     const handleGoList = () => { naviTo(ROUTES.PLAYING_LIST)}
 
-    const fullProgressRef = useRef<HTMLElement>()
+    const fullProgressRef = useRef<HTMLDivElement>(null)
     const handleProgressSet = useCallback((progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
             audioRef.current.currentTime = progress / 100 * curDuration.current
@@ -161,7 +196,7 @@ export const Player = (props: IPlayer) => {
     useProgress({el: fullProgressRef.current, onProgressSet: handleProgressSet, onMove: handleProgressMove})
     const progressPercent = Number((time / curDuration.current * 100).toFixed(2))
 
-    const volumeRef = useRef()
+    const volumeRef = useRef<HTMLDivElement>(null)
     const handleVolumeSet = (progress: number) => {
         setVolume(progress / 100)
         if (audioRef.current) {
@@ -257,7 +292,7 @@ export const Player = (props: IPlayer) => {
                         { music ? (
                             <Fragment>
                                 <p className={style.fullTitle} title={music.title}>{music.title}</p>
-                                <p className={style.fullDesc} title={info.desc}>{info.desc}</p>
+                                <PlayerInfo {...music as Music} />
                             </Fragment>
                         ) : <p>{info.title}</p> }
                     </div>

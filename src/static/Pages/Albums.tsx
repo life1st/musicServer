@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './styles/Albums.module.less'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumState, albumScrollState, albumPageState } from '../model/album'
 import { getAlbums, searchAlbum } from '../API'
@@ -10,17 +10,21 @@ import { useCalColumn } from '../hooks/useCalColumn'
 import { Scroller } from '../Components/Scroller'
 import Cover from '../Components/Cover'
 import { SearchInput } from '../Components/SearchInput'
+import { ROUTES } from '../consts'
 
 const { useRef, useMemo, useEffect, useCallback, Fragment} = React
 
 const { origin } = window.location
+type IlocState = {
+  q: string
+} | null
 const Album = (props: Album & {
   width?: number
 }) => {
   const { name, albumId, width } = props
   const naviTo = useNavigate()
   const handleLClick = () => {
-    naviTo('/album/' + albumId)
+    naviTo(ROUTES.ALBUM_DETAIL.replace(':albumId', albumId))
   }
   const styles = useMemo(() => {
     const mpw = 12 * 2 + 4 * 2 // margin + padding
@@ -64,7 +68,13 @@ const Albums = () => {
   const { list, loadNextPage, hasMore, loading, curPage } = useLoadmore({fetchData, listState: albumState}, searchText)
 
   const containerRef = useRef<HTMLElement>()
-  
+  const location = useLocation()
+  useEffect(() => {
+    const state = location.state as IlocState
+    if (state?.q) {
+      handleSearch(state.q)
+    }
+  }, [location])
 
   const handleSearch = async (val: string) => {
     setAlbumPageState(state => ({

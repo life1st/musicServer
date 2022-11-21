@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useThrottleFn } from 'ahooks'
 
 interface Params {
-    el: HTMLElement | undefined,
+    el: HTMLDivElement | null,
     onProgressSet: (progress: number) => void;
     onMove?: (progress: number) => void;
 }
