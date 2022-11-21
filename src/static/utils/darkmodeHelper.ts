@@ -4,10 +4,11 @@ export const darkModeConfig = {
   sepia: 0,
 }
 
-const localKey = '__auto_set_system_color__'
+const autoDarkKey = '__auto_set_system_color__'
+const isUsingDarkKey = '__is_using_dark_mode__'
 export const autoDarkModeUtils = {
-  getEnabled() {
-    const result = localStorage.getItem(localKey) || ''
+  getEnabledAuto() {
+    const result = localStorage.getItem(autoDarkKey) || ''
     if (!['0', '1'].includes(result)) {
       // if unset, open by default
       autoDarkModeUtils.setEnable(true)
@@ -16,6 +17,12 @@ export const autoDarkModeUtils = {
     return result === '1'
   },
   setEnable(isEnable: boolean) {
-    localStorage.setItem(localKey, isEnable ? '1' : '0')
+    localStorage.setItem(autoDarkKey, isEnable ? '1' : '0')
+  },
+  isUsingDark() {
+    return localStorage.getItem(isUsingDarkKey) === '1'
+  },
+  setIsUsingDark(isUsingDark: boolean) {
+    localStorage.setItem(isUsingDarkKey, isUsingDark ? '1' : '0')
   }
 }

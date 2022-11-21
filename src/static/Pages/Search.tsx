@@ -72,6 +72,7 @@ const Search = (props) => {
     }))
   }
   const handleOpenMenu = async () => {
+    const isAutoDark = autoDarkModeUtils.getEnabledAuto()
     confirm({
       unmountDelay: 1,
       options: [{
@@ -88,12 +89,13 @@ const Search = (props) => {
         text: isEnableDark ? 'disable DarkMode' : 'enable DarkMode',
         action: () => {
           isEnableDark ? disableDarkMode() : enableDarkMode(darkModeConfig)
+          autoDarkModeUtils.setIsUsingDark(!isEnableDark)
           setDark(!isEnableDark)
         }
       }, {
-        text: autoDarkModeUtils.getEnabled() ? 'disable auto darkmode' : 'enable auto darkmode',
+        text: isAutoDark ? 'disable auto darkmode' : 'enable auto darkmode',
         action: () => {
-          autoDarkModeUtils.setEnable(!autoDarkModeUtils.getEnabled())
+          autoDarkModeUtils.setEnable(!isAutoDark)
         }
       }]
     })
