@@ -71,7 +71,8 @@ const Albums = () => {
   const location = useLocation()
   useEffect(() => {
     const state = location.state as IlocState
-    if (state?.q) {
+    const notRefresh = list.length > 0
+    if (state?.q && notRefresh) {
       handleSearch(state.q)
     }
   }, [location])

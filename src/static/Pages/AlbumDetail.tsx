@@ -24,7 +24,7 @@ const AlbumDetail = (props) => {
   const naviTo = useNavigate()
 
   const handleBack = () => {
-    naviTo('/albums', { replace: true })
+    naviTo(ROUTES.ALBUMS, { replace: true })
   }
   const handleMusicItemClick = (music, i) => {
     const list = albumDetail?.songs || []
@@ -54,14 +54,21 @@ const AlbumDetail = (props) => {
     }
   }, [albumId])
 
-  const titleRef = useRef()
+  const titleRef = useRef<HTMLParagraphElement>(null)
   const [ titleInView ] = useInViewport(titleRef)
+  const jumpToArtist = () => {
+    naviTo(ROUTES.ALBUMS, {
+      state: {
+        q: albumDetail?.artist
+      }
+    })
+  }
 
   const hasCurData = albumDetail && albumDetail.albumId === albumId
-
+  const hideTitleInNavi = titleInView === undefined || titleInView || !hasCurData
   return (
     <div className={style.container}>
-      <Navibar onBack={handleBack} title={titleInView || !hasCurData ? null : albumDetail?.name} />
+      <Navibar onBack={handleBack} title={hideTitleInNavi ? null : albumDetail?.name} />
       {
         hasCurData ? (
           <Fragment>
@@ -71,7 +78,7 @@ const AlbumDetail = (props) => {
                   <Cover src={`/file/album_cover/${albumDetail.albumId}`} className={style.coverImg} />
                   <div className={style.detailInfo}>
                     <p className={style.title} ref={titleRef}>{albumDetail.name}</p>
-                    <p className={style.artist}>{albumDetail.artist}</p>
+                    <p className={style.artist} onClick={jumpToArtist}>{albumDetail.artist}</p>
                     { albumDetail.year ? 
                         <p className={style.year}>{albumDetail.year}</p> 
                     : null }

@@ -40,8 +40,8 @@ albumApiRoute
   const { q, pageNum = 0 } = query as { q: string, pageNum: number }
   const albumsByName = await album.getAlbumList({name: q, pageNum})
   const albumsByArtist =  await album.getAlbumList({artist: q, pageNum})
-  const albums = [...albumsByName, ...albumsByArtist]
-  ctx.body = albums.map(album => excludeProps(album, ['_id', 'musicIds'])).filter((_, i) => albums.findIndex(a => a.albumId) === i)
+  const albums = [...albumsByName, ...albumsByArtist].map(album => excludeProps(album, ['_id', 'musicIds']))
+  ctx.body = albums.filter((album, i) => albums.findIndex(a => a.albumId === album.albumId) === i)
 })
 
 export { albumApiRoute }

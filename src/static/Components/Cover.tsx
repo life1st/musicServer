@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cls from 'classnames'
-import styl from './styles/Cover.module.less'
+import * as styl from './styles/Cover.module.less'
 import { Svg } from './Svg'
 
 const { useEffect, useState, Fragment } = React
