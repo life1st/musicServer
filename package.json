@@ -10,7 +10,7 @@
     "watch": "ts-node ./build/server.ts --watch",
     "build": "ts-node ./build/server.ts --build",
     "fe": "parcel ./src/static/index.html --dist-dir=dist/static",
-    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --reporter @parcel/reporter-bundle-analyzer"
+    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --no-source-maps --reporter @parcel/reporter-bundle-analyzer"
   },
   "dependencies": {
     "ahooks": "^3.7.0",

@@ -13,6 +13,7 @@ const MenuBar = (props) => {
   const albumDetail = useRecoilValue(albumDetailState)
 
   const matchAlbumDetail = useMatch(ROUTES.ALBUM_DETAIL)
+  const matchAlbums = useMatch(ROUTES.ALBUMS)
 
   const params = useMemo(() => {
     return matchAlbumDetail ? { replace: true } : {}
@@ -25,9 +26,9 @@ const MenuBar = (props) => {
       title: 'Albums',
       icon: require('../imgs/ic-album.svg'),
       onClick: () => {
-        if (albumDetail?.albumId) {
+        if (albumDetail?.albumId && !matchAlbumDetail && !matchAlbums) {
           navigator(`/album/${albumDetail.albumId}`, params)
-        } else {
+        } else if (!matchAlbums) {
           navigator('/albums', params)
         }
       }

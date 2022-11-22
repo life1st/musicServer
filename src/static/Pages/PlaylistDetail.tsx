@@ -9,6 +9,9 @@ import Songlist from '../Components/Songlist'
 import Navibar  from '../Components/Navibar'
 import Cover from '../Components/Cover'
 import { Svg } from '../Components/Svg'
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayJs.extend(relativeTime)
+
 const { useEffect, useState } = React
 
 const Playlist = (props) => {

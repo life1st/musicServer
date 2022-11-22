@@ -115,7 +115,7 @@ const Albums = () => {
       >
         { isDomReady ? list.reduce(sameAlbumCheck, []).map(album => (
           <li key={album.albumId} className={style.albumItem}>
-            <Album  {...album} width={columnWidth} />
+            <Album {...album} width={columnWidth} />
           </li>
         )) : null }
       </Scroller>

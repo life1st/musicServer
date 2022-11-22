@@ -2,29 +2,17 @@ import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter as Router, useMatch } from 'react-router-dom'
 import { RecoilRoot } from 'recoil'
-import { Player } from './Components/Player'
-import { Pages } from './router'
 import Menubar from './Components/Menubar'
 import { useGlobalTitle } from './hooks/useGlobalTitle'
 import './global.less'
 import 'reset-css'
-import dayJs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { 
-    auto as followSystemColorScheme,
-    enable as enableDarkMode,
-} from 'darkreader'
-import { darkModeConfig, autoDarkModeUtils } from './utils/darkmodeHelper'
+import { darkModeSupport } from './utils/darkmodeHelper'
 
-dayJs.extend(relativeTime)
-const autoEnableDarkMode = autoDarkModeUtils.getEnabledAuto()
-if (autoEnableDarkMode) {
-    followSystemColorScheme(darkModeConfig) // enable auto darkmode
-} else if (autoDarkModeUtils.isUsingDark()) { // auto disabled, use saved setting.
-    enableDarkMode(darkModeConfig)
-}
+darkModeSupport()
+const { useMemo, Fragment, lazy} = React
 
-const { useMemo, Fragment} = React
+const Player = lazy(() => import('./Components/Player'))
+const Pages = lazy(() => import('./router'))
 
 const App = () => {
     const matchPlayer = useMatch('playing')

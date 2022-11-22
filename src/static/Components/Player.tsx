@@ -59,7 +59,7 @@ interface IPlayer {
     onPrevSong?: () => void;
     onNextSong?: () => void;
 }
-export const Player = (props: IPlayer) => {
+const Player = (props: IPlayer) => {
     const match = useMatch('playing')
     const naviTo = useNavigate()
 
@@ -365,3 +365,5 @@ export const Player = (props: IPlayer) => {
         </Fragment>
     )
 }
+
+export default Player

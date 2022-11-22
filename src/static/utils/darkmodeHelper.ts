@@ -1,3 +1,9 @@
+import { 
+  auto as followSystemColorScheme,
+  enable as enableDarkMode,
+} from 'darkreader'
+
+
 export const darkModeConfig = {
   brightness: 100,
   contrast: 90,
@@ -24,5 +30,14 @@ export const autoDarkModeUtils = {
   },
   setIsUsingDark(isUsingDark: boolean) {
     localStorage.setItem(isUsingDarkKey, isUsingDark ? '1' : '0')
+  }
+}
+
+export const darkModeSupport = () => {
+  const autoEnableDarkMode = autoDarkModeUtils.getEnabledAuto()
+  if (autoEnableDarkMode) {
+      followSystemColorScheme(darkModeConfig) // enable auto darkmode
+  } else if (autoDarkModeUtils.isUsingDark()) { // auto disabled, use saved setting.
+      enableDarkMode(darkModeConfig)
   }
 }

@@ -10,6 +10,8 @@ import { playlistState } from '../model/playlist'
 import { Playlist as IPlaylist } from '../../types/Playlist'
 import { Svg } from './Svg'
 import Cover from './Cover'
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayJs.extend(relativeTime)
 
 const { useEffect } = React
 const PlaylistItem = (props: IPlaylist & {

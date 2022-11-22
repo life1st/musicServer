@@ -5,10 +5,6 @@ import {
   useNavigate,
   useMatch
 } from 'react-router-dom'
-import Library from './Pages/Library'
-import Search from './Pages/Search'
-import Albums from './Pages/Albums'
-import PlayingList from './Pages/PlayingList'
 import { EndFix } from './Components/Scroller'
 import { ROUTES } from './consts'
 
@@ -19,8 +15,12 @@ const MusicEditor = lazy(() => import('./Pages/MusicEditor'))
 const AlbumEditor = lazy(() => import('./Pages/AlbumEditor'))
 const PlaylistDetail = lazy(() => import('./Pages/PlaylistDetail'))
 const Playlists = lazy(() => import('./Pages/Playlists'))
+const Library = lazy(() => import('./Pages/Library'))
+const Search = lazy(() => import('./Pages/Search'))
+const Albums = lazy(() => import('./Pages/Albums'))
+const PlayingList = lazy(() => import('./Pages/PlayingList'))
 
-export const Pages = () => {
+const Pages = () => {
   const pages = [{
       name: 'Library',
       path: ROUTES.LIBRARY,
@@ -84,3 +84,5 @@ export const Pages = () => {
     </Suspense>
   )
 }
+
+export default Pages
