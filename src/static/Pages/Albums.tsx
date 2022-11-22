@@ -92,7 +92,12 @@ const Albums = () => {
     }
   }
   const BASE_WIDTH = 116
-  const { columnWidth, isDomReady } = useCalColumn({baseWidth: BASE_WIDTH, containerRef})
+  const MIN_COLUMN = 3
+  const { columnWidth, isDomReady } = useCalColumn({
+    baseWidth: BASE_WIDTH,
+    minColumn: MIN_COLUMN,
+    containerRef
+  })
 
   const sameAlbumCheck = (acc, a) => acc.some(al => al.albumId === a.albumId) ? acc : acc.concat(a)
 
