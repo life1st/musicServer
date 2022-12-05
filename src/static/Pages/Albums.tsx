@@ -42,9 +42,11 @@ const Album = (props: IAlbum & {
   return (
     <div className={style.albumContainer} title={name} style={styles.container}>
       <Cover
+        style={styles.cover}
         src={`${origin}/file/album_cover/${albumId}`} 
         className={style.albumCoverImg}
         onClick={handleLClick}
+        disablePreview={true}
       />
       <p className={style.albumTitle}>{name}</p>
     </div>
@@ -119,7 +121,7 @@ const Albums = () => {
         ref={containerRef}
       >
         { isDomReady ? list.reduce(sameAlbumCheck, []).map(album => (
-          <li key={album.albumId} className={style.albumItem}>
+          <li key={album.albumId} className={style.albumItem} style={{width: columnWidth}}>
             <Album {...album} width={columnWidth} />
           </li>
         )) : null }

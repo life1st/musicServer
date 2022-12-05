@@ -54,6 +54,7 @@ class Library {
                     if (musicMetaTasks.every(t => !t) && scanMusicCache.length === 0 && !scanProcess) {
                         console.log(`scan finish. ${musicMetaProcesses.length} Process, ${musicCount} MusicCount, Time:`, (Date.now() - startTime) / 1000 + 's')
                         musicMetaProcesses = []
+                        this.isScanning = false
                     }
                 }
             })
@@ -114,6 +115,7 @@ class Library {
     }): Promise<[scanning: typeof this.scanningQueue, finishCount: number]> {
         if (!this.isScanning) {
             this.scanMulticore(config)
+            this.isScanning = true
         }
         return [this.scanningQueue.slice(0, 10), this.finishQueue.length]
     }

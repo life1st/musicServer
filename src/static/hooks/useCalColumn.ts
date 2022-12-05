@@ -12,14 +12,15 @@ export const useCalColumn = ({
   let width = useRef(baseWidth)
   let [ domReady, setDomReady ] = useState(!!containerRef.current)
   useEffect(() => {
-    if (containerRef.current) {
-      const containerWidth = containerRef.current.clientWidth - 5
+    const isReady = !!containerRef.current
+    setDomReady(isReady)
+    if (isReady) {
+      let containerWidth = containerRef.current.clientWidth - 10
       const columns = Math.max(Math.floor(containerWidth / baseWidth), minColumn)
+      
       width.current = Math.floor(containerWidth / columns)
     }
-  }, [])
-  useEffect(() => {
-    setDomReady(!!containerRef.current)
   }, [containerRef])
+  
   return { columnWidth: width.current, isDomReady: domReady }
 }

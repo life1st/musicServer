@@ -15,7 +15,7 @@ interface Props {
 const icCoverDefault = require('../imgs/ic-album-default.svg')
 
 const Cover = (props: Props) => {
-  const { src, defaultSrc = icCoverDefault, className = '', style, disablePreview = true } = props
+  const { src, defaultSrc = icCoverDefault, className = '', style, disablePreview = false } = props
   const { onClick } = props
   const [ showPreview, setPreviewState ] = useState(false)
   const [ url, setUrl ] = useState('')
@@ -47,33 +47,37 @@ const Cover = (props: Props) => {
 
   return (
     <Fragment>
-      <div className={cls({
-        [styl.coverPreviewBox]: true,
-        [styl.coverPreviewBoxShow]: showPreview,
-        [styl.coverPreviewBoxHide]: !showPreview
-      })} onClick={handleClickPreview}>
-        {url ? (
-          <img
-            onError={handleLoadError}
-            className={cls({
-              [styl.coverPreview]: true,
-              [styl.coverPreviewShow]: showPreview,
-              [styl.coverPreviewHide]: !showPreview,
-            })}
-            src={url}
-            style={style}
-          />
-        ) : (
-          <Svg 
-            src={defaultSrc}
-            className={cls({
-              [styl.coverPreview]: true,
-              [styl.coverPreviewShow]: showPreview,
-              [styl.coverPreviewHide]: !showPreview,
-            })}
-          />
-        )}
-      </div>
+      {
+        disablePreview ? null : (
+          <div className={cls({
+            [styl.coverPreviewBox]: true,
+            [styl.coverPreviewBoxShow]: showPreview,
+            [styl.coverPreviewBoxHide]: !showPreview
+          })} onClick={handleClickPreview}>
+            {url ? (
+              <img
+                onError={handleLoadError}
+                className={cls({
+                  [styl.coverPreview]: true,
+                  [styl.coverPreviewShow]: showPreview,
+                  [styl.coverPreviewHide]: !showPreview,
+                })}
+                src={url}
+                style={style}
+              />
+            ) : (
+              <Svg 
+                src={defaultSrc}
+                className={cls({
+                  [styl.coverPreview]: true,
+                  [styl.coverPreviewShow]: showPreview,
+                  [styl.coverPreviewHide]: !showPreview,
+                })}
+              />
+            )}
+          </div>
+        )
+      }
       { url ? (
         <img
           onClick={handleClick}

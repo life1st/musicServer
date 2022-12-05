@@ -7,15 +7,17 @@ import {
 } from 'react-router-dom'
 import { EndFix } from './Components/Scroller'
 import { ROUTES } from './consts'
+// import AlbumDetail from './Pages/AlbumDetail'
+// import Library from './Pages/Library'
 
 const { useEffect, lazy, Suspense } = React
 
+const Library = lazy(() => import('./Pages/Library'))
 const AlbumDetail = lazy(() => import('./Pages/AlbumDetail'))
 const MusicEditor = lazy(() => import('./Pages/MusicEditor'))
 const AlbumEditor = lazy(() => import('./Pages/AlbumEditor'))
 const PlaylistDetail = lazy(() => import('./Pages/PlaylistDetail'))
 const Playlists = lazy(() => import('./Pages/Playlists'))
-const Library = lazy(() => import('./Pages/Library'))
 const Search = lazy(() => import('./Pages/Search'))
 const Albums = lazy(() => import('./Pages/Albums'))
 const PlayingList = lazy(() => import('./Pages/PlayingList'))

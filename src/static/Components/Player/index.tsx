@@ -1,57 +1,29 @@
 import * as React from 'react'
-import * as style from './styles/Player.module.less'
-import { useMatch, useNavigate } from 'react-router-dom'
-import { ROUTES } from '../consts'
+import * as style from './Player.module.less'
+import { useMatch, useNavigate, useParams } from 'react-router-dom'
 import cls from 'classnames'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { musicState, playingState } from '../model/playing'
 import { useMemoizedFn } from 'ahooks'
-import { PLAY_MODE } from '../consts'
-import { RESP_STATE } from '../../shareCommon/consts'
-import { Music } from '../../types/Music'
-import { deleteMusic } from '../API'
-import { useProgress } from '../hooks/useProgress'
-import { useShortcuts } from '../hooks/useShortcuts'
-import { Svg } from './Svg'
-import Cover from './Cover'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { ROUTES } from '../../consts'
+import { musicState, playingState } from '../../model/playing'
+import { PLAY_MODE } from '../../consts'
+import { RESP_STATE } from '../../../shareCommon/consts'
+import { Music } from '../../../types/Music'
+import { deleteMusic } from '../../API'
+import { useProgress } from '../../hooks/useProgress'
+import { useShortcuts } from '../../hooks/useShortcuts'
+import { Svg } from '../Svg'
+import Cover from '../Cover'
+import PlayerInfo from './PlayerInfo'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
 
-const PlayerInfo  = (props: Music | null) => {
-    const naviTo = useNavigate()
-
-    if (!props) {
-        return (
-            <p className={style.fullTitle}>No Playing</p>
-        )
-    }
-
-    const { artist, album, albumId } = props
-    const desc = artist && album ? `${artist} - ${artist}` : artist || album || ''
-    const jumpToArtist = () => {
-        naviTo(ROUTES.ALBUMS, {
-            state: { q: artist }
-        })
-    }
-    const jumpToAlbum = () => {
-        if (!albumId) {
-            return
-        }
-        naviTo(ROUTES.ALBUM_DETAIL.replace(':albumId', albumId))
-    }
-    return (
-        <div title={desc} className={style.fullDesc}>
-            { artist ? (
-                <a onClick={jumpToArtist} className={style.partDesc}>{artist}</a>
-            ) : null }
-            { artist && album ? ('-') : null }
-            { album ? (
-                <a onClick={jumpToAlbum} className={style.partDesc}>{album}</a>
-            ) : null }
-        </div>
-    )
-}
+const icNext = require('../../imgs/ic-next.svg')
+const icPause = require('../../imgs/ic-pause.svg')
+const icPlay = require('../../imgs/ic-play.svg')
+const icAudioHigh = require('../../imgs/ic-audio-high.svg')
+const icCheckList = require('../../imgs/ic-checklist.svg')
 
 interface IPlayer {
     onPlayEnd?: (PLAY_MODE) => () => void;
@@ -60,7 +32,7 @@ interface IPlayer {
     onNextSong?: () => void;
 }
 const Player = (props: IPlayer) => {
-    const match = useMatch('playing')
+    const matchPlaying = useMatch('playing')
     const naviTo = useNavigate()
 
     const { music } = useRecoilValue(musicState)
@@ -198,7 +170,11 @@ const Player = (props: IPlayer) => {
 
     const volumeRef = useRef<HTMLDivElement>(null)
     const handleVolumeSet = (progress: number) => {
-        setVolume(progress / 100)
+        const percent = progress / 100
+        if (percent < 0 || percent > 1) {
+            return
+        }
+        setVolume(percent)
         if (audioRef.current) {
             audioRef.current.volume = progress / 100
         }
@@ -208,7 +184,7 @@ const Player = (props: IPlayer) => {
     useShortcuts({
         'space': {
             handler: ({ctrl}) => {
-                if (match || ctrl) {
+                if (matchPlaying || ctrl) {
                     music ? isPlaying ? handlePause() : handlePlay() : null
                 }
             }
@@ -216,7 +192,7 @@ const Player = (props: IPlayer) => {
         'arrowdown': {
             handler: () => {
                 const nextVolume = volume * 100 - 10
-                if (match && nextVolume > 0) {
+                if (matchPlaying && nextVolume > 0) {
                     handleVolumeSet(nextVolume)
                 }
             }
@@ -224,7 +200,7 @@ const Player = (props: IPlayer) => {
         'arrowup': {
             handler: () => {
                 const nextVolume = volume * 100 + 10
-                if (match && nextVolume <= 100) {
+                if (matchPlaying && nextVolume <= 100) {
                     handleVolumeSet(nextVolume)
                 }
             }
@@ -282,8 +258,9 @@ const Player = (props: IPlayer) => {
     return (
         <Fragment>
             <audio controls src={info.src} ref={audioRef} className={style.audioRef} />
-            { match ? (
+            { matchPlaying ? (
                 <div className={style.fullContainer}>
+                    <Svg src={require('../../imgs/arrow-down.svg')} className={style.icCloseFullPlayer} />
                     <div className={style.coverContainer}>
                         <Cover src={info.cover} className={cls(style.fullCover, music ? style.playing : '')} />
                         {music ? <Cover src={info.cover} className={style.fullCoverBlur} /> : null}
@@ -313,36 +290,38 @@ const Player = (props: IPlayer) => {
                     </div>
                     <button onClick={switchPlayMode}>{playModeText}</button>
                     <div className={style.controlBtns}>
-                        <Svg src={require('../imgs/ic-next.svg')} className={style.btnPrev} onClick={handlePlayPrev} />
+                        <Svg src={icNext} className={style.btnPrev} onClick={handlePlayPrev} />
                         {
                             isPlaying ? (
-                                <Svg src={require('../imgs/ic-pause.svg')} className={style.btnPause} onClick={handlePause} />
+                                <Svg src={icPause} className={style.btnPause} onClick={handlePause} />
                             ) : (
-                                <Svg src={require('../imgs/ic-play.svg')} className={style.btnPlay} onClick={handlePlay} />
+                                <Svg src={icPlay} className={style.btnPlay} onClick={handlePlay} />
                             )
                         }
-                        <Svg src={require('../imgs/ic-next.svg')} className={style.btnNext} onClick={handlePlayNext} />
+                        <Svg src={icNext} className={style.btnNext} onClick={handlePlayNext} />
                     </div>
                     <div className={style.endingContainer}>
                         <div 
                             className={style.volumeContainer}
                             ref={volumeRef}
                         >
-                            <Svg src={require('../imgs/ic-audio-high.svg')} className={style.icVolume} />
+                            <Svg src={icAudioHigh} className={style.icVolume} />
                             <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
                             <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
                         </div>
-                        <Svg src={require('../imgs/ic-checklist.svg')} className={style.icPlayinglist} onClick={handleGoList} />
+                        <Svg src={icCheckList} className={style.icPlayinglist} onClick={handleGoList} />
                     </div>
                 </div>
             ) : (
                 <div className={style.miniContainer}>
                     <Cover src={info.cover} className={style.cover} onClick={naviToFullplayer} />
-                    <p className={style.infoText} title={info.title} onClick={naviToFullplayer}>{info.title}</p>
+                    <div className={style.infoText} title={info.title} onClick={naviToFullplayer}>
+                        <p>{info.title}</p>
+                    </div>
                     <div className={style.oprations}>
                         <Svg
                             onClick={isPlaying ? handlePause : handlePlay}
-                            src={isPlaying ? require('../imgs/ic-pause.svg') : require('../imgs/ic-play.svg') } 
+                            src={isPlaying ? icPause : icPlay } 
                             className={cls(
                                 style.icOperation,
                                 isPlaying ? style.icPause : ''
@@ -350,7 +329,7 @@ const Player = (props: IPlayer) => {
                         />
                         <Svg
                             onClick={handlePlayNext}
-                            src={require('../imgs/ic-next.svg')}
+                            src={icNext}
                             className={cls(
                                 style.icOperation,
                                 style.icNext

@@ -11,6 +11,7 @@
     flex-direction: column;
     align-items: center;
     padding-top: 60px;
+    position: relative;
     .coverContainer {
         position: relative;
         @s: 180px;
@@ -67,6 +68,7 @@
             text-overflow: ellipsis;
             overflow: hidden;
             width: 80%;
+            text-align: center;
         }
         .partDesc {
             margin: 0 4px;
@@ -234,6 +236,20 @@
             top: -(@s - @h) * 0.5;
         }
     }
+    .icCloseFullPlayer {
+        @s: 24px;
+        width: @s;
+        height: @s;
+        position: absolute;
+    }
+    .AudioWave {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+    }
 }
 
 .miniContainer {
@@ -283,6 +299,10 @@
         overflow: hidden;
         line-height: 1.5;
         font-size: 15px;
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        padding-bottom: 8px;
     }
     .progressContainer {
         position: absolute;
