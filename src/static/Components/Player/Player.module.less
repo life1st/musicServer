@@ -12,6 +12,15 @@
     align-items: center;
     padding-top: 60px;
     position: relative;
+    transition: all .3s;
+    &.hideFull {
+        transform: translateY(110%);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
     .coverContainer {
         position: relative;
         @s: 180px;
@@ -237,10 +246,18 @@
         }
     }
     .icCloseFullPlayer {
-        @s: 24px;
+        @s: 36px;
         width: @s;
         height: @s;
         position: absolute;
+        @mg: 16px;
+        top: @mg;
+        left: @mg;
+        border-radius: @s * 0.5;
+        transition: background-color .2s;
+        &:hover {
+            background-color: #ccc;
+        }
     }
     .AudioWave {
         position: absolute;
@@ -319,5 +336,20 @@
         height: 2px;
         border-radius: 2px;
         background-color: rgb(192, 62, 62);
+    }
+}
+
+:global {
+    .fullplayer-transition {
+        &-enter,
+        &-exit-done {
+            opacity: 0;
+            transform: translateY(110%);
+        }
+        &-exit,
+        &-enter-done {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 }

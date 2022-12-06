@@ -4,6 +4,7 @@ import { useMatch, useNavigate, useParams } from 'react-router-dom'
 import cls from 'classnames'
 import { useMemoizedFn } from 'ahooks'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { CSSTransition } from 'react-transition-group'
 import { ROUTES } from '../../consts'
 import { musicState, playingState } from '../../model/playing'
 import { PLAY_MODE } from '../../consts'
@@ -15,6 +16,7 @@ import { useShortcuts } from '../../hooks/useShortcuts'
 import { Svg } from '../Svg'
 import Cover from '../Cover'
 import PlayerInfo from './PlayerInfo'
+import AudioWave from '../AudioWave'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
@@ -43,7 +45,16 @@ const Player = (props: IPlayer) => {
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
-    const naviToFullplayer = () => naviTo('/playing')
+    const naviToFullplayer = useMemoizedFn(() => {
+        if (music) {
+            naviTo('/playing')
+        }
+    })
+    const naviBack = useMemoizedFn(() => naviTo(-1))
+    const waveRef = useRef<{
+        start: () => void
+        stop: () => void
+    }>()
     const handleSwitchPlaying = useMemoizedFn((type) => () => {
         let nextIndex: number = -1
         if (curIndex !== null) {
@@ -95,12 +106,18 @@ const Player = (props: IPlayer) => {
         setIsPlaying(false)
         checkHasMusic(() => {
             audioRef.current?.pause()
-        })
+            setTimeout(() => {
+                if (!isPlaying) {
+                    waveRef.current?.stop()
+                }
+            }, 300);
+        }) 
     }
     const handlePlay = () => {
         setIsPlaying(true)
         checkHasMusic(() => {
             audioRef.current?.play()
+            waveRef.current?.start()
         })
     }
 
@@ -110,9 +127,7 @@ const Player = (props: IPlayer) => {
     useEffect(() => {
         if (music && audioRef.current) {
             audioRef.current.currentTime = 0
-            setTimeout(() => {
-                audioRef.current?.play()
-            }, 0)
+            setTimeout(handlePlay, 10)
         }
         audioRef.current?.addEventListener('ended', handlePlayEnd)
         return () => {
@@ -255,12 +270,23 @@ const Player = (props: IPlayer) => {
         }
     }, [time, curDuration.current])
 
+    const fullPlayerRef = useRef<HTMLDivElement>(null)
     return (
         <Fragment>
             <audio controls src={info.src} ref={audioRef} className={style.audioRef} />
-            { matchPlaying ? (
-                <div className={style.fullContainer}>
-                    <Svg src={require('../../imgs/arrow-down.svg')} className={style.icCloseFullPlayer} />
+            <CSSTransition 
+                in={Boolean(matchPlaying)}
+                nodeRef={fullPlayerRef}
+                timeout={350}
+                classNames={'fullplayer-transition'}
+            >
+                <div className={cls(style.fullContainer, !matchPlaying ? style.hideFull : '')} ref={fullPlayerRef}>
+                    <AudioWave
+                        ref={waveRef}
+                        audioRef={audioRef}
+                        className={style.AudioWave}
+                    />
+                    <Svg src={require('../../imgs/arrow-down.svg')} className={style.icCloseFullPlayer} onClick={naviBack} />
                     <div className={style.coverContainer}>
                         <Cover src={info.cover} className={cls(style.fullCover, music ? style.playing : '')} />
                         {music ? <Cover src={info.cover} className={style.fullCoverBlur} /> : null}
@@ -312,7 +338,8 @@ const Player = (props: IPlayer) => {
                         <Svg src={icCheckList} className={style.icPlayinglist} onClick={handleGoList} />
                     </div>
                 </div>
-            ) : (
+            </CSSTransition>
+            { matchPlaying ? null : (
                 <div className={style.miniContainer}>
                     <Cover src={info.cover} className={style.cover} onClick={naviToFullplayer} />
                     <div className={style.infoText} title={info.title} onClick={naviToFullplayer}>

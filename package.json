@@ -10,7 +10,8 @@
     "watch": "ts-node ./build/server.ts --watch",
     "build": "ts-node ./build/server.ts --build",
     "fe": "parcel ./src/static/index.html --dist-dir=dist/static",
-    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --no-source-maps --reporter @parcel/reporter-bundle-analyzer"
+    "build-fe": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --no-source-maps",
+    "analyzer": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --reporter @parcel/reporter-bundle-analyzer && npx anywhere"
   },
   "dependencies": {
     "ahooks": "^3.7.0",
@@ -32,6 +33,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-svg": "^15.1.13",
+    "react-transition-group": "^4.4.5",
     "recoil": "^0.7.4",
     "reset-css": "^5.0.1",
     "zlib": "^1.0.5"
@@ -44,12 +46,15 @@
     "assert": "^2.0.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
+    "console-browserify": "^1.2.0",
     "crypto-browserify": "^3.12.0",
     "esbuild": "^0.14.49",
     "events": "^3.3.0",
     "nodemon": "^2.0.19",
     "parcel": "^2.7.0",
     "path-browserify": "^1.0.1",
+    "postcss": "^8.2.1",
+    "postcss-modules": "^4.3.0",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
     "stream-browserify": "^3.0.0",

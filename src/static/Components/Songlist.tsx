@@ -34,7 +34,7 @@ const SongItem = (props: ItemProps) => {
     return artist || '未知歌手'
   }, [music])
   return (
-    <li onClick={onClick} className={style.songItem}>
+    <li onClick={onClick} className={style.songItem} title={`${music.title} - ${desc}`}>
       <div className={style.content}>
         <p className={style.name} title={music.title}>{music.title}</p>
         <p className={style.desc}>{desc}</p>

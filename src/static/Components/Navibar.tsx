@@ -4,13 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { Svg } from './Svg'
 
 const Navibar = (props) => {
-  let { onBack, title } = props
+  const { title } = props
   const naviTo = useNavigate()
-  if (!onBack) {
-    onBack = () => {
-      naviTo(-1)
-    }
-  }
+  const {
+    onBack = () => { naviTo(-1) }
+  } = props
   return (
     <div className={style.navibar}>
       <div className={style.backBtn} onClick={onBack}>
