@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './Player.module.less'
-import { useMatch, useNavigate, useParams } from 'react-router-dom'
+import { useMatch, useNavigate, useSearchParams } from 'react-router-dom'
 import cls from 'classnames'
 import { useMemoizedFn } from 'ahooks'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
@@ -16,7 +16,8 @@ import { useShortcuts } from '../../hooks/useShortcuts'
 import { Svg } from '../Svg'
 import Cover from '../Cover'
 import PlayerInfo from './PlayerInfo'
-import AudioWave from '../AudioWave'
+import { AudioWave, IAudioWave } from '../AudioWave'
+import { getMusicMeta } from '../../API'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
@@ -33,8 +34,10 @@ interface IPlayer {
     onPrevSong?: () => void;
     onNextSong?: () => void;
 }
+
 const Player = (props: IPlayer) => {
-    const matchPlaying = useMatch('playing')
+    const [ searchParams, setSearchParams ] = useSearchParams()
+    const matchPlaying = useMatch(ROUTES.PLAYING)
     const naviTo = useNavigate()
 
     const { music } = useRecoilValue(musicState)
@@ -45,16 +48,16 @@ const Player = (props: IPlayer) => {
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
     const curDuration = useRef(0)
+    
     const naviToFullplayer = useMemoizedFn(() => {
         if (music) {
-            naviTo('/playing')
+            naviTo(ROUTES.PLAYING)
         }
     })
     const naviBack = useMemoizedFn(() => naviTo(-1))
-    const waveRef = useRef<{
-        start: () => void
-        stop: () => void
-    }>()
+    const naviToList = useMemoizedFn(() => { naviTo(ROUTES.PLAYING_LIST) })
+
+    const waveRef = useRef<IAudioWave>(null)
     const handleSwitchPlaying = useMemoizedFn((type) => () => {
         let nextIndex: number = -1
         if (curIndex !== null) {
@@ -107,7 +110,7 @@ const Player = (props: IPlayer) => {
         checkHasMusic(() => {
             audioRef.current?.pause()
             setTimeout(() => {
-                if (!isPlaying) {
+                if (audioRef.current?.paused) {
                     waveRef.current?.stop()
                 }
             }, 300);
@@ -123,11 +126,33 @@ const Player = (props: IPlayer) => {
 
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
+    useEffect(() => {
+        if (matchPlaying) {
+            const musicId = searchParams.get('id')
+            if (!music && !musicId) {
+                naviTo(ROUTES.LIBRARY)
+            }
+            if (music && !musicId) {
+                setSearchParams({ id: music.id }, { replace: true })
+            }
+            if (!music && musicId) {
+                getMusicMeta(musicId).then(({status, data}) => {
+                    if (status === 200) {
+                        setPlaying({
+                            list: [data.music],
+                            curIndex: 0
+                        })
+                    }
+                })
+            }
+        }
+    }, [matchPlaying])
+
     const audioRef = useRef<HTMLAudioElement>(null)
     useEffect(() => {
         if (music && audioRef.current) {
             audioRef.current.currentTime = 0
-            setTimeout(handlePlay, 10)
+            setTimeout(handlePlay, 0)
         }
         audioRef.current?.addEventListener('ended', handlePlayEnd)
         return () => {
@@ -168,8 +193,6 @@ const Player = (props: IPlayer) => {
         }
     }
 
-    const handleGoList = () => { naviTo(ROUTES.PLAYING_LIST)}
-
     const fullProgressRef = useRef<HTMLDivElement>(null)
     const handleProgressSet = useCallback((progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
@@ -207,7 +230,7 @@ const Player = (props: IPlayer) => {
         'arrowdown': {
             handler: () => {
                 const nextVolume = volume * 100 - 10
-                if (matchPlaying && nextVolume > 0) {
+                if (matchPlaying && nextVolume >= 0) {
                     handleVolumeSet(nextVolume)
                 }
             }
@@ -335,7 +358,7 @@ const Player = (props: IPlayer) => {
                             <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
                             <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
                         </div>
-                        <Svg src={icCheckList} className={style.icPlayinglist} onClick={handleGoList} />
+                        <Svg src={icCheckList} className={style.icPlayinglist} onClick={naviToList} />
                     </div>
                 </div>
             </CSSTransition>

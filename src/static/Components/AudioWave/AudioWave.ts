@@ -1,5 +1,5 @@
 import { colorStr2rgbaArr, genColorStrByColors } from '../../utils/color'
-const DEFAULT_FILLCOLOR = 'rgba(102,102,102,0.4)'
+const DEFAULT_FILLCOLOR = 'rgba(102,102,102,0.3)'
 
 interface IConfig {
   fillColor?: string;
@@ -17,6 +17,8 @@ class AudioWave {
   audioAnalyser: AnalyserNode
   size: { width: number, height: number}
   ratio = window.devicePixelRatio || 2
+  baseY = 0
+  running = false
 
   constructor(canvas: HTMLCanvasElement, audio: HTMLAudioElement, config: IConfig = {}) {
     this.config = config
@@ -29,12 +31,12 @@ class AudioWave {
       width: canvas.offsetWidth * this.ratio,
       height: canvas.offsetHeight * this.ratio,
     }
-
+    this.initBaseY()
     this.init(canvas)
   }
 
-  get baseY() {
-    return Math.floor(this.size.height * 4/5)
+  initBaseY() {
+    this.baseY = Math.floor(this.size.height * 4/5)
   }
 
   init(canvas: HTMLCanvasElement) {
@@ -69,8 +71,6 @@ class AudioWave {
     const canvasCtx = this.ctx.canvas
     canvasCtx.clearRect(0, 0, width, height)
     //array的长度为1024, 总共取10个关键点,关键点左右边各取五个点作为过渡,波浪更为自然;
-    let waveArr1: number[] = [] 
-    let waveArr2: number[] = []
     let waveTemp: number[] = []
     let leftTemp: number[] = []
     let rightTemp: number[] = []
@@ -90,11 +90,8 @@ class AudioWave {
       rightTemp.push(Math.floor(array[key] / 4.8));
     });
     
-    waveArr1 = leftTemp.concat(waveTemp).concat(rightTemp);
-    waveArr2 = leftTemp.concat(rightTemp);
-    waveArr2.map((data, k) => {
-        waveArr2[k] = data * 1.8;
-    });
+    const waveArr1 = [leftTemp, waveTemp, rightTemp].flat().map(data => data * 1.8)
+    const waveArr2 = [leftTemp, rightTemp].flat().map(data => data * 2.4)
     let waveWidth = Math.ceil(width / (waveArr1.length - 3));
     let waveWidth2 =  Math.ceil(width / (waveArr2.length - 3));
 
@@ -127,7 +124,7 @@ class AudioWave {
     canvasCtx.fill();
 
     canvasCtx.beginPath();
-    canvasCtx.fillStyle = genColorStrByColors(colorStr2rgbaArr(fillColor), [0, 0, 0, 0.2])
+    canvasCtx.fillStyle = genColorStrByColors(colorStr2rgbaArr(fillColor), [0, 0, 0, 0.4])
     canvasCtx.moveTo(-waveWidth * 2, this.baseY - waveArr1[0]);
     for(let i = 1; i < waveArr1.length - 2; i++) {
         let p0 = {x: (i - 2) * waveWidth, y:waveArr1[i - 1]};
@@ -158,16 +155,30 @@ class AudioWave {
     if (!this.ctx.audio) {
       this.initAudio()
     }
+    this.initBaseY()
+    this.running = true
     const fn = () => {
+      let isStop = false
+      if (!this.running) {
+        if (this.baseY < this.size.height) {
+          this.baseY += 12
+        }
+        isStop = this.baseY >= this.size.height
+        if (isStop) {
+          cancelAnimationFrame(this.timer);
+        }
+      }
       const arr = new Uint8Array(this.audioAnalyser.frequencyBinCount)
       this.audioAnalyser.getByteFrequencyData(arr)
       this.draw(arr)
-      this.timer = requestAnimationFrame(fn)
+      if (!isStop) {
+        this.timer = requestAnimationFrame(fn)
+      }
     }
     this.timer = requestAnimationFrame(fn);
   }
   stop() {
-    cancelAnimationFrame(this.timer);
+    this.running = false
   }
 }
 

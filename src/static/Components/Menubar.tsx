@@ -32,31 +32,32 @@ const MenuBar = (props) => {
       icon: require('../imgs/ic-album.svg'),
       onClick: () => {
         if (albumDetail?.albumId && !matchAlbumDetail && !matchAlbums) {
-          navigator(`/album/${albumDetail.albumId}`, params)
+          navigator(ROUTES.ALBUM_DETAIL.replace(':albumId', albumDetail.albumId), params)
         } else if (!matchAlbums) {
-          navigator('/albums', params)
+          navigator(ROUTES.ALBUMS, params)
         }
       }
     }, {
       title: 'Library',
       icon: require('../imgs/ic-library.svg'),
-      onClick: () => { navigator('/library', params) }
+      onClick: () => { navigator(ROUTES.LIBRARY, params) }
     }, {
       title: 'Search',
       icon: require('../imgs/ic-search.svg'),
-      onClick: () => { navigator('/search', params) }
+      onClick: () => { navigator(ROUTES.SEARCH, params) }
     },
   ]
 
   const menubarRef = useRef<HTMLDivElement>(null)
+  const TRANS_TIME = 180
   return (
     <CSSTransition
       in={!matchPlaying}
       nodeRef={menubarRef}
-      timeout={200}
+      timeout={TRANS_TIME}
       classNames='menubar-transition'
     >
-      <div className={cls(style.container, matchPlaying ? style.hide : '')} ref={menubarRef}>
+      <div className={cls(style.container, matchPlaying ? style.hide : '')} ref={menubarRef} style={{transition: `all ${TRANS_TIME}ms`}}>
         {menus.map(menu => (
           <div key={menu.title} className={style.menuItem} onClick={menu.onClick}>
             <Svg src={menu.icon} className={style.menuIcon} />

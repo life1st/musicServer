@@ -12,6 +12,11 @@ interface Props {
   audioRef: React.RefObject<HTMLAudioElement>;
   className?: string;
 }
+interface IAudioWave {
+  start: () => void
+  stop: () => void
+}
+
 const AudioWave = forwardRef((props: Props, ref) => {
   const { audioRef, className = '' } = props
   const convasRef = useRef<HTMLCanvasElement>(null)
@@ -35,4 +40,6 @@ const AudioWave = forwardRef((props: Props, ref) => {
   )
 })
 
-export default AudioWave
+export {
+  AudioWave, IAudioWave
+}
