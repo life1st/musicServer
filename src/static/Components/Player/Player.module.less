@@ -97,6 +97,7 @@
         background: #ccc;
         margin: 12px 0;
         border-radius: 2px;
+        cursor: default;
         &::before {
             @moreS: 12px;
             content: '';
@@ -108,10 +109,7 @@
         }
         &:hover {
             .progressDot {
-                width: @dotS + 4;
-                height: @dotS + 4;
-                top: -(@dotS - @s + 4) * 0.5;
-                border-radius: (@dotS + 4) * 0.5;
+                transform: scale(1.2);
             }
         }
         .progress {
@@ -128,8 +126,8 @@
             width: @dotS;
             height: @dotS;
             border-radius: @dotS * 0.5;
-            transition: all .2s;
             background-color: @pc;
+            transition: transform .2s;
         }
     }
 

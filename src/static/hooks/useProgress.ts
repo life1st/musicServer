@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { useThrottleFn } from 'ahooks'
 
 interface Params {
-    el: HTMLDivElement | null,
-    onProgressSet: (progress: number) => void;
-    onMove?: (progress: number) => void;
+    el: HTMLDivElement | null
+    onProgressSet: (progress: number) => void
+    onMove?: (progress: number) => void
+    onPressStatusChange?: (isPressing: boolean) => void
 }
 export const useProgress = (params: Params) => {
-    const { el, onProgressSet = () => {}, onMove = () => {} } = params || {}
+    const { el, onProgressSet = () => {}, onMove = () => {}, onPressStatusChange = () => {} } = params || {}
     const [isKeyDown, setIsKeyDown] = useState(false)
 
     const elRef = useRef({})
@@ -15,8 +16,9 @@ export const useProgress = (params: Params) => {
         if (!el) {
             return
         }
+        const elPos = el.getBoundingClientRect()
         elRef.current = {
-            left: el.offsetLeft,
+            left: elPos.left,
             width: el.offsetWidth,
         }
         el?.addEventListener('mousedown', mouseDown)
@@ -29,6 +31,7 @@ export const useProgress = (params: Params) => {
     }, [el])
     const mouseDown = (e) => {
         setIsKeyDown(true)
+        onPressStatusChange(true)
         document.body.addEventListener('mousemove', mouseMove)
     }
     const { run: mouseMove, cancel: cancelMove } = useThrottleFn((e) => {
@@ -41,6 +44,7 @@ export const useProgress = (params: Params) => {
     }, { wait: 16 })
     const mouseUp = (e) => {
         setIsKeyDown(false)
+        onPressStatusChange(false)
         document.body.removeEventListener('mousemove', mouseMove)
         cancelMove()
         const { clientX } = e

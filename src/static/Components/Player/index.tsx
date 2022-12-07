@@ -47,6 +47,7 @@ const Player = (props: IPlayer) => {
     const [ isPlaying, setIsPlaying ] = useState(false)
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
+    const [progressPercent, setProgressPercent] = useState(0)
     const curDuration = useRef(0)
     
     const naviToFullplayer = useMemoizedFn(() => {
@@ -58,7 +59,7 @@ const Player = (props: IPlayer) => {
     const naviToList = useMemoizedFn(() => { naviTo(ROUTES.PLAYING_LIST) })
 
     const waveRef = useRef<IAudioWave>(null)
-    const handleSwitchPlaying = useMemoizedFn((type) => () => {
+    const handleSwitchPlaying = (type) => () => {
         let nextIndex: number = -1
         if (curIndex !== null) {
             if (type === PLAY_MODE.prev) {
@@ -80,9 +81,9 @@ const Player = (props: IPlayer) => {
                 curIndex: nextIndex,
             }))
         }
-    })
-    const handlePlayPrev = handleSwitchPlaying(PLAY_MODE.prev)
-    const handlePlayNext = handleSwitchPlaying(PLAY_MODE.next)
+    }
+    const handlePlayPrev = useMemoizedFn(handleSwitchPlaying(PLAY_MODE.prev))
+    const handlePlayNext = useMemoizedFn(handleSwitchPlaying(PLAY_MODE.next))
     const handlePlayEnd = handlePlayNext
     const handlePlayError = useMemoizedFn(async () => {
         if (!music) return
@@ -105,7 +106,7 @@ const Player = (props: IPlayer) => {
             afterFunc()
         }
     }
-    const handlePause = () => {
+    const handlePause = useMemoizedFn(() => {
         setIsPlaying(false)
         checkHasMusic(() => {
             audioRef.current?.pause()
@@ -115,14 +116,14 @@ const Player = (props: IPlayer) => {
                 }
             }, 300);
         }) 
-    }
-    const handlePlay = () => {
+    })
+    const handlePlay = useMemoizedFn(() => {
         setIsPlaying(true)
         checkHasMusic(() => {
             audioRef.current?.play()
             waveRef.current?.start()
         })
-    }
+    })
 
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
 
@@ -165,6 +166,9 @@ const Player = (props: IPlayer) => {
         if (duration && currentTime) {
             curDuration.current = duration
             setTime(currentTime)
+            if (!progressMoving.current) {
+                setProgressPercent(Number((currentTime / duration * 100).toFixed(1)))
+            }
         }
     })
     useEffect(() => {
@@ -194,17 +198,26 @@ const Player = (props: IPlayer) => {
     }
 
     const fullProgressRef = useRef<HTMLDivElement>(null)
+    const progressMoving = useRef<Boolean>(false)
     const handleProgressSet = useCallback((progress: number) => {
         if (audioRef.current && audioRef.current.currentTime) {
             audioRef.current.currentTime = progress / 100 * curDuration.current
+            setProgressPercent(progress)
         }
     }, [])
     const handleProgressMove = (p) => {
-        // TODO: change ui first, change audio progress at last call
-        // handleProgressSet(p)
+        if (p < 100 && p > 0) {
+            setProgressPercent(p)
+        }
     }
-    useProgress({el: fullProgressRef.current, onProgressSet: handleProgressSet, onMove: handleProgressMove})
-    const progressPercent = Number((time / curDuration.current * 100).toFixed(2))
+    useProgress({
+        el: fullProgressRef.current,
+        onProgressSet: handleProgressSet,
+        onMove: handleProgressMove,
+        onPressStatusChange: (isPressing) => {
+            progressMoving.current = isPressing
+        }
+    })
 
     const volumeRef = useRef<HTMLDivElement>(null)
     const handleVolumeSet = (progress: number) => {
