@@ -1,5 +1,4 @@
-export enum PLAY_MODE {
-  random,
+export enum PLAY_CONTROL {
   next,
   prev,
 }

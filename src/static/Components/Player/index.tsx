@@ -7,7 +7,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { CSSTransition } from 'react-transition-group'
 import { ROUTES } from '../../consts'
 import { musicState, playingState } from '../../model/playing'
-import { PLAY_MODE } from '../../consts'
+import { PLAY_CONTROL } from '../../consts'
 import { RESP_STATE } from '../../../shareCommon/consts'
 import { Music } from '../../../types/Music'
 import { deleteMusic } from '../../API'
@@ -17,6 +17,7 @@ import { Svg } from '../Svg'
 import Cover from '../Cover'
 import PlayerInfo from './PlayerInfo'
 import { AudioWave, IAudioWave } from '../AudioWave'
+import { Playmode, PLAY_MODE } from './Playmode'
 import { getMusicMeta } from '../../API'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
@@ -27,9 +28,10 @@ const icPause = require('../../imgs/ic-pause.svg')
 const icPlay = require('../../imgs/ic-play.svg')
 const icAudioHigh = require('../../imgs/ic-audio-high.svg')
 const icCheckList = require('../../imgs/ic-checklist.svg')
+const icLyric = require('../../imgs/ic-lyric-music.svg')
 
 interface IPlayer {
-    onPlayEnd?: (PLAY_MODE) => () => void;
+    onPlayEnd?: (PLAY_CONTROL) => () => void;
     onPlayError?: (m: Music) => void;
     onPrevSong?: () => void;
     onNextSong?: () => void;
@@ -62,17 +64,17 @@ const Player = (props: IPlayer) => {
     const handleSwitchPlaying = (type) => () => {
         let nextIndex: number = -1
         if (curIndex !== null) {
-            if (type === PLAY_MODE.prev) {
+            if (type === PLAY_CONTROL.prev) {
                 nextIndex = curIndex - 1 || 0
             }
-            if (type === PLAY_MODE.next) {
+            if (type === PLAY_CONTROL.next) {
                 nextIndex = curIndex + 1 || 0
             }
         }
-        if (type === PLAY_MODE.random) {
+        if (playMode === PLAY_MODE.random) {
             nextIndex = Math.floor(Math.random() * list.length)
         }
-        // if (type === PLAY_MODE.next && nextIndex >= list.length) {
+        // if (type === PLAY_CONTROL.next && nextIndex >= list.length) {
         //     setCurPage(curPage + 1)
         // }
         if (nextIndex >= 0 && nextIndex < list.length) {
@@ -82,9 +84,16 @@ const Player = (props: IPlayer) => {
             }))
         }
     }
-    const handlePlayPrev = useMemoizedFn(handleSwitchPlaying(PLAY_MODE.prev))
-    const handlePlayNext = useMemoizedFn(handleSwitchPlaying(PLAY_MODE.next))
-    const handlePlayEnd = handlePlayNext
+    const handlePlayPrev = useMemoizedFn(handleSwitchPlaying(PLAY_CONTROL.prev))
+    const handlePlayNext = useMemoizedFn(handleSwitchPlaying(PLAY_CONTROL.next))
+    const handlePlayEnd = useMemoizedFn(() => {
+        if (playMode === PLAY_MODE.singleLoop && audioRef.current) {
+            audioRef.current.currentTime = 0
+            setTimeout(handlePlay, 0);
+        } else {
+            handlePlayNext()
+        }
+    })
     const handlePlayError = useMemoizedFn(async () => {
         if (!music) return
         const isSure = confirm(`play ${music.title + '-' + music.artist} error, delete it?`)
@@ -107,7 +116,6 @@ const Player = (props: IPlayer) => {
         }
     }
     const handlePause = useMemoizedFn(() => {
-        setIsPlaying(false)
         checkHasMusic(() => {
             audioRef.current?.pause()
             setTimeout(() => {
@@ -118,14 +126,13 @@ const Player = (props: IPlayer) => {
         }) 
     })
     const handlePlay = useMemoizedFn(() => {
-        setIsPlaying(true)
         checkHasMusic(() => {
             audioRef.current?.play()
             waveRef.current?.start()
         })
     })
 
-    const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.next)
+    const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.inOrder)
 
     useEffect(() => {
         if (matchPlaying) {
@@ -187,15 +194,6 @@ const Player = (props: IPlayer) => {
             audioRef.current?.removeEventListener('error', handlePlayError)
         }
     }, [audioRef])
-    
-    const switchPlayMode =() => {
-        if (playMode === PLAY_MODE.next) {
-            setPlayMode(PLAY_MODE.random)
-        }
-        if (playMode === PLAY_MODE.random) {
-            setPlayMode(PLAY_MODE.next)
-        }
-    }
 
     const fullProgressRef = useRef<HTMLDivElement>(null)
     const progressMoving = useRef<Boolean>(false)
@@ -258,13 +256,9 @@ const Player = (props: IPlayer) => {
         },
     })
 
-    const playModeText = useMemo(() => {
-        const transTable = {
-            [PLAY_MODE.next]: 'In order',
-            [PLAY_MODE.random]: 'Random'
-        }
-        return `Mode: ${transTable[playMode]}`
-    }, [playMode])
+    const handleOpenLyric = useMemoizedFn(() => {
+        console.log('lyric')
+    })
 
     const info = useMemo(() => {
         if (!music) {
@@ -350,7 +344,6 @@ const Player = (props: IPlayer) => {
                             </Fragment>
                         ) : null }
                     </div>
-                    <button onClick={switchPlayMode}>{playModeText}</button>
                     <div className={style.controlBtns}>
                         <Svg src={icNext} className={style.btnPrev} onClick={handlePlayPrev} />
                         {
@@ -363,15 +356,17 @@ const Player = (props: IPlayer) => {
                         <Svg src={icNext} className={style.btnNext} onClick={handlePlayNext} />
                     </div>
                     <div className={style.endingContainer}>
+                        <Svg src={icAudioHigh} className={style.icVolume} />
                         <div 
                             className={style.volumeContainer}
                             ref={volumeRef}
                         >
-                            <Svg src={icAudioHigh} className={style.icVolume} />
                             <div className={style.volumeProgress} style={{width: `${volume * 100}%`}} />
                             <div className={style.volumeDot} style={{left: `${volume * 100}%`}} />
                         </div>
-                        <Svg src={icCheckList} className={style.icPlayinglist} onClick={naviToList} />
+                        <Svg src={icCheckList} className={cls(style.icPlayinglist, style.rbside)} onClick={naviToList} />
+                        <Playmode mode={playMode} onChange={setPlayMode} className={style.rbside} />
+                        <Svg src={icLyric} className={cls(style.icLyric, style.rbside)} onClick={handleOpenLyric} />
                     </div>
                 </div>
             </CSSTransition>

@@ -9,7 +9,7 @@ interface Params {
 }
 export const useProgress = (params: Params) => {
     const { el, onProgressSet = () => {}, onMove = () => {}, onPressStatusChange = () => {} } = params || {}
-    const [isKeyDown, setIsKeyDown] = useState(false)
+    const isKeyDown = useRef(false)
 
     const elRef = useRef({})
     useEffect(() => {
@@ -30,7 +30,7 @@ export const useProgress = (params: Params) => {
         }
     }, [el])
     const mouseDown = (e) => {
-        setIsKeyDown(true)
+        isKeyDown.current = true
         onPressStatusChange(true)
         document.body.addEventListener('mousemove', mouseMove)
     }
@@ -43,7 +43,10 @@ export const useProgress = (params: Params) => {
         }
     }, { wait: 16 })
     const mouseUp = (e) => {
-        setIsKeyDown(false)
+        if (!isKeyDown) {
+            return
+        }
+        isKeyDown.current = false
         onPressStatusChange(false)
         document.body.removeEventListener('mousemove', mouseMove)
         cancelMove()

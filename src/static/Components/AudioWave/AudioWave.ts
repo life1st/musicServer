@@ -1,12 +1,13 @@
 import { colorStr2rgbaArr, genColorStrByColors } from '../../utils/color'
-const DEFAULT_FILLCOLOR = 'rgba(102,102,102,0.3)'
+import { DEFAULT_CONFIG } from './consts'
 
 interface IConfig {
-  fillColor?: string;
+  fillColor?: string
+  fps?: number
 }
 
 class AudioWave {
-  config: IConfig
+  config: Required<IConfig>
   convas: HTMLCanvasElement
   audio: HTMLAudioElement
   ctx: {
@@ -20,8 +21,8 @@ class AudioWave {
   baseY = 0
   running = false
 
-  constructor(canvas: HTMLCanvasElement, audio: HTMLAudioElement, config: IConfig = {}) {
-    this.config = config
+  constructor(canvas: HTMLCanvasElement, audio: HTMLAudioElement, config: IConfig) {
+    this.setConf(config)
     this.convas = canvas
     this.audio = audio
     this.ctx = {
@@ -35,13 +36,22 @@ class AudioWave {
     this.init(canvas)
   }
 
+  setConf(config: IConfig = {}) {
+    const curConfig = this.config || {}
+    this.config = {
+      ...DEFAULT_CONFIG,
+      ...curConfig,
+      ...config
+    }
+  }
+
   initBaseY() {
     this.baseY = Math.floor(this.size.height * 4/5)
   }
 
   init(canvas: HTMLCanvasElement) {
     const { width, height } = this.size
-    const { fillColor = DEFAULT_FILLCOLOR } = this.config
+    const { fillColor } = this.config
 
     canvas.width = width
     canvas.height = height
@@ -65,7 +75,7 @@ class AudioWave {
   }
 
   draw(array){
-    const { fillColor = DEFAULT_FILLCOLOR } = this.config
+    const { fillColor } = this.config
 
     const { width, height } = this.size
     const canvasCtx = this.ctx.canvas
@@ -151,26 +161,31 @@ class AudioWave {
   }
 
   timer: number
+  prevRenterTs = Date.now()
   start() {
     if (!this.ctx.audio) {
       this.initAudio()
     }
+    const { fps } = this.config
+    const renderInterval = Math.floor(1000 / fps)
     this.initBaseY()
     this.running = true
     const fn = () => {
       let isStop = false
       if (!this.running) {
-        if (this.baseY < this.size.height) {
-          this.baseY += 12
-        }
-        isStop = this.baseY >= this.size.height
-        if (isStop) {
+        isStop = this.baseY > this.size.height
+        if (!isStop) {
+          this.baseY += 24
+        } else {
           cancelAnimationFrame(this.timer);
         }
       }
-      const arr = new Uint8Array(this.audioAnalyser.frequencyBinCount)
-      this.audioAnalyser.getByteFrequencyData(arr)
-      this.draw(arr)
+      if (Date.now() - this.prevRenterTs > renderInterval) {
+        this.prevRenterTs = Date.now()
+        const arr = new Uint8Array(this.audioAnalyser.frequencyBinCount)
+        this.audioAnalyser.getByteFrequencyData(arr)
+        this.draw(arr)
+      }
       if (!isStop) {
         this.timer = requestAnimationFrame(fn)
       }
