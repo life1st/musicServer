@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from './player.module.less'
+import * as style from './Player.module.less'
 import cls from 'classnames'
 import { Svg } from '../Svg'
 import { useMemoizedFn } from 'ahooks'
