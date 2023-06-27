@@ -35,7 +35,8 @@ class ArtistsUtil {
       return
     } else {
       const _pinyin = pinyin(name).reduce((acc, cur) => {
-        acc += cur[0] || ''
+        const py = cur.sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0))
+        acc += py[0] || ''
         return acc
       }, '')
       this.artists.push({ name, pinyin: _pinyin })
