@@ -13,6 +13,7 @@ import Cover from '../Components/Cover'
 import Songlist from '../Components/Songlist'
 import { EndFix } from '../Components/Scroller'
 import { Svg } from '../Components/Svg'
+import { parseTrackNumber } from '../utils/music'
 
 const { Fragment, useEffect, useRef } = React
 
@@ -45,7 +46,10 @@ const AlbumDetail = (props) => {
   const fetchData = async (albumId) => {
     const { status, data } = await getAlbumDetail(albumId)
     if (status === 200 && typeof data !== 'string') {
-      setAlbumDetail(data)
+      setAlbumDetail({
+        ...data,
+        songs: data.songs.sort((a, b) => parseTrackNumber(a.trackNumber) - parseTrackNumber(b.trackNumber))
+      })
     }
   }
   useEffect(() => {
@@ -94,6 +98,7 @@ const AlbumDetail = (props) => {
               onItemClick={handleMusicItemClick}
               deleteSuccess={handleDeleted}
               showAlbum={false}
+              showTrackNumber={true}
             />
           </Fragment>
         ) : (

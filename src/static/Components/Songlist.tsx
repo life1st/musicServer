@@ -10,6 +10,7 @@ import { RESP_STATE } from '../../shareCommon/consts'
 import { deleteMusic } from '../API'
 import { Scroller } from './Scroller'
 import { Svg } from './Svg'
+import { parseTrackNumber } from '../utils/music'
 
 const { useMemo } = React
 
@@ -17,13 +18,14 @@ interface ItemProps {
   curPlaying: Music | null;
   music: Music;
   showAlbum?: boolean;
+  showTrackNumber?: boolean;
   onClick: () => void;
   onDelete: (e: React.MouseEvent) => void;
   onEdit: (e: React.MouseEvent) => void;
   onAddList?: (e: React.MouseEvent) => void;
 }
 const SongItem = (props: ItemProps) => {
-  const { music, curPlaying, showAlbum = true } = props
+  const { music, curPlaying, showAlbum = true, showTrackNumber } = props
   const { onClick = () => {}, onDelete = () => {}, onEdit = () => {}, onAddList = () => {} } = props
   const isPlaying = curPlaying?.id === music.id
   const desc = useMemo(() => {
@@ -33,8 +35,10 @@ const SongItem = (props: ItemProps) => {
     }
     return artist || '未知歌手'
   }, [music])
+  const index = parseTrackNumber(music.trackNumber)
   return (
     <li onClick={onClick} className={style.songItem} title={`${music.title} - ${desc}`}>
+      { showTrackNumber ? <p className={style.index}>{index}</p> : null }
       <div className={style.content}>
         <p className={style.name} title={music.title}>{music.title}</p>
         <p className={style.desc}>{desc}</p>
@@ -62,10 +66,11 @@ interface ISonglist {
     className?: string;
     showAlbum?: boolean;
     startNode?: React.ReactNode;
+    showTrackNumber?: boolean;
 }
 const Songlist = (props: ISonglist) => {
     const { 
-      list, hasMore, initScrollTop, showLoading, className, showAlbum,
+      list, hasMore, initScrollTop, showLoading, className, showAlbum, showTrackNumber,
       onItemClick, onReachEnd, onScroll, deleteSuccess
     } = props
     const { music: curPlaying } = useRecoilValue(musicState)
@@ -120,6 +125,7 @@ const Songlist = (props: ISonglist) => {
             onAddList={(e) => { handleAddItemToList(e, item) }}
             curPlaying={curPlaying}
             showAlbum={showAlbum}
+            showTrackNumber={showTrackNumber}
           />
         )) }
         {list.length ? <p className={style.endCount}>Songs: {list.length}</p> : null}
