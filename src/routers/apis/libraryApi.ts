@@ -1,6 +1,7 @@
 import Router from 'koa-router'
 import { library } from '../../controller/library'
 import { musicFileHandler } from '../file'
+import { artistUtil } from '../../utils/artists'
 
 const libraryApiRoute = new Router()
 
@@ -39,5 +40,8 @@ libraryApiRoute
   ctx.body = { status }
 })
 .get('/music/:id', musicFileHandler)
+.get('/artists',async ctx => {
+  ctx.body = artistUtil.getArtists()
+})
 
 export { libraryApiRoute }

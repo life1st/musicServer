@@ -11,5 +11,6 @@ export interface Music {
     coverId?: string;
     coverUrl?: string;
     keyword?: string;
+    trackNumber?: string;
     extraInfo: {};
 }

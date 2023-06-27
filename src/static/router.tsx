@@ -21,6 +21,7 @@ const Playlists = lazy(() => import('./Pages/Playlists'))
 const Search = lazy(() => import('./Pages/Search'))
 const Albums = lazy(() => import('./Pages/Albums'))
 const PlayingList = lazy(() => import('./Pages/PlayingList'))
+const Artists = lazy(() => import('./Pages/Artists'))
 
 const Pages = () => {
   const pages = [{
@@ -63,6 +64,10 @@ const Pages = () => {
       name: 'Playlist',
       path: ROUTES.PLAYLIST,
       comp: <PlaylistDetail />
+    }, {
+      name: 'Artists',
+      path: ROUTES.ARTISTS,
+      comp: <Artists />
     }
   ]
 

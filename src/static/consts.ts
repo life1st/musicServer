@@ -14,4 +14,5 @@ export const ROUTES = {
   PLAYING_LIST: '/playing_list',
   PLAYLISTS: '/playlists',
   PLAYLIST: '/playlist/:id',
+  ARTISTS: '/artists',
 }

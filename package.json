@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./dist/app.js",
-    "prod": "NODE_ENV=production yarn start",
+    "prod": "NODE_ENV=production npm run start",
     "watch": "ts-node ./build/server.ts --watch",
     "build": "ts-node ./build/server.ts --build",
     "fe": "parcel ./src/static/index.html --dist-dir=dist/static",
@@ -27,7 +27,7 @@
     "md5": "^2.3.0",
     "nedb-promises": "^6.1.0",
     "node-id3": "^0.2.3",
-    "pinyin": "^3.0.0-alpha.5",
+    "pinyinlite": "^1.2.1",
     "react": "^18.2.0",
     "react-confirm": "^0.2.3",
     "react-dom": "^18.2.0",

@@ -38,7 +38,7 @@ const Cover = (props: Props) => {
     setUrl(defaultSrc)
   }
   useEffect(() => {
-    if (src.includes('undefined')) {
+    if (!src || src.includes('undefined')) {
       setUrl(defaultSrc)
     } else {
       setUrl(src)

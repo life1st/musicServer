@@ -52,6 +52,7 @@ export const getMusicData = async (musicPath: string): Promise<Music> => {
       title: title || path.basename(musicPath), 
       artist, album, genre, year,
       size: stat.size,
+      trackNumber,
       extraInfo: {
           trackNumber, unsynchronisedLyrics, 
       }

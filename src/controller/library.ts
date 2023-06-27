@@ -10,6 +10,7 @@ import { album as albumController } from './album'
 import { Music } from '../types/Music'
 import { RESP_STATE } from '../shareCommon/consts'
 import { excludeProps, filterExistProps } from '../utils/obj'
+import { artistUtil } from '../utils/artists'
 
 class Library {
     isScanning = false
@@ -42,6 +43,7 @@ class Library {
                     music.albumId = albumInfo.albumId
                 }
                 await libraryModel.updateMusic(music)
+                artistUtil.insertArtist({name: music.artist})
 
                 const i = musicMetaTasks.findIndex(t => t === music.path)
                 if (scanMusicCache.length > 0 && i >= 0) {

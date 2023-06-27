@@ -8,6 +8,7 @@ import { useLoadmore } from '../hooks/useLoadmore'
 import { getLibrary, scanLibrary } from '../API'
 import Songlist from '../Components/Songlist'
 import { PlaylistEntry } from '../Components/PlaylistEntry'
+import { ROUTES } from '../consts'
 
 const { Fragment } = React
 const Library = (props) => {
@@ -28,7 +29,7 @@ const Library = (props) => {
         list,
         curIndex: i,
       }))
-      navi('/playing')
+      navi(ROUTES.PLAYING)
   }
   const handleLoadMore = () => {
     if (hasMore && !loading) {
@@ -42,6 +43,9 @@ const Library = (props) => {
       list: state.list.filter(m => m.id !== music.id),
     }))
   }
+  const handleGoArtistsPage = () => {
+    navi(ROUTES.ARTISTS)
+  }
 
   return (
     <Fragment>
@@ -49,7 +53,12 @@ const Library = (props) => {
       <Songlist
         startNode={(
           <Fragment>
-            <PlaylistEntry />
+            <li>
+              <PlaylistEntry />
+            </li>
+            <li onClick={handleGoArtistsPage}>
+              <p style={{marginLeft: 12}}>Artists {`->`}</p>
+            </li>
             <li className={style.startNodeEndfix} />
           </Fragment>
         )}
