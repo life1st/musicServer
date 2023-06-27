@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Svg } from './Svg'
 
 const Navibar = (props) => {
-  const { title } = props
+  const { title, rightNode } = props
   const naviTo = useNavigate()
   const {
     onBack = () => { naviTo(-1) }
@@ -16,7 +16,7 @@ const Navibar = (props) => {
         <p>Back</p>
       </div>
       {title ? <div className={style.title}>{title}</div> : null}
-      <div className={style.rightNode}></div>
+      <div className={style.rightNode}>{rightNode}</div>
     </div>
   )
 }

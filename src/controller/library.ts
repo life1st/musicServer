@@ -134,7 +134,7 @@ class Library {
         const music = await libraryModel.getMusic(id)
         const result: any = {}
         if (music) {
-            result.music = excludeProps(music, ['path', '_id'])
+            result.music = excludeProps(music, ['_id'])
             result.size = music.size
             if (needStream) {
                 const stream = createReadStream(music.path)

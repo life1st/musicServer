@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { genFile, getDir } from './file'
 import pinyin from 'pinyinlite'
+import { libraryModel } from '../model/libraryModel'
 
 interface Artist {
   name: string;
@@ -41,6 +42,35 @@ class ArtistsUtil {
       }, '')
       this.artists.push({ name, pinyin: _pinyin })
       this.saveArtists2File()
+    }
+  }
+  updateArtist({name, cover}) {
+    const index = this.artists.findIndex(artist => artist.name === name)
+    if (index < 0) {
+      return false
+    }
+    this.artists[index] = {
+      ...this.artists[index],
+      cover,
+    }
+    this.saveArtists2File()
+  }
+  deleteArtist({name}) {
+    this.artists = this.artists.filter(artist => artist.name !== name)
+    this.saveArtists2File()
+  }
+  async scan() {
+    let pageNum = 0
+    const limit = 50
+    while(true) {
+      const musics = await libraryModel.getMusicList(pageNum, limit)
+      musics.forEach(music => {
+        this.insertArtist({ name: music.artist })
+      })
+      if (musics.length < limit) {
+        break
+      }
+      pageNum++
     }
   }
 

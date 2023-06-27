@@ -8,19 +8,23 @@ import { Scroller } from '../Components/Scroller'
 import { albumPageState } from '../model/album'
 import { ROUTES } from '../consts'
 import Navibar from '../Components/Navibar'
+import { artistState } from '../model/artistEditor'
 const { useState, useEffect } = React
 
 const Artists = (props) => {
   const naviTo = useNavigate()
   const setAlbumPageState = useSetRecoilState(albumPageState)
+  const setArtistState = useSetRecoilState(artistState)
   const [ artists, setArtists ] = useState([])
-  useEffect(() => {
+  const fetchArtists = () => {
     axios.get('/api/artists').then(resp => {
-      console.log(resp, 'artitss')
       if (resp.status === 200) {
-        setArtists(resp.data)
+        setArtists(resp.data.sort((a, b) => a.pinyin.charCodeAt(0) - b.pinyin.charCodeAt(0)))
       }
     })
+  }
+  useEffect(() => {
+    fetchArtists()
   }, [])
   const handleSearchArtist = (name) => {
     setAlbumPageState(state => ({
@@ -29,23 +33,65 @@ const Artists = (props) => {
     }))
     naviTo(ROUTES.ALBUMS)
   }
+  const handleDelete = (e, name) => {
+    e.stopPropagation()
+    const isConfirm = confirm(`删除${name}?`)
+    if (isConfirm) {
+      axios.delete(`/api/artist/${name}`).then(resp => {
+        console.log(resp)
+        fetchArtists()
+      })
+    }
+  }
+  const handleEdit = (e, name) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setArtistState(state => ({
+      ...state,
+      name,
+    }))
+    naviTo(ROUTES.ARTIST_EDITOR)
+  }
+  const handleScan = () => {
+    axios.post('/api/artists/scan')
+  }
   return (
-    <div>
-      <Navibar />
+    <>
+      <Navibar rightNode={(
+        <p className={style.scanBtn} onClick={handleScan}>scan</p>
+      )} />
       <Scroller className={style.artistsList}>
         { artists.map(({name, cover}) => (
-          <div className={style.artistItem} onClick={() => handleSearchArtist(name)}>
-            <Cover
-              defaultSrc={require('../imgs/ic-artist-default.svg')}
-              src={cover}
-              disablePreview={true}
-              className={style.artistCover}
-            />
-            {name}
-          </div>
+          <li
+            className={style.artistItem} 
+            onClick={() => handleSearchArtist(name)}
+            title={name}
+          >
+            <div className={style.coverContainer}>
+              <Cover
+                defaultSrc={require('../imgs/ic-artist-default.svg')}
+                src={cover}
+                disablePreview={true}
+                className={style.artistCover}
+              />
+              <img 
+                src={require('../imgs/ic-delete.svg')} 
+                title="删除" 
+                className={style.artistDelete} 
+                onClick={e => handleDelete(e, name)}
+              />
+              <img 
+                src={require('../imgs/ic-edit.svg')} 
+                title="编辑" 
+                className={style.artistEdit} 
+                onClick={e => handleEdit(e, name)}
+              />
+            </div>
+            <p className={style.artistName}>{name}</p>
+          </li>
         )) }
       </Scroller>
-    </div>
+    </>
   )
 }
 
