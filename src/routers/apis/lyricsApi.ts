@@ -13,7 +13,7 @@ lyricsApiRoute
   console.log('data', data)
   ctx.body = data || 'no result'
 })
-.get('/lyric/:id',async ctx => {
+.get('/lyric/:id', async ctx => {
   const { id } = ctx.params
   ctx.body = await lyrics.getLyricsBy({ musicId: id })
 })

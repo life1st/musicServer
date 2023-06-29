@@ -5,9 +5,11 @@ import { getMusicMeta, updateMeta } from '../API'
 import { Music } from '../../types/Music'
 import Navibar from '../Components/Navibar'
 import { copyText } from '../utils'
+import { loading } from '../Components/ModalBox/Loading'
+import { toast } from '../Components/ModalBox/Toast'
 
 const { useEffect, useState } = React
-const MusicEditor = (props) => {
+const EditorForMusic = (props) => {
   const { id } = useParams()
   const [ meta, setMeta ] = useState<Music>({} as Music)
   const naviTo = useNavigate()
@@ -24,18 +26,26 @@ const MusicEditor = (props) => {
   }, [id])
 
   const handleChange = (key: string) => e => {
-    const val = e.target.value
+    let val = e.target.value
     console.log(key, val)
     if (!['string', 'number'].includes(typeof meta[key])) {
-      return
+      try {
+        val = JSON.parse(val)
+      } catch {
+        console.log('parse object error.')
+        return
+      }
     }
     setMeta({ ...meta, [key]: val })
   }
 
   const handleUpdate = async () => {
+    const handleLoadingFinish = loading({ text: 'saving...' })
     const {status, data} = await updateMeta(meta.id, meta)
     console.log(data)
+    handleLoadingFinish()
     if (status === 200) {
+      toast({ text: 'save success' })
       handleBack()
     }
   }
@@ -85,4 +95,4 @@ const MusicEditor = (props) => {
   )
 }
 
-export default MusicEditor
+export default EditorForMusic

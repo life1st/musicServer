@@ -8,7 +8,7 @@ import Navibar from '../Components/Navibar'
 import { Album } from '../../types/Album'
 
 const { useEffect, useState } = React
-const AlbumEditor = (props) => {
+const EditorForAlbum = (props) => {
   const { id } = useParams()
   const naviTo = useNavigate()
 
@@ -83,4 +83,4 @@ const AlbumEditor = (props) => {
   )
 }
 
-export default AlbumEditor
+export default EditorForAlbum

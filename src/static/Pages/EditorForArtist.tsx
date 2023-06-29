@@ -7,7 +7,7 @@ import { ROUTES } from '../consts'
 import Cover from '../Components/Cover'
 
 const { useEffect } = React
-const ArtistEditor = (props) => {
+const EditorForArtist = (props) => {
   const [artist, setArtist] = useRecoilState(artistState)
   const naviTo = useNavigate()
   useEffect(() => {
@@ -40,4 +40,4 @@ const ArtistEditor = (props) => {
   )
 }
 
-export default ArtistEditor
+export default EditorForArtist

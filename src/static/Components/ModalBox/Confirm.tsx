@@ -51,7 +51,5 @@ export const confirm = (config: {
     options = [],
     ...restConfig
   } = config || {}
-  return createConfirmation(Confirm, {
-    unmountDelay
-  })({title, options})
+  return createConfirmation(Confirm, unmountDelay)({title, options})
 }
