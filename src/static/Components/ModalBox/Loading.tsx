@@ -6,12 +6,12 @@ import { Svg } from '../Svg'
 
 const { useEffect } = React
 const Loading = (props) => {
-  const { isFullPage, dispose, emitFinish, text } = props
+  const { isFullPage = true, dispose, emitFinish, text } = props
   useEffect(() => {
     emitFinish(dispose)
   }, [])
   return (
-    <div className={clx(style.container, isFullPage && style.fullContainer)}>
+    <div className={clx(isFullPage && style.fullContainer)}>
       <div className={style.loadingWrapper}>
         <Svg src={require('../../imgs/ic-loading.svg')} className={style.icLoading} defaultColor={false} />
         <p className={style.loadingText}>{text}</p>

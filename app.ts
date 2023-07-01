@@ -21,7 +21,7 @@ app
 .use(staticHost(STATIC_DIR, {
     maxAge: 1000 * 60 * 60,
 }))
-.use(bodyParser({}))
+.use(bodyParser())
 .use(route.routes())
 
 app.listen(3000, () => {
