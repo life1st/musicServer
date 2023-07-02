@@ -150,10 +150,10 @@ class Library {
 
     async updateMeta(musicId, info) {
         const {
-            title, artist, album, year, genre,
+            title, artist, album, year, genre, trackNumber,
         } = info
         let tags = filterExistProps({
-            title, artist, album, year, genre,
+            title, artist, album, year, genre, trackNumber
         })
         const music = await libraryModel.getMusic(musicId)
 
