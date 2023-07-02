@@ -13,7 +13,9 @@ artistsApiRoute
 })
 .post('/artist/:name', async ctx => {
   const { name } = ctx.params
-  console.log(name, ctx.request)
+  const { covername } = ctx.request.body || {}
+  const result = await artistUtil.updateArtist({ name: decodeURIComponent(name), covername })
+  ctx.body = { status: result }
 })
 .delete('/artist/:name', async ctx => {
   const { name } = ctx.params

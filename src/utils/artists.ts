@@ -1,5 +1,6 @@
-import { ARTISTS_DIR } from './path'
+import { ARTISTS_DIR, UPLOAD_TMP_DIR } from './path'
 import fs from 'fs/promises'
+import { existsSync, createReadStream } from 'fs'
 import path from 'path'
 import { genFile, getDir } from './file'
 import pinyin from 'pinyinlite'
@@ -24,12 +25,15 @@ class ArtistsUtil {
       const artists = value.split('\n')
       this.artists = artists.map(artist => {
         const [name, pinyin, cover] = artist.split(' ')
-        return { name, pinyin, cover }
+        return { name: decodeURIComponent(name), pinyin, cover }
       })
     })
   }
   getArtists() {
     return this.artists
+  }
+  getCover(coverName) {
+    return createReadStream(path.join(ARTISTS_DIR, encodeURIComponent(coverName)))
   }
   insertArtist({name}) {
     if (this.artists.some(artist => artist.name === name)) {
@@ -44,16 +48,31 @@ class ArtistsUtil {
       this.saveArtists2File()
     }
   }
-  updateArtist({name, cover}) {
+  async updateArtist({name, covername }) {
     const index = this.artists.findIndex(artist => artist.name === name)
     if (index < 0) {
       return false
     }
+    const coverTmpPath = path.join(UPLOAD_TMP_DIR, covername)
+    if (!existsSync(coverTmpPath)) {
+      return false
+    }
+    const savedCoverName = `${encodeURIComponent(name)}.${covername.split('.').pop()}`
+    const coverPath = path.join(ARTISTS_DIR, savedCoverName)
+    await fs.rename(coverTmpPath, coverPath)
+    if (this.artists[index].cover) {
+      try {
+        await fs.unlink(this.artists[index].cover)
+      } catch {
+        console.log('delete failed.', this.artists[index])
+      }
+    }
     this.artists[index] = {
       ...this.artists[index],
-      cover,
+      cover: savedCoverName,
     }
     this.saveArtists2File()
+    return true
   }
   deleteArtist({name}) {
     this.artists = this.artists.filter(artist => artist.name !== name)
@@ -78,7 +97,7 @@ class ArtistsUtil {
   saveArtists2File() {
     clearTimeout(this.cacheId)
     this.cacheId = setTimeout(() => {
-      const fileData = this.artists.map(artist => `${artist.name} ${artist.pinyin} ${artist.cover}`).join('\n')
+      const fileData = this.artists.map(artist => `${encodeURIComponent(artist.name)} ${artist.pinyin} ${artist.cover}`).join('\n')
       fs.writeFile(STORE_PATH, fileData, { encoding: 'utf-8' })
     }, 0);
   }

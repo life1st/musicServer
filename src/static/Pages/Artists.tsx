@@ -66,11 +66,12 @@ const Artists = (props) => {
             className={style.artistItem} 
             onClick={() => handleSearchArtist(name)}
             title={name}
+            key={name}
           >
             <div className={style.coverContainer}>
               <Cover
                 defaultSrc={require('../imgs/ic-artist-default.svg')}
-                src={cover}
+                src={`/file/artist_cover/${cover}`}
                 disablePreview={true}
                 className={style.artistCover}
               />

@@ -14,9 +14,9 @@
     "analyzer": "rm -rf ./dist/static && parcel build ./src/static/index.html --dist-dir=dist/static --reporter @parcel/reporter-bundle-analyzer && npx anywhere"
   },
   "dependencies": {
-    "@koa/multer": "^3.0.2",
     "ahooks": "^3.7.8",
     "axios": "^0.27.2",
+    "busboy": "^1.6.0",
     "classnames": "^2.3.2",
     "darkreader": "^4.9.58",
     "dayjs": "^1.11.9",

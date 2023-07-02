@@ -1,5 +1,4 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs'
-import fs from 'fs/promises'
 import md5 from 'md5'
 import ID3 from 'node-id3'
 

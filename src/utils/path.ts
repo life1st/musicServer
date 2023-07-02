@@ -11,5 +11,6 @@ export const COVER_DIR = path.join(CONFIG_DIR, 'cover')
 export const LRC_DIR = path.join(CONFIG_DIR, 'lrc')
 export const ARTISTS_DIR = path.join(CONFIG_DIR, 'artists')
 export const DB_DIR = path.join(CONFIG_DIR, 'db')
+export const UPLOAD_TMP_DIR = path.join(CONFIG_DIR, 'upload_tmp')
 
 export const STATIC_DIR = 'dist/static'
