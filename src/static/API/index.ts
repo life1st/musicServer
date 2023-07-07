@@ -17,7 +17,7 @@ export const scanLibrary = () => {
 }
 
 export const scanAlbumsFromMusic = () => {
-    const url = '/api//album_scan'
+    const url = '/api/album_scan'
 
     return axios.post(url)
 }
