@@ -2,8 +2,9 @@ import * as React from 'react'
 import cls from 'classnames'
 import * as styl from './styles/Cover.module.less'
 import { Svg } from './Svg'
+import debounce from 'loda'
 
-const { useEffect, useState, Fragment } = React
+const { useEffect, useState, useRef, Fragment } = React
 interface Props {
   src: string;
   defaultSrc?: string;
@@ -11,14 +12,16 @@ interface Props {
   style?: React.CSSProperties;
   disablePreview?: boolean;
   onClick?: () => void;
+  onUpdate?: (imgNode: Element) => void;
 }
 const icCoverDefault = require('../imgs/ic-album-default.svg')
 
 const Cover = (props: Props) => {
   const { src, defaultSrc = icCoverDefault, className = '', style, disablePreview = false } = props
-  const { onClick } = props
+  const { onClick, onUpdate } = props
   const [ showPreview, setPreviewState ] = useState(false)
   const [ url, setUrl ] = useState('')
+  const coverRef = useRef(null)
   const handleClick = () => {
     if (onClick) {
       if (!disablePreview) {
@@ -37,6 +40,10 @@ const Cover = (props: Props) => {
   const handleLoadError = () => {
     setUrl(defaultSrc)
   }
+  const handleImgLoaded = () => {
+    onUpdate?.(coverRef.current)
+  }
+
   useEffect(() => {
     if (!src || src.includes('undefined')) {
       setUrl(defaultSrc)
@@ -80,8 +87,10 @@ const Cover = (props: Props) => {
       }
       { url ? (
         <img
+          ref={coverRef}
           onClick={handleClick}
           onError={handleLoadError}
+          onLoad={handleImgLoaded}
           className={cls({
             [className]: true,
             [styl.normalCover]: true,

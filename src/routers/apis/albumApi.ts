@@ -5,7 +5,7 @@ import { excludeProps } from '../../utils/obj'
 const albumApiRoute = new Router()
 
 albumApiRoute
-.get('/album_scan', async ctx => {
+.post('/album_scan', async ctx => {
   album.createAlbumFromLibrary()
   ctx.body = { status: 'ok' }
 })

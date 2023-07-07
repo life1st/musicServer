@@ -11,9 +11,7 @@ const Toast = (props: {
   const { text, resolve } = props
   useEffect(() => {
     resolve()
-    console.log('effect')
   }, [])
-  console.log('runderd ')
   return (
     <div className={style.toast}>{text}</div>
   )
@@ -27,6 +25,5 @@ export const toast = (config: {
     unmountDelay = 3000,
     text = '',
   } = config
-  console.log('toast fun')
   return createConfirmation(Toast, unmountDelay)({text, unmountDelay})
 }

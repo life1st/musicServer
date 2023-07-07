@@ -21,7 +21,7 @@ class AudioWave {
   baseY = 0
   running = false
 
-  constructor(canvas: HTMLCanvasElement, audio: HTMLAudioElement, config: IConfig) {
+  constructor(canvas: HTMLCanvasElement, audio: HTMLAudioElement, config?: IConfig) {
     this.setConf(config)
     this.convas = canvas
     this.audio = audio
@@ -134,7 +134,7 @@ class AudioWave {
     canvasCtx.fill();
 
     canvasCtx.beginPath();
-    canvasCtx.fillStyle = genColorStrByColors(colorStr2rgbaArr(fillColor), [0, 0, 0, 0.4])
+    canvasCtx.fillStyle = genColorStrByColors(colorStr2rgbaArr(fillColor), [0, 0, 0, 0.3])
     canvasCtx.moveTo(-waveWidth * 2, this.baseY - waveArr1[0]);
     for(let i = 1; i < waveArr1.length - 2; i++) {
         let p0 = {x: (i - 2) * waveWidth, y:waveArr1[i - 1]};

@@ -22,3 +22,12 @@ export const musicState = selector({
     }
   }
 })
+
+export const musicThemeState = atom<{
+  themeColors: string[];
+}>({
+  key: 'musicThemeState',
+  default: {
+    themeColors: []
+  }
+})

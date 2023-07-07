@@ -140,7 +140,7 @@ class Library {
                 const stream = createReadStream(music.path)
                 const close = () => { stream.close() }
                 stream.on('error', close)
-                stream.on('en', close)
+                stream.on('end', close)
                 result.stream = stream
             }
             return result
@@ -159,10 +159,10 @@ class Library {
 
         let isSuccess = false
         if (music?.path) {
-            const neddUpdateId3 = Object.keys(tags).some(k => tags[k] !== music[k])
-            isSuccess = neddUpdateId3 ? await updateMusicID3(music.path, tags) : true
+            const needUpdateId3 = Object.keys(tags).some(k => tags[k] !== music[k])
+            isSuccess = needUpdateId3 ? await updateMusicID3(music.path, tags) : true
             if (isSuccess) {
-                const musicMeta = neddUpdateId3 ? await getMusicData(music.path) : music
+                const musicMeta = needUpdateId3 ? await getMusicData(music.path) : music
                 await albumController.updateAlbumBy({ music: musicMeta })
                 return libraryModel.updateMusic(musicMeta, { prevId: musicId })
             }

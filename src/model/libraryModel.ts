@@ -76,7 +76,10 @@ class LibraryModel {
         const existMusic = await this.db.findOne<Music>({id})
         let hasUpdate = false
         if (existMusic) {
-            hasUpdate = await this.db.update({id}, music, {}) > 0 
+            hasUpdate = await this.db.update({id}, {
+                ...existMusic,
+                ...music,
+            }, {}) > 0 
         } else {
             hasUpdate = await this.db.insert(music) !== null
         }

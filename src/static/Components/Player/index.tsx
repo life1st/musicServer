@@ -3,10 +3,10 @@ import * as style from './Player.module.less'
 import { useMatch, useNavigate, useSearchParams } from 'react-router-dom'
 import cls from 'classnames'
 import { useMemoizedFn } from 'ahooks'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil'
 import { CSSTransition } from 'react-transition-group'
 import { ROUTES } from '../../consts'
-import { musicState, playingState } from '../../model/playing'
+import { musicState, playingState, musicThemeState } from '../../model/playing'
 import { PLAY_CONTROL } from '../../consts'
 import { RESP_STATE } from '../../../shareCommon/consts'
 import { Music } from '../../../types/Music'
@@ -19,6 +19,7 @@ import PlayerInfo from './PlayerInfo'
 import { AudioWave, IAudioWave } from '../AudioWave'
 import { Playmode, PLAY_MODE } from './Playmode'
 import { getMusicMeta } from '../../API'
+import { getImgThemeColors } from '../../utils/color'
 
 const { Fragment, useRef, useEffect, useState, useMemo, useCallback } = React
 const { origin } = window.location
@@ -44,13 +45,21 @@ const Player = (props: IPlayer) => {
 
     const { music } = useRecoilValue(musicState)
     const { curIndex, list } = useRecoilValue(playingState)
+    const [ { themeColors }, setMusicTheme ] = useRecoilState(musicThemeState)
     const setPlaying = useSetRecoilState(playingState)
-
     const [ isPlaying, setIsPlaying ] = useState(false)
     const [ time, setTime ] = useState(0)
     const [ volume, setVolume ] = useState(1)
     const [progressPercent, setProgressPercent] = useState(0)
     const curDuration = useRef(0)
+    const waveFillColor = useMemo(() => {
+        const color = themeColors?.[0]
+        if (color) {
+            const [r, g, b, a] = color 
+            return `rgb(${r}, ${g}, ${b}, .2)`
+        }
+        return null
+    }, [themeColors])
     
     const naviToFullplayer = useMemoizedFn(() => {
         if (music) {
@@ -126,9 +135,13 @@ const Player = (props: IPlayer) => {
         }) 
     })
     const handlePlay = useMemoizedFn(() => {
-        checkHasMusic(() => {
-            audioRef.current?.play()
-            waveRef.current?.start()
+        checkHasMusic(async () => {
+            try {
+                await audioRef.current?.play()
+                waveRef.current?.start()
+            } catch (e) {
+                console.log('play failed', e)
+            }
         })
     })
 
@@ -194,6 +207,13 @@ const Player = (props: IPlayer) => {
             audioRef.current?.removeEventListener('error', handlePlayError)
         }
     }, [audioRef])
+
+    const handleCoverUpdate = (imgNode) => {
+        if (imgNode) {
+            const colors = getImgThemeColors(imgNode)
+            setMusicTheme({themeColors: colors.map(c => Array.from(c))})
+        }
+    }
 
     const fullProgressRef = useRef<HTMLDivElement>(null)
     const progressMoving = useRef<Boolean>(false)
@@ -315,10 +335,15 @@ const Player = (props: IPlayer) => {
                         ref={waveRef}
                         audioRef={audioRef}
                         className={style.AudioWave}
+                        fillColor={waveFillColor}
                     />
                     <Svg src={require('../../imgs/arrow-down.svg')} className={style.icCloseFullPlayer} onClick={naviBack} />
                     <div className={style.coverContainer}>
-                        <Cover src={info.cover} className={cls(style.fullCover, music ? style.playing : '')} />
+                        <Cover
+                            onUpdate={handleCoverUpdate}
+                            src={info.cover} 
+                            className={cls(style.fullCover, music ? style.playing : '')} 
+                        />
                         {music ? <Cover src={info.cover} className={style.fullCoverBlur} /> : null}
                     </div>
                     <div className={style.fullContent}>
@@ -372,7 +397,12 @@ const Player = (props: IPlayer) => {
             </CSSTransition>
             { matchPlaying ? null : (
                 <div className={style.miniContainer}>
-                    <Cover src={info.cover} className={style.cover} onClick={naviToFullplayer} />
+                    <Cover 
+                        src={info.cover} 
+                        className={style.cover} 
+                        onClick={naviToFullplayer} 
+                        onUpdate={handleCoverUpdate}
+                    />
                     <div className={style.infoText} title={info.title} onClick={naviToFullplayer}>
                         <p>{info.title}</p>
                     </div>

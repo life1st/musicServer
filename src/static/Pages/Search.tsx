@@ -3,7 +3,7 @@ import * as style from './styles/Search.module.less'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { playingState } from '../model/playing'
 import { searchPageState, searchListState } from '../model/search'
-import { searchMusic } from '../API'
+import { searchMusic, scanAlbumsFromMusic } from '../API'
 import { SearchInput } from '../Components/SearchInput'
 import Songlist from '../Components/Songlist'
 import { useLoadmore } from '../hooks/useLoadmore'
@@ -15,6 +15,7 @@ import {
   isEnabled as isEnabledDarkMode,
 } from 'darkreader'
 import { darkModeConfig, autoDarkModeUtils } from '../utils/darkmodeHelper'
+import { toast } from '../Components/ModalBox/Toast'
 
 const { useCallback, useState, useEffect } = React
 const darkEnableStatus = isEnabledDarkMode()
@@ -81,9 +82,11 @@ const Search = (props) => {
           console.log('toSetting')
         }
       }, {
-        text: 'scan',
-        action: () => {
+        text: 'scan albums from music',
+        action: async () => {
           console.log('scan')
+          await scanAlbumsFromMusic()
+          toast({ text: 'success' })
         }
       }, {
         text: isEnableDark ? 'disable DarkMode' : 'enable DarkMode',
