@@ -9,10 +9,11 @@ interface Props {
   defaultColor?: boolean;
   onClick?: MouseEventHandler;
 }
+const noopFn = () => {}
 export const Svg = (props: Props) => {
   const { src, className = '', defaultColor = true } = props
   const {
-    onClick = () => {}
+    onClick = noopFn
   } = props
   return (
     <ReactSVG onClick={onClick} className={cls(className, style.svgContainer, defaultColor && style.defaultColor)} src={src} />

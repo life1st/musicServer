@@ -103,9 +103,6 @@ class Album {
         let count = 0
         while(true) {
             const musicList = await libraryModel.getMusicList(page++, LIMIT)
-            if (musicList.length === 0) {
-                break
-            }
             console.log(`create album from library page ${page}`)
             count += musicList.length
             for (const music of musicList) {
@@ -134,6 +131,9 @@ class Album {
                         libraryModel.deleteMusic(music.id, { saveToDel: false })
                     ])
                 }
+            }
+            if (musicList.length < LIMIT) {
+                break
             }
         }
         console.log('createAlbumFromLibrary finish', (Date.now() - start)/1000 + ' sec.', count, 'songs')

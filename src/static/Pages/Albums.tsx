@@ -3,6 +3,7 @@ import * as style from './styles/Albums.module.less'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { albumState, albumScrollState, albumPageState } from '../model/album'
+import { globalData } from '../model/global'
 import { getAlbums, searchAlbum } from '../API'
 import { Album as IAlbum } from '../../types/Album'
 import { useLoadmore } from '../hooks/useLoadmore'
@@ -57,6 +58,7 @@ const Albums = () => {
   const memScrollTop = useRecoilValue(albumScrollState)
   const setAlbumScroll = useSetRecoilState(albumScrollState)
   const { searchText } = useRecoilValue(albumPageState)
+  const { isWideScreen } = useRecoilValue(globalData)
   const setAlbumPageState = useSetRecoilState(albumPageState)
 
   const fetchData = useCallback((pageNum: number) => {
@@ -93,7 +95,7 @@ const Albums = () => {
       loadNextPage((curPage || 0) + 1, { deps: [searchText] })
     }
   }
-  const BASE_WIDTH = 116
+  const BASE_WIDTH = isWideScreen ? 160 : 116
   const MIN_COLUMN = 3
   const { columnWidth, isDomReady } = useCalColumn({
     baseWidth: BASE_WIDTH,

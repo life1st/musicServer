@@ -65,7 +65,7 @@ export const getImgThemeColors = (imgNode) => {
   const calcRange = (c1, c2) => Math.abs(c1 - c2) < rgbRange
   pixels.forEach((p) => {
       const [r, g, b, o] = p
-      if ([r, g, b].every(c => c > 225 || c < 35)) {
+      if ([r, g, b].every(c => c > 240 || c < 15)) {
           return // filter edge color.
       }
       if (reducedPixels.length === 0 || 

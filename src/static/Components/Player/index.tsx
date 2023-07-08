@@ -150,7 +150,7 @@ const Player = (props: IPlayer) => {
     const [ playMode, setPlayMode ] = useState<PLAY_MODE>(PLAY_MODE.inOrder)
 
     useEffect(() => {
-        if (matchPlaying) {
+        if (matchPlayingRoute) {
             const musicId = searchParams.get('id')
             if (!music && !musicId) {
                 naviTo(ROUTES.LIBRARY)
@@ -169,7 +169,7 @@ const Player = (props: IPlayer) => {
                 })
             }
         }
-    }, [matchPlaying])
+    }, [matchPlayingRoute])
 
     const audioRef = useRef<HTMLAudioElement>(null)
     useEffect(() => {

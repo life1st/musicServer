@@ -9,13 +9,24 @@ import { albumPageState } from '../model/album'
 import { ROUTES } from '../consts'
 import Navibar from '../Components/Navibar'
 import { artistState } from '../model/artistEditor'
-const { useState, useEffect } = React
+import { useCalColumn } from '../hooks/useCalColumn'
+
+const { useState, useEffect, useRef } = React
 
 const Artists = (props) => {
   const naviTo = useNavigate()
   const setAlbumPageState = useSetRecoilState(albumPageState)
   const setArtistState = useSetRecoilState(artistState)
   const [ artists, setArtists ] = useState([])
+  
+  const containerRef = useRef()
+  const BASE_WIDTH = 140
+  const MIN_COLUMN = 3
+  const { columnWidth, isDomReady } = useCalColumn({
+    baseWidth: BASE_WIDTH,
+    minColumn: MIN_COLUMN,
+    containerRef
+  })
   const fetchArtists = () => {
     axios.get('/api/artists').then(resp => {
       if (resp.status === 200) {
@@ -60,15 +71,21 @@ const Artists = (props) => {
       <Navibar rightNode={(
         <p className={style.scanBtn} onClick={handleScan}>scan</p>
       )} />
-      <Scroller className={style.artistsList}>
-        { artists.map(({name, cover}) => (
+      <Scroller className={style.artistsList} ref={containerRef}>
+        { isDomReady ? artists.map(({name, cover}) => (
           <li
+            style={{ width: columnWidth }}
             className={style.artistItem} 
             onClick={() => handleSearchArtist(name)}
             title={name}
             key={name}
           >
-            <div className={style.coverContainer}>
+            <div className={style.coverContainer}
+              style={{
+                width: columnWidth,
+                height: columnWidth,
+              }}
+            >
               <Cover
                 defaultSrc={require('../imgs/ic-artist-default.svg')}
                 src={`/file/artist_cover/${cover}`}
@@ -90,7 +107,7 @@ const Artists = (props) => {
             </div>
             <p className={style.artistName}>{name}</p>
           </li>
-        )) }
+        )) : null }
       </Scroller>
     </>
   )

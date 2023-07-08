@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const useCalColumn = ({
   baseWidth,
@@ -9,8 +9,8 @@ export const useCalColumn = ({
   minColumn?: number;
   containerRef: React.RefObject<HTMLElement | undefined>;
 }) => {
-  let width = useRef(baseWidth)
-  let [ domReady, setDomReady ] = useState(!!containerRef.current)
+  const [ domReady, setDomReady ] = useState(!!containerRef.current)
+  const [ width, setWidth ] = useState(baseWidth)
   useEffect(() => {
     const isReady = !!containerRef.current
     setDomReady(isReady)
@@ -18,9 +18,8 @@ export const useCalColumn = ({
       let containerWidth = containerRef.current.clientWidth - 10
       const columns = Math.max(Math.floor(containerWidth / baseWidth), minColumn)
       
-      width.current = Math.floor(containerWidth / columns)
+      setWidth(Math.floor(containerWidth / columns))
     }
-  }, [containerRef])
-  
-  return { columnWidth: width.current, isDomReady: domReady }
+  }, [containerRef, baseWidth])
+  return { columnWidth: width, isDomReady: domReady }
 }

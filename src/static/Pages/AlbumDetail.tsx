@@ -72,7 +72,11 @@ const AlbumDetail = (props) => {
   const hideTitleInNavi = titleInView === undefined || titleInView || !hasCurData
   return (
     <div className={style.container}>
-      <Navibar onBack={handleBack} title={hideTitleInNavi ? null : albumDetail?.name} />
+      <Navibar 
+        onBack={handleBack} 
+        className={hideTitleInNavi ? null : style.navShadow} 
+        title={hideTitleInNavi ? null : albumDetail?.name} 
+      />
       {
         hasCurData ? (
           <Fragment>
