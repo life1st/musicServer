@@ -40,3 +40,27 @@
 ::-webkit-scrollbar-thumb:window-inactive {
     background: rgba(0,0,0, .05);
 }
+
+.page-full-player {
+    width: 100%;
+}
+@media screen and (min-width: 900px) {
+    .root {
+        display: flex;
+        flex-direction: row;
+        max-width: 100%;
+    }
+    .pages-content-container {
+        flex-basis: 60%;
+    }
+    .pages-full-nav {
+        box-shadow: 0 -1px 10px #ccc;
+    }
+    .page-full-player {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        flex: 1 0 40%;
+        box-shadow: -1px 0 5px #ccc;
+    }
+}

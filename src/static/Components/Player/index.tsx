@@ -6,7 +6,8 @@ import { useMemoizedFn } from 'ahooks'
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil'
 import { CSSTransition } from 'react-transition-group'
 import { ROUTES } from '../../consts'
-import { musicState, playingState, musicThemeState } from '../../model/playing'
+import { musicState, playingState } from '../../model/playing'
+import { globalData } from '../../model/global'
 import { PLAY_CONTROL } from '../../consts'
 import { RESP_STATE } from '../../../shareCommon/consts'
 import { Music } from '../../../types/Music'
@@ -40,12 +41,12 @@ interface IPlayer {
 
 const Player = (props: IPlayer) => {
     const [ searchParams, setSearchParams ] = useSearchParams()
-    const matchPlaying = useMatch(ROUTES.PLAYING)
+    const matchPlayingRoute = useMatch(ROUTES.PLAYING)
     const naviTo = useNavigate()
 
     const { music } = useRecoilValue(musicState)
     const { curIndex, list } = useRecoilValue(playingState)
-    const [ { themeColors }, setMusicTheme ] = useRecoilState(musicThemeState)
+    const [ { themeColors, isWideScreen }, setGlobalData ] = useRecoilState(globalData)
     const setPlaying = useSetRecoilState(playingState)
     const [ isPlaying, setIsPlaying ] = useState(false)
     const [ time, setTime ] = useState(0)
@@ -60,6 +61,7 @@ const Player = (props: IPlayer) => {
         }
         return null
     }, [themeColors])
+    const matchPlaying = matchPlayingRoute || isWideScreen
     
     const naviToFullplayer = useMemoizedFn(() => {
         if (music) {
@@ -211,7 +213,10 @@ const Player = (props: IPlayer) => {
     const handleCoverUpdate = (imgNode) => {
         if (imgNode) {
             const colors = getImgThemeColors(imgNode)
-            setMusicTheme({themeColors: colors.map(c => Array.from(c))})
+            setGlobalData(_state => ({
+                ..._state,
+                themeColors: colors.map(c => Array.from(c))
+            }))
         }
     }
 
@@ -337,7 +342,7 @@ const Player = (props: IPlayer) => {
                         className={style.AudioWave}
                         fillColor={waveFillColor}
                     />
-                    <Svg src={require('../../imgs/arrow-down.svg')} className={style.icCloseFullPlayer} onClick={naviBack} />
+                    { isWideScreen && !matchPlayingRoute ? null : <Svg src={require('../../imgs/arrow-down.svg')} className={style.icCloseFullPlayer} onClick={naviBack} /> }
                     <div className={style.coverContainer}>
                         <Cover
                             onUpdate={handleCoverUpdate}

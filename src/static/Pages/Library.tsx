@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSetRecoilState, useRecoilValue } from 'recoil'
 import { libraryState, libraryScrollState } from '../model/library'
 import { playingState } from '../model/playing'
+import { globalData } from '../model/global'
 import { useLoadmore } from '../hooks/useLoadmore'
 import { getLibrary, scanLibrary } from '../API'
 import Songlist from '../Components/Songlist'
@@ -14,6 +15,7 @@ const { Fragment } = React
 const Library = (props) => {
   const setPlaying = useSetRecoilState(playingState)
   const memScrollTop = useRecoilValue(libraryScrollState)
+  const { isWideScreen } = useRecoilValue(globalData)
   const setLibraryScroll = useSetRecoilState(libraryScrollState)
   const setLibraryState = useSetRecoilState(libraryState)
 
@@ -29,7 +31,9 @@ const Library = (props) => {
         list,
         curIndex: i,
       }))
-      navi(ROUTES.PLAYING)
+      if (!isWideScreen) {
+        navi(ROUTES.PLAYING)
+      }
   }
   const handleLoadMore = () => {
     if (hasMore && !loading) {
